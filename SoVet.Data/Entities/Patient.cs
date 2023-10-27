@@ -1,4 +1,6 @@
-﻿namespace SoVet.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SoVet.Data.Entities;
 
 /// <summary>
 /// Сущность Пациент
@@ -12,6 +14,7 @@ public sealed class Patient
     public string? Comment { get; set; }
 
     public int ClientId { get; set; }
+    [ForeignKey(nameof(ClientId))]
     public Client Owner { get; set; } = null!;
     public ICollection<Vaccination> Vaccinations = new List<Vaccination>();
 }

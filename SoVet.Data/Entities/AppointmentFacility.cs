@@ -1,4 +1,6 @@
-﻿namespace SoVet.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SoVet.Data.Entities;
 
 /// <summary>
 /// Сущность Услуги приема
@@ -11,8 +13,10 @@ public sealed class AppointmentFacility
     public decimal Sum { get; set; }
 
     public int AppointmentId { get; set; }
+    [ForeignKey(nameof(AppointmentId))]
     public Appointment Appointment { get; set; } = null!;
 
     public int FacilityId { get; set; }
+    [ForeignKey(nameof(FacilityId))]
     public Facility Facility { get; set; } = null!;
 }

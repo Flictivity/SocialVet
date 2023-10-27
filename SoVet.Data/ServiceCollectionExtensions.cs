@@ -12,11 +12,15 @@ public static class ServiceCollectionExtensions
 
         if (connectionString is null)
             throw new Exception("No database connection string");
-        
+
         services.AddDbContext<ApplicationContext>(options =>
         {
             options.UseNpgsql(connectionString,
-                npgsqlOptions => { npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery); });
+                    npgsqlOptions =>
+                    {
+                        npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                    })
+                .UseSnakeCaseNamingConvention();
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
 

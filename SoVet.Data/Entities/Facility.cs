@@ -1,4 +1,6 @@
-﻿namespace SoVet.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SoVet.Data.Entities;
 
 /// <summary>
 /// Сущность услуга
@@ -10,9 +12,11 @@ public sealed class Facility
     public decimal Cost { get; set; }
 
     public int FacilityCategoryId { get; set; }
+    [ForeignKey(nameof(FacilityCategoryId))]
     public FacilityCategory FacilityCategory { get; set; } = null!;
 
     public int ValueAddedTaxId { get; set; }
+    [ForeignKey(nameof(ValueAddedTaxId))]
     public ValueAddedTax ValueAddedTax { get; set; } = null!;
 
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();

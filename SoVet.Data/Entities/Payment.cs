@@ -1,4 +1,6 @@
-﻿namespace SoVet.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SoVet.Data.Entities;
 
 /// <summary>
 /// Сущность Платеж
@@ -11,5 +13,6 @@ public sealed class Payment
     public int PaymentType { get; set; }
 
     public int AppointmentId { get; set; }
+    [ForeignKey(nameof(AppointmentId))]
     public Appointment Appointment { get; set; } = null!;
 }

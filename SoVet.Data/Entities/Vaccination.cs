@@ -1,4 +1,6 @@
-﻿namespace SoVet.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SoVet.Data.Entities;
 
 /// <summary>
 /// Сущьность Вакцинация
@@ -16,5 +18,6 @@ public sealed class Vaccination
     public int ExpirationTime { get; set; }
 
     public int PatientId { get; set; }
+    [ForeignKey(nameof(PatientId))]
     public Patient Patient { get; set; } = null!;
 }

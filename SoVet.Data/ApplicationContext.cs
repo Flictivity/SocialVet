@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using SoVet.Data.Entities;
 
 namespace SoVet.Data;
@@ -39,11 +40,18 @@ public class ApplicationContext : DbContext
     public DbSet<RegistrationType> RegistrationTypes { get; set; } = null!;
     
     public DbSet<Vaccination> Vaccinations { get; set; } = null!;
-    
-    public DbSet<ValueAddedTax> ValueAddedTaxes { get; set; } = null!;
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public DbSet<ValueAddedTax> ValueAddedTaxes { get; set; } = null!;
+}
+
+public sealed class MigrationApplicationContext : IDesignTimeDbContextFactory<ApplicationContext>
+{
+    public ApplicationContext CreateDbContext(string[] args)
     {
-        base.OnModelCreating(modelBuilder);
+        var options = new DbContextOptionsBuilder<ApplicationContext>()
+            .UseNpgsql("test")
+            .UseSnakeCaseNamingConvention()
+            .Options;
+        return new ApplicationContext(options);
     }
 }

@@ -1,8 +1,11 @@
-﻿namespace SoVet.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SoVet.Data.Entities;
 
 /// <summary>
 /// Сущность Прием
 /// </summary>
+/// 
 public sealed class Appointment
 {
     public int Id { get; set; }
@@ -15,9 +18,11 @@ public sealed class Appointment
     public Employee Employee { get; set; } = null!;
 
     public int PatientId { get; set; }
+    [ForeignKey(nameof(PatientId))]
     public Patient Patient { get; set; } = null!;
 
     public int RecommendationId { get; set; }
+    [ForeignKey(nameof(RecommendationId))]
     public Recommendation Recommendation { get; set; } = null!;
 
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();
