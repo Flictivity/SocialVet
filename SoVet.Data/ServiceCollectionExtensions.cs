@@ -1,6 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using LanguageExt.Common;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SoVet.Data.PipelineBehaviors;
+using SoVet.Data.Repositories;
+using SoVet.Data.Repositories.Impl;
+using SoVet.Domain.Commands.Client;
 
 namespace SoVet.Data;
 
@@ -23,6 +30,16 @@ public static class ServiceCollectionExtensions
                 .UseSnakeCaseNamingConvention();
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
+        
+        services.AddMediatR(options =>
+        {
+            options.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            options
+                .AddBehavior<IPipelineBehavior<AddClientCommand, Result<Domain.Models.Client>>,
+                    TransactPipelineBehavior<AddClientCommand, Domain.Models.Client>>();
+        });
+
+        services.AddScoped<IClientRepository, ClientRepository>();
 
         return services;
     }
