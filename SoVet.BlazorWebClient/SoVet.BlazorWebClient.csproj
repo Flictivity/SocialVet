@@ -7,8 +7,23 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.12"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.12" PrivateAssets="all"/>
+    </ItemGroup>
+
+
+
+    <ItemGroup>
+      <Folder Include="OutputModels\" />
+    </ItemGroup>
+
+
+
+    <ItemGroup>
+      <Content Update="wwwroot\appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

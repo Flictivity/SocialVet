@@ -41,9 +41,8 @@ public class AuthorizationController : ControllerBase
         var clientId = commandResult.Match(x => x.Id, _ => 0);
         var response = new AuthorizationResponse
         {
-            Id = clientId,
-            Email = credentials.Email,
-            Token = await _sender.Send(new GenerateTokenCommand(credentials.Email, clientId))
+            Token = await _sender.Send(new GenerateTokenCommand(credentials.Email, clientId)), 
+            IsSuccess = true
         }; 
         
         return Ok(response);

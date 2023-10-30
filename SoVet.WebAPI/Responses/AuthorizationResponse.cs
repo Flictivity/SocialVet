@@ -2,9 +2,7 @@
 
 namespace SoVet.WebAPI.Responses;
 
-public sealed class AuthorizationResponse
+public sealed class AuthorizationResponse : BaseResponse
 {
-    public int Id { get; set; }
-    public string Email { get; set; } = null!;
     public string? Token { get; set; }
 }
