@@ -1,11 +1,10 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SoVet.Domain.Commands.Client;
 using SoVet.Domain.Commands.Token;
 using SoVet.Domain.Models;
-using SoVet.WebAPI.Credentials.Authorization;
-using SoVet.WebAPI.Responses;
+using SoVet.Domain.Requests.Authorization;
+using SoVet.Domain.Responses.Authorization;
 
 namespace SoVet.WebAPI.Controllers;
 

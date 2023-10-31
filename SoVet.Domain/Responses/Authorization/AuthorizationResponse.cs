@@ -1,8 +1,8 @@
 ﻿using SoVet.Domain.Models;
 
-namespace SoVet.WebAPI.Responses;
+namespace SoVet.Domain.Responses.Authorization;
 
 public sealed class AuthorizationResponse : BaseResponse
 {
-    public string? Token { get; set; }
+    public TokenDTO? Token { get; set; }
 }

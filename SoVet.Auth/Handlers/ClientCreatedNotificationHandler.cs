@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using SoVet.Auth.Models;
+using SoVet.Domain.ErrorMessages;
 using SoVet.Domain.Exceptions;
 using SoVet.Domain.Notifications;
 
@@ -25,7 +26,7 @@ internal sealed class ClientCreatedNotificationHandler : INotificationHandler<Cl
         {
             if (await _userManager.FindByEmailAsync(notification.Email) is not null)
             {
-                throw new UserCreationException("User with this email already exists");
+                throw new UserCreationException(UserErrorMessages.UserExists);
             }
 
             var user = new ClinicUser { Email = notification.Email, UserName = notification.Email };

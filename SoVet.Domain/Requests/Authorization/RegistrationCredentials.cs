@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace SoVet.WebAPI.Credentials.Authorization;
+﻿namespace SoVet.Domain.Requests.Authorization;
 
 public sealed class RegistrationCredentials
 {

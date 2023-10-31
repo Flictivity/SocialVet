@@ -1,6 +1,4 @@
-﻿using LanguageExt.Pipes;
-
-namespace SoVet.Data.Repositories;
+﻿namespace SoVet.Data.Repositories;
 
 public interface IClientRepository
 {

@@ -4,12 +4,13 @@ using System.Text;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
 using SoVet.Domain.Commands.Token;
+using SoVet.Domain.Models;
 using SoVet.Domain.Services;
 using SoVet.Domain.Settings;
 
 namespace SoVet.Domain.Handlers;
 
-public sealed class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenCommand, string>
+public sealed class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenCommand, TokenDTO>
 {
     private readonly JwtSettings _jwtSettings;
     private readonly TokenValidationParameters _tokenValidationParameters;
@@ -22,7 +23,7 @@ public sealed class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenC
         _encryptionService = encryptionService;
     }
     
-    public Task<string> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
+    public Task<TokenDTO> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
@@ -42,6 +43,6 @@ public sealed class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenC
 
         var accessToken = tokenHandler.CreateToken(tokenDescriptor);
 
-        return Task.FromResult(tokenHandler.WriteToken(accessToken));
+        return Task.FromResult(new TokenDTO{Token = tokenHandler.WriteToken(accessToken), Expiration = tokenDescriptor.Expires});
     }
 }

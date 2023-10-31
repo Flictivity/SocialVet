@@ -26,4 +26,8 @@
       <ProjectReference Include="..\SoVet.Domain\SoVet.Domain.csproj" />
     </ItemGroup>
 
+
+
+
+
 </Project>
