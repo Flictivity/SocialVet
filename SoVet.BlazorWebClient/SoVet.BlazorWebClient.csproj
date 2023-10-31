@@ -15,15 +15,12 @@
 
 
     <ItemGroup>
-      <Folder Include="OutputModels\" />
-    </ItemGroup>
-
-
-
-    <ItemGroup>
       <Content Update="wwwroot\appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
+
+
+
 
 </Project>

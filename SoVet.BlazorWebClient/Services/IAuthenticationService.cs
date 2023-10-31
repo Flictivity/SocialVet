@@ -5,5 +5,5 @@ namespace SoVet.BlazorWebClient.Services;
 
 public interface IAuthenticationService
 {
-    public Task<UserRegistrationResult> Register(UserRegistration userRegistration);
+    public Task<BaseResult> Register(UserRegistration userRegistration);
 }

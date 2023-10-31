@@ -1,6 +1,7 @@
 ﻿namespace SoVet.BlazorWebClient.Results;
 
-public abstract class BaseResult
+public sealed class BaseResult
 {
     public bool IsSuccess { get; set; }
+    public string? Message { get; set; }
 }

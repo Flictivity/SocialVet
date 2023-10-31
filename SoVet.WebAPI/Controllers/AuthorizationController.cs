@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using SoVet.Domain.Commands.Client;
 using SoVet.Domain.Commands.Token;
+using SoVet.Domain.Commands.User;
+using SoVet.Domain.ErrorMessages;
 using SoVet.Domain.Models;
 using SoVet.Domain.Requests.Authorization;
+using SoVet.Domain.Responses;
 using SoVet.Domain.Responses.Authorization;
 
 namespace SoVet.WebAPI.Controllers;
@@ -35,15 +38,19 @@ public class AuthorizationController : ControllerBase
         var commandResult = await _sender.Send(addClientCommand);
         
         if (!commandResult.IsSuccess)
-            return BadRequest("Ошибка при регистрации клиента");
-
-        var clientId = commandResult.Match(x => x.Id, _ => 0);
-        var response = new AuthorizationResponse
-        {
-            Token = await _sender.Send(new GenerateTokenCommand(credentials.Email, clientId)), 
-            IsSuccess = true
-        }; 
+            return BadRequest(new BaseResponse{ IsSuccess = false, Message = ClientErrorMessages.ClientRegistrationError});
         
-        return Ok(response);
+        return Ok(new BaseResponse{IsSuccess = true});
+    }
+    
+    [HttpPost]
+    [Route("login")]
+    public async Task<IActionResult> Login([FromBody] LoginCredentials credentials)
+    {
+        var loginCommand = new LoginUserCommand(credentials.Email, credentials.Password);
+        var commandResult = await _sender.Send(loginCommand);
+        if (!commandResult.IsSuccess)
+            return BadRequest(commandResult);
+        return Ok(commandResult);
     }
 }

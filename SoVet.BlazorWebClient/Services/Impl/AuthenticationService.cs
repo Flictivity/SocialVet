@@ -17,32 +17,20 @@ public sealed class AuthenticationService : IAuthenticationService
         _tokenService = tokenService;
     }
 
-    public async Task<UserRegistrationResult> Register(UserRegistration userRegistration)
+    public async Task<BaseResult> Register(UserRegistration userRegistration)
     {
         try
         {
             var response = await _httpClient.PostAsJsonAsync("register", userRegistration);
-            var result = await response.Content.ReadFromJsonAsync<UserRegistrationResult>();
-            if (result is null)
-            {
-                return new UserRegistrationResult { IsSuccess = false };
-            }
-            if (result.Token is null)
-            {
-                return new UserRegistrationResult { IsSuccess = false };
-            }
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
 
-            await _tokenService.SetToken(result.Token);
-            return result;
+            return result ?? new BaseResult{IsSuccess = false, Message = "Ошибка при регистрации клиента"};
         }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
 
-            return new UserRegistrationResult
-            {
-                IsSuccess = false
-            };
+            return new BaseResult { IsSuccess = false, Message = "Ошибка при регистрации клиента" };
         }
     }
 }
