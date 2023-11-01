@@ -47,7 +47,7 @@ public sealed class AuthenticationService : IAuthenticationService
                 return new AuthorizationResult { IsSuccess = false, Message = "Ошибка при авторизации клиента" };
             
             if (result.Token is null)
-                return new AuthorizationResult { IsSuccess = false, Message = "Ошибка при авторизации клиента" };
+                return new AuthorizationResult { IsSuccess = false, Message = result.Message };
 
             await _tokenService.SetToken(result.Token);
             
