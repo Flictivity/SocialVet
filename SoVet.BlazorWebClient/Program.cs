@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor.Services;
 using SoVet.BlazorWebClient;
 using SoVet.BlazorWebClient.Services;
 using SoVet.BlazorWebClient.Services.Impl;
@@ -14,6 +15,7 @@ var connectionString = builder.Configuration.GetConnectionString("ApiConnection"
 if (connectionString is null)
     throw new InvalidOperationException("APIBaseAddress missing from appsettings file.");
 
+builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
