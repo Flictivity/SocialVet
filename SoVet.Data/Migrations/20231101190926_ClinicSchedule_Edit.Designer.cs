@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SoVet.Data;
@@ -11,9 +12,11 @@ using SoVet.Data;
 namespace SoVet.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20231101190926_ClinicSchedule_Edit")]
+    partial class ClinicSchedule_Edit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,7 +180,7 @@ namespace SoVet.Data.Migrations
                     b.ToTable("clients", (string)null);
                 });
 
-            modelBuilder.Entity("SoVet.Data.Entities.Clinic", b =>
+            modelBuilder.Entity("SoVet.Data.Entities.ClinicSchedule", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -186,14 +189,13 @@ namespace SoVet.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ClinicName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("clinic_name");
-
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("interval")
                         .HasColumnName("end_time");
+
+                    b.Property<bool>("IsActual")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_actual");
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("interval")

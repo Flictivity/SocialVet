@@ -40,6 +40,7 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<IClinicRepository, ClinicRepository>();
 
         return services;
     }

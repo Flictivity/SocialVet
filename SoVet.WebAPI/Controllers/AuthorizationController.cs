@@ -1,18 +1,16 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SoVet.Domain.Commands.Client;
-using SoVet.Domain.Commands.Token;
 using SoVet.Domain.Commands.User;
 using SoVet.Domain.ErrorMessages;
 using SoVet.Domain.Models;
 using SoVet.Domain.Requests.Authorization;
 using SoVet.Domain.Responses;
-using SoVet.Domain.Responses.Authorization;
 
 namespace SoVet.WebAPI.Controllers;
 
 [ApiController]
-[Microsoft.AspNetCore.Components.Route("/api/[controller]")]
+[Route("/api/[controller]")]
 public class AuthorizationController : ControllerBase 
 {
     private readonly ILogger<AuthorizationController> _logger;

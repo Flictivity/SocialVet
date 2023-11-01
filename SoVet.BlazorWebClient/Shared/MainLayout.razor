@@ -16,7 +16,7 @@
         <AuthorizeView>
             <Authorized>
                 <MudStack Row="true" Class="d-flex align-center">
-                    <MudText>Hello, @context.User.Identity.Name</MudText>
+                    <MudText>Hello, @context.User.Identity?.Name</MudText>
                     <MudTooltip Text="Выход">
                         <MudIconButton Color="Color.Secondary" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Logout" OnClick="@(async () => await LogOut())"/>
                     </MudTooltip>

@@ -1,0 +1,37 @@
+﻿@page "/clinic"
+@using SoVet.BlazorWebClient.Models
+@using SoVet.BlazorWebClient.Services
+
+@inject IClinicService ClinicService;
+@inject ISnackbar Snackbar;
+
+@* @attribute [Authorize(Roles = "Администратор")] *@
+<PageTitle>Информация о клинике</PageTitle>
+
+<MudStack>
+    <MudTextField T="string" Label="Наименование клиники" @bind-Value="_model.ClinicName"></MudTextField>
+    <MudText>Рабочее время клиники</MudText>
+    <div class="d-flex align-items-center">
+        <MudTimePicker @bind-Time="_model.StartTime" Variant="Variant.Outlined" Label="Время открытия" Editable="true"></MudTimePicker>
+        <MudTimePicker @bind-Time="_model.EndTime" Variant="Variant.Outlined" Label="Время закрытия" Editable="true"></MudTimePicker>
+    </div>
+</MudStack>
+
+@code {
+    private Clinic _model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ClinicService.GetClinicInfoAsync();
+
+        if (result is null)
+        {
+            Snackbar.Add("Информация о клинике не найдена",Severity.Error);
+            return;
+        }
+        
+        _model = result;
+        await base.OnInitializedAsync();
+    }
+
+}

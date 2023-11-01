@@ -23,7 +23,7 @@ public sealed class AuthenticationService : IAuthenticationService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("register", userRegistration);
+            var response = await _httpClient.PostAsJsonAsync("Authorization/register/", userRegistration);
             var result = await response.Content.ReadFromJsonAsync<BaseResult>();
             
             return result ?? new BaseResult { IsSuccess = false, Message = "Ошибка при регистрации клиента" };
@@ -56,7 +56,7 @@ public sealed class AuthenticationService : IAuthenticationService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("login", userLogin);
+            var response = await _httpClient.PostAsJsonAsync("Authorization/login", userLogin);
             var result = await response.Content.ReadFromJsonAsync<AuthorizationResult>();
 
             if (result is null)

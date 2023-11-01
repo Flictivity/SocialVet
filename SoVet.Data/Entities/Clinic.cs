@@ -1,12 +1,12 @@
 ﻿namespace SoVet.Data.Entities;
 
 /// <summary>
-/// Сущность Расписание клиники
+/// Сущность Клиники
 /// </summary>
-public sealed class ClinicSchedule
+public sealed class Clinic
 {
     public int Id { get; set; }
-    public DayOfWeek DayOfWeek { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
+    public string ClinicName { get; set; } = "SoVet";
 }

@@ -1,5 +1,4 @@
-﻿using LanguageExt;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using SoVet.Auth.Models;
 using SoVet.Domain.Commands.Token;

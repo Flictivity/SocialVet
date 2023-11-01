@@ -19,7 +19,7 @@ public class ApplicationContext : DbContext
     
     public DbSet<Client> Clients { get; set; } = null!;
     
-    public DbSet<ClinicSchedule> ClinicSchedules { get; set; } = null!;
+    public DbSet<Clinic> ClinicSchedules { get; set; } = null!;
     
     public DbSet<Diagnosis> Diagnoses { get; set; } = null!;
     
@@ -49,7 +49,7 @@ public sealed class MigrationApplicationContext : IDesignTimeDbContextFactory<Ap
     public ApplicationContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<ApplicationContext>()
-            .UseNpgsql("test")
+            .UseNpgsql("Host=localhost;Port=7432;Database=social_vet;Username=postgres;Password=postgreS12;")
             .UseSnakeCaseNamingConvention()
             .Options;
         return new ApplicationContext(options);

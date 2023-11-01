@@ -6,6 +6,6 @@ namespace SoVet.WebAPI.Controllers;
 [Authorize]
 [ApiController]
 [Route("/api/[controller]")]
-public sealed class AuthorizedControllerBase : ControllerBase
+public class AuthorizedControllerBase : ControllerBase
 {
 }
