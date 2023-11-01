@@ -16,8 +16,8 @@
 
     private async Task IncrementCount()
     {
-        var res = await AuthenticationService.Register(new UserRegistration
-        { Email = "test2@tes.ru", Password = "12345", ConfirmPassword = "12345", Name = "11111", Address = "22222" });
+        var res = await AuthenticationService.Login(new UserLogin()
+        { Email = "riazonbin@gmail.com", Password = "12345"});
 
         if (res.IsSuccess)
         {

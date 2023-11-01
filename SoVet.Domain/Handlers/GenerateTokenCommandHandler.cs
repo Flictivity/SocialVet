@@ -16,33 +16,37 @@ public sealed class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenC
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IEncryptionService _encryptionService;
 
-    public GenerateTokenCommandHandler(JwtSettings jwtSettings, TokenValidationParameters tokenValidationParameters, IEncryptionService encryptionService)
+    public GenerateTokenCommandHandler(JwtSettings jwtSettings, TokenValidationParameters tokenValidationParameters,
+        IEncryptionService encryptionService)
     {
         _jwtSettings = jwtSettings;
         _tokenValidationParameters = tokenValidationParameters;
         _encryptionService = encryptionService;
     }
-    
+
     public Task<TokenDTO> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
-        var tokenDescriptor = new SecurityTokenDescriptor
+        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Key));
+
+        var claims = new List<Claim>
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, request.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, request.Email),
-                new Claim("id", request.Id.ToString())
-            }),
-            Expires = DateTime.UtcNow.Add(_jwtSettings.AccessTokenLifetime),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            new(ClaimTypes.Name, request.Name),
+            new(ClaimTypes.Role, request.Role),
+            new(ClaimTypes.Email, request.Email),
+            new("id", request.Id.ToString())
         };
 
-        var accessToken = tokenHandler.CreateToken(tokenDescriptor);
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
-        return Task.FromResult(new TokenDTO{Token = tokenHandler.WriteToken(accessToken), Expiration = tokenDescriptor.Expires});
+        var token = new JwtSecurityToken(
+            claims: claims,
+            expires: DateTime.Now.Add(_jwtSettings.AccessTokenLifetime),
+            signingCredentials: credentials);
+
+        var accessToken = tokenHandler.WriteToken(token);
+
+        return Task.FromResult(new TokenDTO
+            { Token = accessToken, Expiration =  DateTime.Now.Add(_jwtSettings.AccessTokenLifetime)});
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using LanguageExt;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using SoVet.Auth.Models;
 using SoVet.Domain.Commands.Token;
@@ -34,10 +35,15 @@ public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, 
         if (!signInResult.Succeeded)
             return new AuthorizationResponse { IsSuccess = false, Message = UserErrorMessages.UserWrongPassword };
 
+        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+        
+        if(role is null || user.UserName is null)
+            return new AuthorizationResponse { IsSuccess = false, Message = UserErrorMessages.UserNotFound };
+        
         return new AuthorizationResponse
         {
             IsSuccess = true,
-            Token = await _sender.Send(new GenerateTokenCommand(request.Email, user.Id), cancellationToken)
+            Token = await _sender.Send(new GenerateTokenCommand(request.Email, user.Id, role, user.UserName), cancellationToken)
         };
     }
 }

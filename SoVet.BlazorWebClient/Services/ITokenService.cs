@@ -1,8 +1,10 @@
-﻿namespace SoVet.BlazorWebClient.Services;
+﻿using SoVet.BlazorWebClient.Models;
+
+namespace SoVet.BlazorWebClient.Services;
 
 public interface ITokenService
 {
-    Task<string> GetToken();
+    Task<TokenDTO?> GetToken();
     Task RemoveToken();
-    Task SetToken(string token);
+    Task SetToken(TokenDTO token);
 }

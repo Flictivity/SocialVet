@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SoVet.BlazorWebClient;
@@ -13,9 +14,14 @@ var connectionString = builder.Configuration.GetConnectionString("ApiConnection"
 if (connectionString is null)
     throw new InvalidOperationException("APIBaseAddress missing from appsettings file.");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(connectionString) });
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(connectionString) });
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+builder.Services.AddAuthorizationCore();
+
 
 await builder.Build().RunAsync();

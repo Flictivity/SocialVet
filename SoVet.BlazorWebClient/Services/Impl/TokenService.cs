@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using SoVet.BlazorWebClient.Models;
 
 namespace SoVet.BlazorWebClient.Services.Impl;
 
@@ -12,9 +13,9 @@ public sealed class TokenService : ITokenService
     }
 
     
-    public async Task<string> GetToken()
+    public async Task<TokenDTO?> GetToken()
     {
-        return await _localStorageService.GetItemAsync<string>("token");
+        return await _localStorageService.GetItemAsync<TokenDTO>("token");
     }
 
     public async Task RemoveToken()
@@ -22,7 +23,7 @@ public sealed class TokenService : ITokenService
         await _localStorageService.RemoveItemAsync("token");
     }
 
-    public async Task SetToken(string token)
+    public async Task SetToken(TokenDTO token)
     {
         await _localStorageService.SetItemAsync("token", token);
     }
