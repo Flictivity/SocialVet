@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using SoVet.BlazorWebClient.Services
+@inherits LayoutComponentBase
+
+@inject IAuthenticationService AuthenticationService;
+@inject NavigationManager NavigationManager;
 
 <MudThemeProvider Theme="_theme"/>
 <MudDialogProvider/>
@@ -11,10 +15,17 @@
         <MudSpacer/>
         <AuthorizeView>
             <Authorized>
-                <MudText>Hello, @context.User.Identity.Name</MudText>
+                <MudStack Row="true" Class="d-flex align-center">
+                    <MudText>Hello, @context.User.Identity.Name</MudText>
+                    <MudTooltip Text="Выход">
+                        <MudIconButton Color="Color.Secondary" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Logout" OnClick="@(async () => await LogOut())"/>
+                    </MudTooltip>
+                </MudStack>
             </Authorized>
             <NotAuthorized>
-                <MudButton Color="Color.Secondary">Войти</MudButton>
+                <MudTooltip Text="Войти">
+                    <MudIconButton Color="Color.Secondary" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Login" Href="/login">Войти</MudIconButton>
+                </MudTooltip>
             </NotAuthorized>
         </AuthorizeView>
     </MudAppBar>
@@ -30,7 +41,7 @@
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-3">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -60,4 +71,13 @@
             Divider = "#BDBDBD"
         }
     };
+
+    private async Task LogOut()
+    {
+        var result = await AuthenticationService.LogOut();
+        if (result.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
 }

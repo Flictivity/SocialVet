@@ -36,6 +36,22 @@ public sealed class AuthenticationService : IAuthenticationService
         }
     }
 
+    public async Task<BaseResult> LogOut()
+    {
+        try
+        {
+            await _tokenService.RemoveToken();
+            _myAuthenticationStateProvider.StateChanged();
+            return new BaseResult {IsSuccess = true};
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.Message);
+
+            return new AuthorizationResult { IsSuccess = false, Message = "Ошибка при выходе" };
+        }
+    }
+
     public async Task<AuthorizationResult> Login(UserLogin userLogin)
     {
         try
@@ -49,6 +65,7 @@ public sealed class AuthenticationService : IAuthenticationService
             if (result.Token is null)
                 return new AuthorizationResult { IsSuccess = false, Message = result.Message };
 
+            await _tokenService.RemoveToken();
             await _tokenService.SetToken(result.Token);
             
             _myAuthenticationStateProvider.StateChanged();
