@@ -1,6 +1,7 @@
 ﻿@page "/clinic"
 @using SoVet.BlazorWebClient.Models
 @using SoVet.BlazorWebClient.Services
+@using System.Xml.Linq
 
 @inject IClinicService ClinicService;
 @inject ISnackbar Snackbar;
@@ -8,18 +9,35 @@
 @* @attribute [Authorize(Roles = "Администратор")] *@
 <PageTitle>Информация о клинике</PageTitle>
 
+@if (!_isLoaded)
+{
+    <MudProgressLinear Color="Color.Primary"  Indeterminate="true" />
+    return;
+}
 <MudStack>
-    <MudTextField T="string" Label="Наименование клиники" @bind-Value="_model.ClinicName"></MudTextField>
-    <MudText>Рабочее время клиники</MudText>
-    <div class="d-flex align-items-center">
-        <MudTimePicker @bind-Time="_model.StartTime" Variant="Variant.Outlined" Label="Время открытия" Editable="true"></MudTimePicker>
-        <MudTimePicker @bind-Time="_model.EndTime" Variant="Variant.Outlined" Label="Время закрытия" Editable="true"></MudTimePicker>
-    </div>
+    <MudStack Row="true" Class="d-flex align-center">
+        <MudText Typo="Typo.h6">Информация о клинике</MudText>
+        <MudTooltip Text="Сохранить">
+            <MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Save" OnClick="@(async () => await Save())"/>
+        </MudTooltip>
+    </MudStack>
+    <MudTextField Variant="Variant.Outlined" T="string" Label="Наименование клиники" @bind-Value="_model.ClinicName"></MudTextField>
+    <MudText Typo="Typo.h6">Рабочее время</MudText>
+    <MudGrid Spacing="2" Justify="Justify.SpaceBetween">
+        <MudItem xs=12 sm=6>
+            <MudTimePicker @bind-Time="_model.StartTime" Variant="Variant.Outlined" Label="Время открытия" Editable="true"></MudTimePicker>
+        </MudItem>
+        <MudItem xs=12 sm=6>
+            <MudTimePicker @bind-Time="_model.EndTime" Variant="Variant.Outlined" Label="Время закрытия" Editable="true"></MudTimePicker>
+        </MudItem>
+    </MudGrid>
 </MudStack>
+
 
 @code {
     private Clinic _model = new();
-
+    private bool _isLoaded = false;
+    
     protected override async Task OnInitializedAsync()
     {
         var result = await ClinicService.GetClinicInfoAsync();
@@ -31,7 +49,18 @@
         }
         
         _model = result;
+        _isLoaded = true;
         await base.OnInitializedAsync();
     }
 
+    private async Task Save()
+    {
+        var result = await ClinicService.UpdateClinicAsync(_model);
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(result.Message,Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно",Severity.Success);
+    }
 }

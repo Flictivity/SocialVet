@@ -29,8 +29,17 @@ public sealed class ClinicService : IClinicService
         }
     }
 
-    public Task<BaseResult> UpdateClinicAsync(Clinic clinic)
+    public async Task<BaseResult> UpdateClinicAsync(Clinic clinic)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _httpClient.PutAsJsonAsync("clinic",clinic);
+            return new BaseResult{IsSuccess = true};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult{IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
     }
 }
