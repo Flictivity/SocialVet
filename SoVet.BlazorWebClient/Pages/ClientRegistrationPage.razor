@@ -1,0 +1,39 @@
+﻿@page "/registrate-to-appointment"
+@using SoVet.BlazorWebClient.Services
+@using SoVet.BlazorWebClient.Models.Registration
+
+@inject IRegistrationService RegistrationService;
+
+<PageTitle>Запись на прием</PageTitle>
+
+<MudSelect T="int">
+    <MudSelectItem T="int" Value="1">Ivanov</MudSelectItem>
+</MudSelect>
+
+<MudDatePicker Class="mt-5" @bind-Date="_date"></MudDatePicker>
+
+<MudGrid Class="mt-3">
+    @foreach (var time in _list)
+    {
+        <MudItem>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary">
+                @($"{time:hh\\:mm}")
+            </MudButton>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private DateTime? _date;
+    private int _employee = 1;
+
+    private List<TimeSpan>? _list = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _list = await RegistrationService.GetAvailableRegistrationTimes(new GetAvailableRegistrationsRequest
+        { EmployeeId = _employee, RegistrationDate = _date is null ? DateOnly.FromDateTime(DateTime.Now) : DateOnly.FromDateTime(_date.Value) });
+        await base.OnInitializedAsync();
+    }
+
+}

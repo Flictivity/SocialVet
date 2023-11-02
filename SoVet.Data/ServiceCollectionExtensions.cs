@@ -41,6 +41,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<IClinicRepository, ClinicRepository>();
+        services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 
         return services;
     }
