@@ -6,28 +6,44 @@
 
 <PageTitle>Запись на прием</PageTitle>
 
-<MudSelect T="int">
-    <MudSelectItem T="int" Value="1">Ivanov</MudSelectItem>
-</MudSelect>
+<MudGrid Class="d-flex align-center justify-center" Style="height:90vh;">
+    <MudItem xs="12" sm="6">
+        <MudImage Elevation="7" Src="images/close-up-on-veterinarian-taking-care-of-dog.jpg" Alt="Doc" Class="rounded-lg" Fluid="true"></MudImage>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudSelect T="int" Variant="Variant.Outlined" Label="Врач">
+            <MudSelectItem T="int" Value="1">Ivanov</MudSelectItem>
+        </MudSelect>
 
-<MudDatePicker Class="mt-5" @bind-Date="_date"></MudDatePicker>
-
-<MudGrid Class="mt-3">
-    @foreach (var time in _list)
-    {
-        <MudItem>
-            <MudButton Variant="Variant.Outlined" Color="Color.Primary">
-                @($"{time:hh\\:mm}")
-            </MudButton>
-        </MudItem>
-    }
+        <MudDatePicker Class="mt-5" @bind-Date="_date" Variant="Variant.Outlined" Label="Дата посещения"></MudDatePicker>
+        @if (_list is null)
+        {
+            <MudProgressLinear/>
+            return;
+        }
+        @if (_list.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Class="mt-3">На выбранное время нет свободных записей</MudAlert>
+            return;
+        }
+        <MudGrid Class="mt-3" Justify="Justify.FlexStart">
+            @foreach (var time in _list)
+            {
+                <MudItem>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary">
+                        @($"{time:hh\\:mm}")
+                    </MudButton>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudItem>
 </MudGrid>
 
 @code {
     private DateTime? _date;
     private int _employee = 1;
 
-    private List<TimeSpan>? _list = new ();
+    private List<TimeSpan>? _list = new();
 
     protected override async Task OnInitializedAsync()
     {
