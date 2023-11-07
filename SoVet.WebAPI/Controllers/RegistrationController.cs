@@ -1,7 +1,7 @@
-﻿using MediatR;
+﻿using System.Globalization;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SoVet.Domain.Queries.Registration;
-using SoVet.Domain.Requests.Registration;
 
 namespace SoVet.WebAPI.Controllers;
 
@@ -13,12 +13,18 @@ public sealed class RegistrationController : AuthorizedControllerBase
     {
         _sender = sender;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetAvailableRegistrationTimes([FromQuery(Name = "employeeId")] int employeeId,
-        [FromQuery(Name = "date")] DateOnly registrationDate)
+        [FromQuery(Name = "date")] string registrationDate)
     {
-        var command = new GetAvailableRegistrationTimesQuery(employeeId, registrationDate);
+        if (!DateOnly.TryParseExact(registrationDate, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None,
+                out var parsedDate))
+        {
+            return BadRequest();
+        }
+
+        var command = new GetAvailableRegistrationTimesQuery(employeeId, parsedDate);
         var commandResult = await _sender.Send(command);
         if (commandResult is null)
             return BadRequest();

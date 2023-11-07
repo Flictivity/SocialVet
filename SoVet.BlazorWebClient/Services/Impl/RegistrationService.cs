@@ -1,7 +1,4 @@
 ﻿using System.Net.Http.Json;
-using System.Net.Mime;
-using System.Text;
-using System.Web;
 using SoVet.BlazorWebClient.Models.Registration;
 
 namespace SoVet.BlazorWebClient.Services.Impl;
@@ -19,10 +16,16 @@ public sealed class RegistrationService : IRegistrationService
 
     public async Task<List<TimeSpan>?> GetAvailableRegistrationTimes(GetAvailableRegistrationsRequest request)
     {
-        var result =
-            await _httpClient.GetFromJsonAsync<List<TimeSpan>>(
-                $"registration?employeeId={request.EmployeeId}&date={request.RegistrationDate}");
-
-        return result;
+        try
+        {
+            var result =
+                await _httpClient.GetFromJsonAsync<List<TimeSpan>>(
+                    $"registration?employeeId={request.EmployeeId}&date={request.RegistrationDate.ToString("yyyy-MM-dd")}");
+            return result;
+        }
+        catch
+        {
+            return new List<TimeSpan>();
+        }
     }
 }

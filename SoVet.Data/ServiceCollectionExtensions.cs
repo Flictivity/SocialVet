@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Dapper;
 using LanguageExt.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<IClinicRepository, ClinicRepository>();
         services.AddScoped<IRegistrationRepository, RegistrationRepository>();
+        SqlMapper.AddTypeHandler(new DapperSqlDateOnlyTypeHandler());
 
         return services;
     }

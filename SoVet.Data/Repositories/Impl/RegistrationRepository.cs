@@ -18,7 +18,7 @@ public sealed class RegistrationRepository : IRegistrationRepository
         var connection = _context.Database.GetDbConnection();
         var result = (await connection
                 .QueryAsync<DateTime>(RegistrationRepositoryQueries.GetavailableTimes,
-                    new { date = registrationDate.ToDateTime(TimeOnly.Parse("00:00")), employeeId })
+                    new { dateReg = registrationDate, employeeId })
             ).Select(x => x.TimeOfDay).AsList();
 
         return result;
