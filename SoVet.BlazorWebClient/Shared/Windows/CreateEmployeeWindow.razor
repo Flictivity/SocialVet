@@ -9,11 +9,11 @@
         <MudForm @ref="_form" @bind-IsValid="_isValid" Model="_model">
             <MudGrid Spacing="3">
                 <MudItem xs="12">
-                    <MudTextField Required="true" Variant="Variant.Outlined" T="string" @bind-Value="_model.Name" Label="ФИО" FullWidth="true"/>
+                    <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => _model.Name)" T="string" @bind-Value="_model.Name" Label="ФИО" FullWidth="true"/>
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField Required="true" Variant="Variant.Outlined" InputType="InputType.Email" T="string"
-                                  @bind-Value="_model.Email" FullWidth="true" Label="Email"/>
+                                  @bind-Value="_model.Email" Immediate For="@(() => _model.Email)" FullWidth="true" Label="Email"/>
                 </MudItem>
                 <MudItem xs="12">
                     <MudSelect T="string" Required="true" Variant="Variant.Outlined" @bind-Value="_model.Role" Label="Роль" FullWidth="true">
@@ -35,7 +35,7 @@
 
     private MudForm _form = null!;
     private EmployeeRegistration _model = new();
-    private bool _isValid = true;
+    private bool _isValid;
 
     private async Task Create()
     {
@@ -48,4 +48,5 @@
         Snackbar.Add("Успешно", Severity.Success);
         MudDialog.Close(DialogResult.Ok(true));
     }
+
 }
