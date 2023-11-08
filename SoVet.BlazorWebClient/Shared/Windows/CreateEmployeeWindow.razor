@@ -1,0 +1,36 @@
+﻿@using SoVet.BlazorWebClient.Models.Employee
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid Spacing="3">
+            <MudItem xs="12">
+                <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="_model.Name" Label="ФИО" FullWidth="true"/>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField Variant="Variant.Outlined" InputType="InputType.Email" T="string"
+                              @bind-Value="_model.Name" FullWidth="true" Label="Email"/>
+            </MudItem>
+            <MudItem xs="12">
+                <MudSelect T="string" Variant="Variant.Outlined" @bind-Value="_model.Role" Label="Роль" FullWidth="true">
+                    <MudSelectItem T="string">Ветеринар</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Create())">Создать</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    private MudForm _form = null!;
+    private EmployeeRegistration _model = new();
+
+    private async Task Create()
+    {
+    }
+}

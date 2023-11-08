@@ -8,18 +8,18 @@ using SoVet.Domain.Notifications;
 
 namespace SoVet.Auth.Handlers;
 
-internal sealed class ClientCreatedNotificationHandler : INotificationHandler<ClientCreatedNotification>
+internal sealed class UserCreatedNotificationHandler : INotificationHandler<UserCreatedNotification>
 {
     private readonly UserManager<ClinicUser> _userManager;
     private readonly IdentityContext _context;
 
-    public ClientCreatedNotificationHandler(UserManager<ClinicUser> userManager, IdentityContext context)
+    public UserCreatedNotificationHandler(UserManager<ClinicUser> userManager, IdentityContext context)
     {
         _userManager = userManager;
         _context = context;
     }
 
-    public async Task Handle(ClientCreatedNotification notification, CancellationToken cancellationToken)
+    public async Task Handle(UserCreatedNotification notification, CancellationToken cancellationToken)
     {
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
@@ -37,8 +37,15 @@ internal sealed class ClientCreatedNotificationHandler : INotificationHandler<Cl
                 throw new UserCreationException($"Could not create a user: {string.Join("; ", res.Errors.Select(x => $"{x.Code} - {x.Description}"))}");
             }
 
-            await _userManager.AddToRoleAsync(user, Role.Client);
-            await _userManager.AddClaimAsync(user, new Claim(UserClaims.ClientId, notification.Client.Id.ToString()));
+            await _userManager.AddToRoleAsync(user, notification.Role ?? Role.Client);
+            if (notification.Client is null && notification.Employee is not null)
+            {
+                await _userManager.AddClaimAsync(user, new Claim(UserClaims.EmployeeId, notification.Employee.Id.ToString()));
+            }
+            else if (notification.Client is not null && notification.Employee is null)
+            {
+                await _userManager.AddClaimAsync(user, new Claim(UserClaims.ClientId, notification.Client.Id.ToString()));
+            }
             await _userManager.AddPasswordAsync(user, notification.Password);
             await transaction.CommitAsync(cancellationToken);
         }

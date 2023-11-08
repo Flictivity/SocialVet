@@ -20,7 +20,7 @@ public sealed class AddClientCommandHandler : IRequestHandler<AddClientCommand, 
     public async Task<Result<Domain.Models.Client>> Handle(AddClientCommand request, CancellationToken cancellationToken)
     {
         var teacher = await _repository.AddClientAsync(request.Client); 
-        var notification = new ClientCreatedNotification(teacher, request.Email, request.Password);
+        var notification = new UserCreatedNotification(Client:teacher,Employee:null, request.Email, request.Password,Role:null);
         await _publisher.Publish(notification, cancellationToken);
 
         return teacher;

@@ -1,0 +1,18 @@
+﻿@page "/employees"
+@using SoVet.BlazorWebClient.Shared.Windows
+
+@inject IDialogService DialogService;
+<PageTitle>Сотрудникик</PageTitle>
+<MudButton Variant="Variant.Filled" OnClick="OpenCreateWindow">Open</MudButton>
+@code {
+
+    private async Task OpenCreateWindow()
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        await DialogService.ShowAsync<CreateEmployeeWindow>("Новый сотрудник", options);
+    }
+}
