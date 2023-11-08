@@ -10,4 +10,6 @@ public sealed partial class DatabaseMapper
     public partial Client Map(Domain.Models.Client client) ;
     public partial Domain.Models.Clinic Map(Clinic clinic) ;
     public partial Clinic Map(Domain.Models.Clinic clinic) ;
+    public partial Employee Map(Domain.Models.Employee employee) ;
+    public partial Domain.Models.Employee Map(Employee employee) ;
 }

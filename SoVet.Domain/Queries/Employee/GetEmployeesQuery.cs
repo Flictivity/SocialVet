@@ -1,5 +1,6 @@
 ﻿using MediatR;
+using SoVet.Domain.Models;
 
 namespace SoVet.Domain.Queries.Employee;
 
-public sealed record GetEmployeesQuery(int[] EmployeeIds) : IRequest<List<Models.Employee>>;
+public sealed record GetEmployeesQuery(string RoleName, string ClaimType) : IRequest<List<Models.Employee>>;
