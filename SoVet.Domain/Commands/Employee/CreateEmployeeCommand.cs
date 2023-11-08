@@ -5,4 +5,4 @@ using SoVet.Domain.Responses;
 
 namespace SoVet.Domain.Commands.Employee;
 
-public sealed record CreateEmployeeCommand (Models.Employee Employee, string Email, string Role) : IRequest<Result<Models.Employee>>, ITransactRequest;
+public sealed record CreateEmployeeCommand (Models.Employee Employee, string Email, string Role) : IRequest<Result<EntityResponse<Models.Employee>>>, ITransactRequest;

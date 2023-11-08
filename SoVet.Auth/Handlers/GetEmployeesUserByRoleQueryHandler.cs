@@ -3,17 +3,16 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SoVet.Auth.Models;
 using SoVet.Auth.SqlQueries;
-using SoVet.Domain.Models;
 using SoVet.Domain.Queries.Employee;
 using SoVet.Domain.SqlQueries;
 
 namespace SoVet.Auth.Handlers;
 
-public sealed class GetEmployeesUserQueryHandler : IRequestHandler<GetEmployeesUserQuery, List<UserInfo>>
+public sealed class GetEmployeesUserByRoleQueryHandler : IRequestHandler<GetEmployeesUserByRoleQuery, List<int>>
 {
     private readonly IdentityContext _context;
 
-    public GetEmployeesUserQueryHandler(IdentityContext context)
+    public GetEmployeesUserByRoleQueryHandler(IdentityContext context)
     {
         _context = context;
     }
@@ -24,15 +23,6 @@ public sealed class GetEmployeesUserQueryHandler : IRequestHandler<GetEmployeesU
         var result = (await connection
                 .QueryAsync<int>(UserQueries.GetEmployeesUsersByRole,
                     new { roleName = request.RoleName, claimType = request.ClaimType})
-            ).AsList();
-        return result;
-    }
-
-    public async Task<List<UserInfo>> Handle(GetEmployeesUserQuery request, CancellationToken cancellationToken)
-    {
-        var connection = _context.Database.GetDbConnection();
-        var result = (await connection
-                .QueryAsync<UserInfo>(UserQueries.GetEmployeesUsers, new {claimType = UserClaims.EmployeeId})
             ).AsList();
         return result;
     }

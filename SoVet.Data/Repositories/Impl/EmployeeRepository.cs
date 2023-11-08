@@ -1,4 +1,5 @@
-﻿using SoVet.Data.Mappers;
+﻿using Dapper;
+using SoVet.Data.Mappers;
 using SoVet.Domain.Models;
 using SoVet.Domain.Requests.Employee;
 using SoVet.Domain.Responses;
@@ -23,11 +24,24 @@ public sealed class EmployeeRepository : IEmployeeRepository
         return Task.FromResult(employees);
     }
 
+    public Task<List<EmployeeUser>> GetEmployees(List<UserInfo> users)
+    {
+        var employees = _context.Employees.AsList();
+        var res = (from employee in employees
+                let employeeUser = users.FirstOrDefault(x => x.Id == employee.Id)
+                where employeeUser is not null
+                select new EmployeeUser
+                    { Id=employeeUser.Id, Name = employee.Name, Email = employeeUser.Email, Role = employeeUser.RoleName })
+            .ToList();
+
+        return Task.FromResult(res);
+    }
+
     public async Task<Employee> CreateEmployee(Employee employee)
     {
         var employeeDb = _mapper.Map(employee);
         await _context.Employees.AddAsync(employeeDb);
         await _context.SaveChangesAsync();
-        return _mapper.Map(employeeDb);   
+        return _mapper.Map(employeeDb);
     }
 }

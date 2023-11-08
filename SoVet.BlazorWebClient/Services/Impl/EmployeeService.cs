@@ -15,11 +15,24 @@ public sealed class EmployeeService : IEmployeeService
         _logger = logger;
     }
 
-    public async Task<List<Employee>?> GetEmployees()
+    public async Task<List<Employee>?> GetVeterinarians()
     {
         try
         {
             return await _httpClient.GetFromJsonAsync<List<Employee>>("Employee/veterinarians");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
+
+    public async Task<List<EmployeeUser>?> GetEmployees()
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<List<EmployeeUser>>("Employee");
         }
         catch (Exception ex)
         {

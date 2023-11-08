@@ -4,10 +4,11 @@ using MediatR;
 using SoVet.Data.Repositories;
 using SoVet.Domain.Commands.Employee;
 using SoVet.Domain.Notifications;
+using SoVet.Domain.Responses;
 
 namespace SoVet.Data.Handlers.Employee;
 
-public sealed class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, Result<Domain.Models.Employee>>
+public sealed class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, Result<EntityResponse<Domain.Models.Employee>>>
 {
     private readonly IEmployeeRepository _repository;
     private readonly IPublisher _publisher;
@@ -18,7 +19,7 @@ public sealed class CreateEmployeeCommandHandler : IRequestHandler<CreateEmploye
         _publisher = publisher;
     }
 
-    public async Task<Result<Domain.Models.Employee>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
+    public async Task<Result<EntityResponse<Domain.Models.Employee>>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
         // const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         // var password = new string(Enumerable.Repeat(chars.Concat(chars.ToLower()).ToArray(), 12)
@@ -28,6 +29,6 @@ public sealed class CreateEmployeeCommandHandler : IRequestHandler<CreateEmploye
         var notification = new UserCreatedNotification(Client:null, Employee:employee, request.Email, password,request.Role);
         await _publisher.Publish(notification, cancellationToken);
 
-        return employee;
+        return new EntityResponse<Domain.Models.Employee>{Entity = employee, IsSuccess = true};
     }
 }

@@ -23,7 +23,15 @@ public class EmployeeController : AuthorizedControllerBase
     [Route("veterinarians")]
     public async Task<IActionResult> GetDoctors()
     {
-        var command = new GetEmployeesQuery(Role.Veterinarian, UserClaims.EmployeeId);
+        var command = new GetEmployeesByRoleQuery(Role.Veterinarian, UserClaims.EmployeeId);
+        var res = await _sender.Send(command);
+        return Ok(res);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetEmployees()
+    {
+        var command = new GetEmployeesQuery();
         var res = await _sender.Send(command);
         return Ok(res);
     }
@@ -37,10 +45,17 @@ public class EmployeeController : AuthorizedControllerBase
             Name = employeeRegistration.Name
         };
         var command = new CreateEmployeeCommand(newEmployee, employeeRegistration.Email, employeeRegistration.Role);
-        var commandResult = await _sender.Send(command);
-        if (!commandResult.IsSuccess)
-            return BadRequest(new BaseResponse{ IsSuccess = false, Message = EmployeeErrorMessages.EmployeeRegistrationError});
+        try
+        {
+            var commandResult = await _sender.Send(command);
+            if (!commandResult.IsSuccess)
+                return BadRequest(new BaseResponse{ IsSuccess = false, Message = EmployeeErrorMessages.EmployeeRegistrationError});
         
-        return Ok(new BaseResponse{IsSuccess = true});
+            return Ok(new BaseResponse{IsSuccess = true});
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new BaseResponse{ IsSuccess = false, Message = ex.Message});
+        }
     }
 }

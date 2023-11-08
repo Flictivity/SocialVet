@@ -5,6 +5,7 @@ namespace SoVet.BlazorWebClient.Services;
 
 public interface IEmployeeService
 {
-    public Task<List<Employee>?> GetEmployees();
+    public Task<List<Employee>?> GetVeterinarians();
+    public Task<List<EmployeeUser>?> GetEmployees();
     public Task<BaseResult> CreateEmployee(EmployeeRegistration employeeRegistration);
 }

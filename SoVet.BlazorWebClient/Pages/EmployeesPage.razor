@@ -1,11 +1,26 @@
 ﻿@page "/employees"
 @using SoVet.BlazorWebClient.Shared.Windows
+@using SoVet.BlazorWebClient.Models.Employee
+@using SoVet.BlazorWebClient.Services
 
 @inject IDialogService DialogService;
-<PageTitle>Сотрудникик</PageTitle>
-<MudButton Variant="Variant.Filled" OnClick="OpenCreateWindow">Open</MudButton>
-@code {
+@inject IEmployeeService EmployeeService;
+@inject ISnackbar Snackbar;
 
+<PageTitle>Сотрудникик</PageTitle>
+
+<MudDataGrid @ref="_dataGrid" Striped="true" T="EmployeeUser" ServerData="GetServerData">
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="ФИО"/>
+        <PropertyColumn Property="x => x.Email" Title="Email адрес"/>
+        <PropertyColumn Property="x => x.Role" Title="Роль"/>
+    </Columns>
+</MudDataGrid>
+
+<MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenCreateWindow())"></MudFab>
+
+@code {
+    MudDataGrid<EmployeeUser> _dataGrid = null!;
     private async Task OpenCreateWindow()
     {
         var options = new DialogOptions
@@ -13,6 +28,22 @@
             Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
         };
 
-        await DialogService.ShowAsync<CreateEmployeeWindow>("Новый сотрудник", options);
+        var dialog = await DialogService.ShowAsync<CreateEmployeeWindow>("Новый сотрудник", options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await _dataGrid.ReloadServerData();
+        }
+    }
+
+    private async Task<GridData<EmployeeUser>> GetServerData(GridState<EmployeeUser> state)
+    {
+        var employees = new List<EmployeeUser>();
+        var res = await EmployeeService.GetEmployees();
+        if (res is not null)
+        {
+            employees = res;
+        }
+        return new GridData<EmployeeUser> { Items = employees, TotalItems = employees.Count };
     }
 }
