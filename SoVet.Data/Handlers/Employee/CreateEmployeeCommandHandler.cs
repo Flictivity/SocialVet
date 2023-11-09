@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using LanguageExt.Common;
+﻿using LanguageExt.Common;
 using MediatR;
 using SoVet.Data.Repositories;
 using SoVet.Domain.Commands.Employee;

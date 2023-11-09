@@ -1,6 +1,6 @@
-﻿namespace SoVet.BlazorWebClient.Models.Registration;
+﻿namespace SoVet.Domain.Requests.Registration;
 
-public sealed class RegistrationCreateRequest
+public sealed class CreateRegistrationRequest
 {
     public string? Comment { get; set; }
     public DateTime StartTime { get; set; }

@@ -36,6 +36,7 @@ public sealed class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenC
             new(ClaimTypes.Email, request.Email),
             new("id", request.Id.ToString())
         };
+        claims.AddRange(request.Claims.Select(claim => new Claim(claim.Type, claim.Value)));
 
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 

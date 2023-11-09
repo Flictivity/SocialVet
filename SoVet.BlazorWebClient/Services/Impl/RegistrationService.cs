@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using SoVet.BlazorWebClient.Models.Registration;
+using SoVet.BlazorWebClient.Results;
 
 namespace SoVet.BlazorWebClient.Services.Impl;
 
@@ -26,6 +27,21 @@ public sealed class RegistrationService : IRegistrationService
         catch
         {
             return new List<TimeSpan>();
+        }
+    }
+
+    public async Task<BaseResult> CreateRegistration(RegistrationCreateRequest request)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("Registration/create", request);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult { IsSuccess = false, Message = "Ошибка при создании новой записи" };
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError("Error:{1}", ex.Message);
+            return new BaseResult { IsSuccess = false, Message = "Ошибка при создании новой записи" };
         }
     }
 }

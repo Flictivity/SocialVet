@@ -1,8 +1,6 @@
 ﻿using Dapper;
 using SoVet.Data.Mappers;
 using SoVet.Domain.Models;
-using SoVet.Domain.Requests.Employee;
-using SoVet.Domain.Responses;
 
 namespace SoVet.Data.Repositories.Impl;
 

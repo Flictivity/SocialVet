@@ -1,10 +1,8 @@
 ﻿using Dapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SoVet.Auth.Models;
 using SoVet.Auth.SqlQueries;
 using SoVet.Domain.Queries.Employee;
-using SoVet.Domain.SqlQueries;
 
 namespace SoVet.Auth.Handlers;
 

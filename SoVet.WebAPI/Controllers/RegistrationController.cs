@@ -1,7 +1,10 @@
 ﻿using System.Globalization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SoVet.Domain.Commands.Registration;
+using SoVet.Domain.Models;
 using SoVet.Domain.Queries.Registration;
+using SoVet.Domain.Requests.Registration;
 
 namespace SoVet.WebAPI.Controllers;
 
@@ -29,5 +32,24 @@ public sealed class RegistrationController : AuthorizedControllerBase
         if (commandResult is null)
             return BadRequest();
         return Ok(commandResult);
+    }
+
+    [HttpPost]
+    [Route("create")]
+    public async Task<IActionResult> CreateRegistration([FromBody] CreateRegistrationRequest request)
+    {
+        var newRegistration = new Registration
+        {
+            Comment = request.Comment,
+            StartTime = request.StartTime,
+            ClientId = request.ClientId,
+            EmployeeId = request.EmployeeId,
+            RegistrationTypeId = request.RegistrationTypeId
+        };
+        var command = new CreateRegistrationCommand(newRegistration);
+        var result = await _sender.Send(command);
+        if (!result.IsSuccess)
+            return BadRequest(result);
+        return Ok(result);
     }
 }

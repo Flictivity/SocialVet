@@ -1,11 +1,11 @@
 ﻿@page "/employees"
 @using SoVet.BlazorWebClient.Shared.Windows
 @using SoVet.BlazorWebClient.Models.Employee
-@using SoVet.BlazorWebClient.Services
 
 @inject IDialogService DialogService;
 @inject IEmployeeService EmployeeService;
-@inject ISnackbar Snackbar;
+
+@attribute [Authorize(Roles = Role.Administrator)]
 
 <PageTitle>Сотрудникик</PageTitle>
 

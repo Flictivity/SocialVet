@@ -1,9 +1,16 @@
 ﻿@page "/registrate-to-appointment"
-@using SoVet.BlazorWebClient.Services
+@using SoVet.BlazorWebClient.Models.Employee
 @using SoVet.BlazorWebClient.Models.Registration
+@using SoVet.BlazorWebClient.Shared.Windows
+@using SoVet.Auth.Models
+@using System.Security.Claims
 
 @inject IRegistrationService RegistrationService;
+@inject IEmployeeService EmployeeService;
+@inject IDialogService DialogService;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
 
+@attribute [Authorize(Roles = Role.Client)]
 <PageTitle>Запись на прием</PageTitle>
 
 <MudGrid Class="d-flex align-center justify-center" Style="height:90vh;">
@@ -11,26 +18,33 @@
         <MudImage Elevation="7" Src="images/close-up-on-veterinarian-taking-care-of-dog.jpg" Alt="Doc" Class="rounded-lg" Fluid="true"></MudImage>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudSelect T="int" Variant="Variant.Outlined" Label="Врач">
-            <MudSelectItem T="int" Value="1">Ivanov</MudSelectItem>
-        </MudSelect>
+        @if (_veterinarians is not null)
+        {
+            <MudSelect T="Employee" Variant="Variant.Outlined" Label="Врач" ValueChanged="VeterinarianChanged">
+                @foreach (var veterinarian in _veterinarians)
+                {
+                    <MudSelectItem T="Employee" Value="veterinarian">@veterinarian.Name</MudSelectItem>
+                }
+            </MudSelect>
+        }
 
-        <MudDatePicker Class="mt-5" @bind-Date="_date" Variant="Variant.Outlined" Label="Дата посещения"></MudDatePicker>
-        @if (_list is null)
+        <MudDatePicker Class="mt-5" MinDate="DateTime.Today" DateChanged="DateChanged"
+                       Variant="Variant.Outlined" Label="Дата посещения" PickerVariant="PickerVariant.Dialog"/>
+        @if (_availableTimes is null)
         {
             <MudProgressLinear/>
             return;
         }
-        @if (_list.Count == 0)
+        @if (_availableTimes.Count == 0)
         {
-            <MudAlert Severity="Severity.Info" Class="mt-3">На выбранное время нет свободных записей</MudAlert>
+            <MudAlert Severity="Severity.Info" Class="mt-3">На выбранную дату нет свободных записей</MudAlert>
             return;
         }
         <MudGrid Class="mt-3" Justify="Justify.FlexStart">
-            @foreach (var time in _list)
+            @foreach (var time in _availableTimes)
             {
                 <MudItem>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Primary">
+                    <MudButton Disabled="@(_date is null && _veterinarian is null)" Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(async () => await OpenDialogWindow(time))">
                         @($"{time:hh\\:mm}")
                     </MudButton>
                 </MudItem>
@@ -41,15 +55,70 @@
 
 @code {
     private DateTime? _date;
-    private int _employee = 1;
-
-    private List<TimeSpan>? _list = new();
+    private List<Employee>? _veterinarians = new();
+    private List<TimeSpan>? _availableTimes = new();
+    private Employee? _veterinarian;
+    private RegistrationCreateRequest _model = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        _list = await RegistrationService.GetAvailableRegistrationTimes(new GetAvailableRegistrationsRequest
-        { EmployeeId = _employee, RegistrationDate = _date is null ? DateOnly.FromDateTime(DateTime.Now) : DateOnly.FromDateTime(_date.Value) });
-        await base.OnInitializedAsync();
+        _veterinarians = await EmployeeService.GetVeterinarians();
     }
 
+    private async Task DateChanged(DateTime? value)
+    {
+        _date = value;
+        await UpdateAvailableTimes();
+    }
+
+    private async Task VeterinarianChanged(Employee value)
+    {
+        _veterinarian = value;
+        await UpdateAvailableTimes();
+    }
+
+    private async Task UpdateAvailableTimes()
+    {
+        if (_veterinarian is null || _date is null)
+            return;
+
+        var request = new GetAvailableRegistrationsRequest
+        {
+            EmployeeId = _veterinarian.Id,
+            RegistrationDate = _date is null ? DateOnly.FromDateTime(DateTime.Now) : DateOnly.FromDateTime(_date.Value)
+        };
+        _availableTimes = await RegistrationService.GetAvailableRegistrationTimes(request);
+    }
+
+    private async Task OpenDialogWindow(TimeSpan time)
+    {
+        var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var clientId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.ClientId).Value);
+
+        _model = new RegistrationCreateRequest
+        {
+            Comment = null,
+            StartTime = _date!.Value + time,
+            ClientId = clientId,
+            EmployeeId = _veterinarian!.Id,
+            RegistrationTypeId = 1
+        };
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true,
+            DisableBackdropClick = true
+        };
+        var parameters = new DialogParameters
+        {
+            { "Model", _model }
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateRegistrationWindow>("Новая запись", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await UpdateAvailableTimes();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
 }

@@ -34,6 +34,8 @@ public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, 
         if (!signInResult.Succeeded)
             return new AuthorizationResponse { IsSuccess = false, Message = UserErrorMessages.UserWrongPassword };
 
+        var claims = (await _userManager.GetClaimsAsync(user)).ToList();
+        
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
         
         if(role is null || user.UserName is null)
@@ -42,7 +44,7 @@ public sealed class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, 
         return new AuthorizationResponse
         {
             IsSuccess = true,
-            Token = await _sender.Send(new GenerateTokenCommand(request.Email, user.Id, role, user.UserName), cancellationToken)
+            Token = await _sender.Send(new GenerateTokenCommand(request.Email, user.Id, role, user.UserName, claims), cancellationToken)
         };
     }
 }

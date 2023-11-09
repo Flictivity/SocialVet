@@ -1,5 +1,4 @@
 ﻿@using SoVet.BlazorWebClient.Models.Employee
-@using SoVet.BlazorWebClient.Services
 
 @inject IEmployeeService EmployeeService;
 @inject ISnackbar Snackbar;
@@ -17,7 +16,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudSelect T="string" Required="true" Variant="Variant.Outlined" @bind-Value="_model.Role" Label="Роль" FullWidth="true">
-                        <MudSelectItem T="string" Value="@("Ветеринар")">Ветеринар</MudSelectItem>
+                        <MudSelectItem T="string" Value="Role.Veterinarian">@Role.Veterinarian</MudSelectItem>
                     </MudSelect>
                 </MudItem>
             </MudGrid>
@@ -29,7 +28,6 @@
 </MudDialog>
 
 @code {
-
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = null!;
 
