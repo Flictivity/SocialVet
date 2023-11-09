@@ -1,4 +1,4 @@
-﻿namespace SoVet.BlazorWebClient.Models.Registration;
+﻿namespace SoVet.BlazorWebClient.Models.RegistrationModels;
 
 public sealed class RegistrationCreateRequest
 {

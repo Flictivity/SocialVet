@@ -1,0 +1,32 @@
+﻿@page "/appointment-registrations"
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+@inject IRegistrationService RegistrationService;
+
+<PageTitle>Записи</PageTitle>
+
+@if (_registrations?.Count != 0)
+{
+    <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="EndTime"
+                     TextProperty="ClientName" SelectedIndex="1">
+        <RadzenDayView StartTime="@startTime" EndTime="@endTime" TimeFormat="H:mm" Text="День" />
+        <RadzenWeekView StartTime="@startTime" EndTime="@endTime" TimeFormat="H:mm" Text="Неделя" />
+    </RadzenScheduler>
+}
+@code {
+    RadzenScheduler<Registration> _scheduler = null!;
+    private List<Registration>? _registrations = new();
+    
+    public static TimeSpan startTime = new TimeSpan(8, 0, 0);
+    public static TimeSpan endTime = new TimeSpan(23, 0, 0);
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _registrations = await RegistrationService.GetRegistrations(null);
+        await base.OnInitializedAsync();
+    }
+
+}

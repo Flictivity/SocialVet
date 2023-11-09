@@ -22,7 +22,7 @@ public sealed class RegistrationRepository : IRegistrationRepository
     {
         var connection = _context.Database.GetDbConnection();
         var result = (await connection
-                .QueryAsync<DateTime>(RegistrationRepositoryQueries.GetavailableTimes,
+                .QueryAsync<DateTime>(RegistrationRepositoryQueries.GetAvailableTimes,
                     new { dateReg = registrationDate, employeeId })
             ).Select(x => x.TimeOfDay).AsList();
 
@@ -36,5 +36,15 @@ public sealed class RegistrationRepository : IRegistrationRepository
         _context.Registrations.Add(registrationDb);
         await _context.SaveChangesAsync();
         return new BaseResponse { IsSuccess = true };
+    }
+
+    public async Task<List<Registration>> GetRegistrations(int? employeeId)
+    {
+        var connection = _context.Database.GetDbConnection();
+        var result = (await connection
+                .QueryAsync<Registration>(RegistrationRepositoryQueries.GetRegistrations)
+            ).AsList();
+
+        return result;
     }
 }

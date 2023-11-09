@@ -18,6 +18,7 @@ public sealed class RegistrationController : AuthorizedControllerBase
     }
 
     [HttpGet]
+    [Route("available-times")]
     public async Task<IActionResult> GetAvailableRegistrationTimes([FromQuery(Name = "employeeId")] int employeeId,
         [FromQuery(Name = "date")] string registrationDate)
     {
@@ -51,5 +52,15 @@ public sealed class RegistrationController : AuthorizedControllerBase
         if (!result.IsSuccess)
             return BadRequest(result);
         return Ok(result);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetRegistrations([FromQuery(Name = "employeeId")] int? employeeId)
+    {
+        var command = new GetRegistrationsQuery(employeeId);
+        var commandResult = await _sender.Send(command);
+        if (commandResult is null)
+            return BadRequest();
+        return Ok(commandResult);
     }
 }

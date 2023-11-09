@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
-using SoVet.BlazorWebClient.Models.Registration;
+using SoVet.BlazorWebClient.Models;
+using SoVet.BlazorWebClient.Models.RegistrationModels;
 using SoVet.BlazorWebClient.Results;
 
 namespace SoVet.BlazorWebClient.Services.Impl;
@@ -21,7 +22,7 @@ public sealed class RegistrationService : IRegistrationService
         {
             var result =
                 await _httpClient.GetFromJsonAsync<List<TimeSpan>>(
-                    $"registration?employeeId={request.EmployeeId}&date={request.RegistrationDate.ToString("yyyy-MM-dd")}");
+                    $"registration/available-times?employeeId={request.EmployeeId}&date={request.RegistrationDate.ToString("yyyy-MM-dd")}");
             return result;
         }
         catch
@@ -42,6 +43,21 @@ public sealed class RegistrationService : IRegistrationService
         {
             _logger.LogError("Error:{1}", ex.Message);
             return new BaseResult { IsSuccess = false, Message = "Ошибка при создании новой записи" };
+        }
+    }
+
+    public async Task<List<Registration>?> GetRegistrations(int? employeeId)
+    {
+        try
+        {
+            var result =
+                await _httpClient.GetFromJsonAsync<List<Registration>>(
+                    $"registration?employeeId={employeeId}");
+            return result;
+        }
+        catch
+        {
+            return new List<Registration>();
         }
     }
 }
