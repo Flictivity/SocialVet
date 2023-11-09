@@ -41,11 +41,11 @@ public sealed class EmployeeService : IEmployeeService
         }
     }
 
-    public async Task<BaseResult> CreateEmployee(EmployeeRegistration employeeRegistration)
+    public async Task<BaseResult> CreateEmployee(EmployeeUser employeeUser)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("Employee/create", employeeRegistration);
+            var response = await _httpClient.PostAsJsonAsync("Employee/create", employeeUser);
             var result = await response.Content.ReadFromJsonAsync<BaseResult>();
             return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при добавлении сотрудника"};
         }
@@ -53,6 +53,22 @@ public sealed class EmployeeService : IEmployeeService
         {
             _logger.LogError(ex.Message);
             return new BaseResult {IsSuccess = false, Message = ex.Message};
+        }
+    }
+
+    public async Task<BaseResult> UpdateEmployee(EmployeeUser employeeUser, string oldEmail)
+    {
+        try
+        {
+            employeeUser.OldEmail = oldEmail;
+            var response = await _httpClient.PutAsJsonAsync("Employee/update", employeeUser);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при обновлении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult {IsSuccess = false, Message  = "Произошла ошибка при обновлении"};
         }
     }
 }

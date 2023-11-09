@@ -58,4 +58,28 @@ public class EmployeeController : AuthorizedControllerBase
             return BadRequest(new BaseResponse{ IsSuccess = false, Message = ex.Message});
         }
     }
+    
+    [HttpPut]
+    [Route("update")]
+    public async Task<IActionResult> UpdateEmployee([FromBody] EmployeeRegistrationRequest employeeRegistration)
+    {
+        var newEmployee = new Employee
+        {
+            Id = employeeRegistration.Id,
+            Name = employeeRegistration.Name
+        };
+        var command = new UpdateEmployeeCommand(newEmployee, employeeRegistration.OldEmail, employeeRegistration.Email, employeeRegistration.Role, employeeRegistration.Password);
+        try
+        {
+            var commandResult = await _sender.Send(command);
+            if (!commandResult.IsSuccess)
+                return BadRequest(new BaseResponse{ IsSuccess = false, Message = EmployeeErrorMessages.EmployeeRegistrationError});
+        
+            return Ok(new BaseResponse{IsSuccess = true});
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new BaseResponse{ IsSuccess = false, Message = ex.Message});
+        }
+    }
 }

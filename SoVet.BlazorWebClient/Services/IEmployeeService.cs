@@ -7,5 +7,6 @@ public interface IEmployeeService
 {
     public Task<List<Employee>?> GetVeterinarians();
     public Task<List<EmployeeUser>?> GetEmployees();
-    public Task<BaseResult> CreateEmployee(EmployeeRegistration employeeRegistration);
+    public Task<BaseResult> CreateEmployee(EmployeeUser employeeUser);
+    public Task<BaseResult> UpdateEmployee(EmployeeUser employeeUser, string oldEmail);
 }

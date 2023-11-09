@@ -41,7 +41,9 @@ public static class ServiceCollectionExtensions
                 .AddBehavior<IPipelineBehavior<AddClientCommand, Result<Domain.Models.Client>>,
                     TransactPipelineBehavior<AddClientCommand, Domain.Models.Client>>()
                 .AddBehavior<IPipelineBehavior<CreateEmployeeCommand, Result<EntityResponse<Domain.Models.Employee>>>,
-                    TransactPipelineBehavior<CreateEmployeeCommand, EntityResponse<Domain.Models.Employee>>>();
+                    TransactPipelineBehavior<CreateEmployeeCommand, EntityResponse<Domain.Models.Employee>>>()
+                .AddBehavior<IPipelineBehavior<UpdateEmployeeCommand, Result<EntityResponse<Domain.Models.Employee>>>,
+                    TransactPipelineBehavior<UpdateEmployeeCommand, EntityResponse<Domain.Models.Employee>>>();
         });
 
         services.AddScoped<IClientRepository, ClientRepository>();

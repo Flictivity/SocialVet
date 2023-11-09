@@ -17,16 +17,6 @@ public sealed class GetEmployeesUserQueryHandler : IRequestHandler<GetEmployeesU
         _context = context;
     }
 
-    public async Task<List<int>> Handle(GetEmployeesUserByRoleQuery request, CancellationToken cancellationToken)
-    {
-        var connection = _context.Database.GetDbConnection();
-        var result = (await connection
-                .QueryAsync<int>(UserQueries.GetEmployeesUsersByRole,
-                    new { roleName = request.RoleName, claimType = request.ClaimType})
-            ).AsList();
-        return result;
-    }
-
     public async Task<List<UserInfo>> Handle(GetEmployeesUserQuery request, CancellationToken cancellationToken)
     {
         var connection = _context.Database.GetDbConnection();

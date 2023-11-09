@@ -42,4 +42,13 @@ public sealed class EmployeeRepository : IEmployeeRepository
         await _context.SaveChangesAsync();
         return _mapper.Map(employeeDb);
     }
+
+    public async Task<Employee> UpdateEmployee(Employee employee)
+    {
+        _context.ChangeTracker.Clear();
+        var employeeDb = _mapper.Map(employee);
+        _context.Employees.Update(employeeDb);
+        await _context.SaveChangesAsync();
+        return _mapper.Map(employeeDb);
+    }
 }
