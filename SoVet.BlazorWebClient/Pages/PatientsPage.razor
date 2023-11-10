@@ -1,0 +1,73 @@
+﻿@page "/patients"
+@using SoVet.BlazorWebClient.Shared.Windows
+@using SoVet.Auth.Models
+
+@inject IPatientService PatientService;
+@inject IDialogService DialogService;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+
+@attribute [Authorize];
+<PageTitle>Пациенты</PageTitle>
+
+<MudDataGrid @ref="_dataGrid" Striped="true" T="Patient" ServerData="GetServerData">
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Кличка"/>
+        <PropertyColumn Property="x => x.Age" Title="Возраст"/>
+        <PropertyColumn Property="x => x.AnimalTypeName" Title="Тип животного"/>
+        <PropertyColumn Property="x => x.ClientName" Title="Владелец"/>
+        @if (!_isClient)
+        {
+            <TemplateColumn>
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" OnClick="@(async () => await OpenWindow(context.Item))"/>
+                </CellTemplate>
+            </TemplateColumn>
+        }
+    </Columns>
+</MudDataGrid>
+
+<MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenWindow(new Patient()))"></MudFab>
+
+@code {
+    MudDataGrid<Patient> _dataGrid = null!;
+    private bool _isClient;
+
+    private async Task<GridData<Patient>> GetServerData(GridState<Patient> state)
+    {
+        List<Patient>? patients;
+        var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if (userIdentity.IsInRole(Role.Client))
+        {
+            _isClient = true;
+            var clientId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.ClientId).Value);
+            patients = await PatientService.GetPatients(clientId);
+        }
+        else
+        {
+            patients = await PatientService.GetPatients();
+        }
+        patients ??= new List<Patient>();
+        return new GridData<Patient> {Items = patients, TotalItems = patients.Count};
+    }
+
+    private async Task OpenWindow(Patient patient)
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            {"Model", patient},
+        };
+
+        var dialog = await DialogService.ShowAsync<PatientWindow>("Пациент", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await _dataGrid.ReloadServerData();
+        }
+    }
+
+}
