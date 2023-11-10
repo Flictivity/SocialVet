@@ -1,0 +1,60 @@
+﻿@inject IPatientService PatientService;
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="Model">
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="true" Variant="Variant.Outlined" T="string"
+                                  Value="Model.EmployeeName" FullWidth="true" Label="Ветеринар"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="true" Variant="Variant.Outlined" T="string"
+                                  Value="Model.ClientName" FullWidth="true" Label="Клиент"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudAutocomplete T="Patient" Label="Пациент" Variant="Variant.Outlined" @bind-Value="_patient" SearchFunc="@(GetClientPatients)"
+                                     ToStringFunc="@(e => e is null ? null : $"{e.Name} Возраст(в месяцах) - {e.Age} ")">
+                    </MudAutocomplete>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="true" Variant="Variant.Outlined" T="string" Lines="4" Value="Model.Comment" Label="Комментарий" FullWidth="true"/>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await OpenAppointment())">Перейти к приему</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public Registration Model { get; set; } = new();
+
+    private Patient _patient = null!;
+    private MudForm _form = null!;
+    private List<Patient> _patients = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var patients = await PatientService.GetPatients(Model.ClientId);
+        if (patients is not null)
+            _patients = patients;
+        await base.OnInitializedAsync();
+    }
+
+    private Task<IEnumerable<Patient>> GetClientPatients(string value)
+    {
+        var res = _patients.Where(x => x.Name.Contains(value));
+        return Task.FromResult(res);
+    }
+
+    private async Task OpenAppointment()
+    {
+        
+    }
+}

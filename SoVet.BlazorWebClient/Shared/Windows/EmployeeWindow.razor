@@ -1,5 +1,4 @@
 ﻿@using SoVet.BlazorWebClient.Models.Employee
-@using SoVet.BlazorWebClient.Results
 
 @inject IEmployeeService EmployeeService;
 @inject ISnackbar Snackbar;
@@ -55,5 +54,4 @@
         Snackbar.Add("Успешно", Severity.Success);
         MudDialog.Close(DialogResult.Ok(true));
     }
-
 }

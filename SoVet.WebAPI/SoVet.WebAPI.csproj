@@ -23,6 +23,7 @@
     <ItemGroup>
       <ProjectReference Include="..\SoVet.Auth\SoVet.Auth.csproj" />
       <ProjectReference Include="..\SoVet.Data\SoVet.Data.csproj" />
+
     </ItemGroup>
 
 

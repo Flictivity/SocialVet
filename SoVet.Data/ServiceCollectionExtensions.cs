@@ -50,6 +50,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IClinicRepository, ClinicRepository>();
         services.AddScoped<IRegistrationRepository, RegistrationRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IPatientRepository, PatientRepository>();
         SqlMapper.AddTypeHandler(new DapperSqlDateOnlyTypeHandler());
 
         return services;
