@@ -4,5 +4,5 @@ namespace SoVet.BlazorWebClient.Services;
 
 public interface IPatientService
 {
-    public Task<List<Patient>?> GetPatients(int? clientId);
+    public Task<List<Patient>?> GetPatients(int? clientId = null);
 }

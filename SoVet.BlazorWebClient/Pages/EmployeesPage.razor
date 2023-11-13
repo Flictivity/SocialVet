@@ -9,11 +9,16 @@
 
 <PageTitle>Сотрудникик</PageTitle>
 
-<MudDataGrid @ref="_dataGrid" Striped="true" T="EmployeeUser" ServerData="GetServerData" RowClick="RowClick">
+<MudDataGrid @ref="_dataGrid" Striped="true" T="EmployeeUser" ServerData="GetServerData">
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="ФИО"/>
         <PropertyColumn Property="x => x.Email" Title="Email адрес"/>
         <PropertyColumn Property="x => x.Role" Title="Роль"/>
+        <TemplateColumn>
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(async () => await OpenCreateWindow(context.Item, context.Item.Email))"/>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
 </MudDataGrid>
 
@@ -21,6 +26,7 @@
 
 @code {
     MudDataGrid<EmployeeUser> _dataGrid = null!;
+
     private async Task OpenCreateWindow(EmployeeUser employeeUser, string? email)
     {
         var options = new DialogOptions
@@ -30,11 +36,11 @@
 
         var parameters = new DialogParameters
         {
-            { "Model", employeeUser },
-            { "OldEmail", email }
+            {"Model", employeeUser},
+            {"OldEmail", email}
         };
-        
-        var dialog = await DialogService.ShowAsync<EmployeeWindow>("Новый сотрудник", parameters, options);
+
+        var dialog = await DialogService.ShowAsync<EmployeeWindow>("Сотрудник", parameters, options);
         var result = await dialog.Result;
         if (!result.Canceled)
         {
@@ -50,11 +56,7 @@
         {
             employees = res;
         }
-        return new GridData<EmployeeUser> { Items = employees, TotalItems = employees.Count };
+        return new GridData<EmployeeUser> {Items = employees, TotalItems = employees.Count};
     }
 
-    private async Task RowClick(DataGridRowClickEventArgs<EmployeeUser> args)
-    {
-        await OpenCreateWindow(args.Item, args.Item.Email);
-    }
 }
