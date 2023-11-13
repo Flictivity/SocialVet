@@ -1,0 +1,51 @@
+﻿<MudCard Class="pa-4">
+    <MudTabs Rounded="true" Color="Color.Primary">
+        <MudTabPanel Text="Лист осмотра">
+            <MudStack Row="true">
+                <MudTextField T="string" Label="Цель визита" Variant="Variant.Outlined"/>
+                <MudTextField ReadOnly="true" T="string" Label="Ветеринар" Variant="Variant.Outlined">Козлов</MudTextField>
+            </MudStack>
+            <MudTextField T="string" Label="Анамнез" Lines="3" FullWidth="true" Variant="Variant.Outlined"/>
+            <MudTextField T="string" Label="Осмотр" Lines="3" FullWidth="true" Variant="Variant.Outlined"/>
+            <MudStack Row="true" Spacing="5">
+                <MudSelect T="string" Variant="Variant.Outlined" Label="Тип">
+                    <MudSelectItem T="string"></MudSelectItem>
+                </MudSelect>
+                <MudTextField T="string" Variant="Variant.Outlined"></MudTextField>
+                <MudSelect T="string" Variant="Variant.Outlined" Label="Результат">
+                    <MudSelectItem T="string"></MudSelectItem>
+                </MudSelect>
+            </MudStack>
+            <MudTextField T="string" Label="Осмотр" Lines="3" FullWidth="true" Variant="Variant.Outlined"/>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3">Добавить диагноз</MudButton>
+            
+            <MudSimpleTable Class="mt-5">
+                    <thead>
+                    <tr>
+                        <th>1</th>
+                        <th>2</th>
+                        <th>3</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>3</td>
+                    </tr>
+                    </tbody>
+                </MudSimpleTable>
+        </MudTabPanel>
+        <MudTabPanel Text="Рекомендации"></MudTabPanel>
+        <MudTabPanel Text="Услуги"></MudTabPanel>
+    </MudTabs>
+    <MudCardActions>
+        <MudButton OnClick="@ChangeTab" Style="position: fixed;
+                                                   right: 30px; bottom: 30px;
+                                                   padding: 10px;" Variant="Variant.Filled" Color="Color.Error">Close</MudButton>
+    </MudCardActions>
+</MudCard>
+@code {
+    [Parameter]
+    public Action ChangeTab { get; set; }
+}

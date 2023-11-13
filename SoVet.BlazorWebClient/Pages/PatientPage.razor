@@ -1,0 +1,26 @@
+﻿@page "/patient"
+
+<MudTabs Color="Color.Secondary" Rounded="true">
+    <MudTabPanel Text="История приемов">
+        @if (!_appointmentOpen)
+        {
+            <Appointments/>
+            <MudButton OnClick="@ChangeTab">Открыть</MudButton>
+        }
+        else
+        {
+            <Appointment ChangeTab="ChangeTab"/>
+        }
+    </MudTabPanel>
+    <MudTabPanel Text="Вакцинации">
+        
+    </MudTabPanel>
+    <MudTabPanel Text="Профиль">
+            
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    private bool _appointmentOpen;
+    private void ChangeTab() => _appointmentOpen = !_appointmentOpen;
+}
