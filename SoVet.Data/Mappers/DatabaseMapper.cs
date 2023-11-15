@@ -18,4 +18,6 @@ public sealed partial class DatabaseMapper
     [MapperIgnoreSource(nameof(Domain.Models.Registration.ClientName))]
     [MapperIgnoreSource(nameof(Domain.Models.Registration.TypeName))]
     public partial Registration Map(Domain.Models.Registration registration);
+    public partial AnimalType Map(Domain.Models.AnimalType animalType);
+    public partial Domain.Models.AnimalType Map(AnimalType animalType);
 }

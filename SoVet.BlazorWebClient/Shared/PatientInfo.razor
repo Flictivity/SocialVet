@@ -1,4 +1,5 @@
 ﻿@inject IClientService ClientService;
+@inject IAnimalTypeService AnimalTypeService;
 
 @if (Model is null)
 {
@@ -43,13 +44,26 @@
     private bool _isValid;
     private List<AnimalType> _animalTypes = new();
     private List<Client> _clients = new();
+    private bool _isEdit;
 
     protected override async Task OnInitializedAsync()
     {
+        if (Model is null)
+        {
+            _isEdit = true;
+            Model = new();
+        }
+        
         var clients = await ClientService.GetClients();
         if (clients is not null)
         {
             _clients = clients;
+        }
+
+        var types = await AnimalTypeService.GetAnimalTypes();
+        if (types is not null)
+        {
+            _animalTypes = types;
         }
         await base.OnInitializedAsync();
     }

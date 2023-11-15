@@ -61,7 +61,7 @@
             {"Model", patient},
         };
 
-        var dialog = await DialogService.ShowAsync<PatientWindow>("Пациент", parameters, options);
+        var dialog = await DialogService.ShowAsync<PatientInfo>("Пациент", parameters, options);
         var result = await dialog.Result;
         if (!result.Canceled)
         {
