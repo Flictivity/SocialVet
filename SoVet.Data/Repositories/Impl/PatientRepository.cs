@@ -22,7 +22,13 @@ public sealed class PatientRepository : IPatientRepository
             builder.Where($"p.client_id = {clientId}");
         
         var connection = _context.Database.GetDbConnection();
-        var result = (await connection.QueryAsync<Patient>(selector.RawSql)).AsList();
+        var result = (await connection.QueryAsync<Patient, AnimalType, Client,Patient>(selector.RawSql,
+            (patient, at, c) =>
+            {
+                patient.AnimalType = at;
+                patient.Client = c;
+                return patient;
+            })).AsList();
 
         return result;
     }

@@ -1,13 +1,16 @@
-﻿namespace SoVet.BlazorWebClient.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SoVet.BlazorWebClient.Models;
 
 public sealed class Patient
 {
     public int Id { get; set; }
+    [Required(ErrorMessage = "Обязательное поле")]
     public string Name { get; set; } = null!;
+    [Required(ErrorMessage = "Обязательное поле")]
     public int Age { get; set; }
-    public int AnimalTypeId { get; set; }
-    public string AnimalTypeName { get; set; } = null!;
-    public int ClientId { get; set; }
-    public string ClientName { get; set; } = null!;
+
+    public AnimalType AnimalType { get; set; } = null!;
+    public Client Client { get; set; } = null!;
     public string? Comment { get; set; }
 }

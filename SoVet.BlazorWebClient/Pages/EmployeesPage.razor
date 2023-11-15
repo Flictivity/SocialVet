@@ -7,7 +7,7 @@
 
 @attribute [Authorize(Roles = Role.Administrator)]
 
-<PageTitle>Сотрудникик</PageTitle>
+<PageTitle>Сотрудники</PageTitle>
 
 <MudDataGrid @ref="_dataGrid" Striped="true" T="EmployeeUser" ServerData="GetServerData">
     <Columns>
@@ -15,7 +15,7 @@
         <PropertyColumn Property="x => x.Email" Title="Email адрес"/>
         <PropertyColumn Property="x => x.Role" Title="Роль"/>
         <TemplateColumn>
-            <CellTemplate>
+            <CellTemplate>  
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(async () => await OpenCreateWindow(context.Item, context.Item.Email))"/>
             </CellTemplate>
         </TemplateColumn>

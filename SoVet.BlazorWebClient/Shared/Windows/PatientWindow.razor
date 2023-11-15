@@ -1,4 +1,73 @@
-﻿
+﻿@inject IClientService ClientService;
+
+@if (Model is null)
+{
+    return;
+}
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)"
+                                  T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudNumericField Required="true" Variant="Variant.Outlined" Min="1"
+                                     @bind-Value="Model.Age" Immediate For="@(() => Model.Age)" FullWidth="true" Label="Возраст (мес.)"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
+                                     ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                    </MudAutocomplete>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudAutocomplete T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
+                                     ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                    </MudAutocomplete>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Create())">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
 @code {
+    [Parameter]
+    public Patient? Model { get; set; }
+
+    private MudForm _form = null!;
+    private bool _isValid;
+    private List<AnimalType> _animalTypes = new();
+    private List<Client> _clients = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var clients = await ClientService.GetClients();
+        if (clients is not null)
+        {
+            _clients = clients;
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private Task<IEnumerable<Client>> GetClients(string value)
+    {
+        var res = _clients.Where(x => x.Name.Contains(value));
+        return Task.FromResult(res);
+    }
     
+    private Task<IEnumerable<AnimalType>> GetAnimalTypes(string value)
+    {
+        var res = _animalTypes.Where(x => x.Name.Contains(value));
+        return Task.FromResult(res);
+    }
+
+    private async Task Create()
+    {
+        
+    }
 }

@@ -3,8 +3,8 @@ using MediatR;
 using SoVet.Data.Repositories;
 using SoVet.Domain.Commands.Client;
 using SoVet.Domain.Notifications;
-    
-namespace SoVet.Data.Handlers;
+
+namespace SoVet.Data.Handlers.Client;
 
 public sealed class AddClientCommandHandler : IRequestHandler<AddClientCommand, Result<Domain.Models.Client>>
 {

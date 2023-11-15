@@ -1,4 +1,4 @@
-﻿namespace SoVet.Auth.Models;
+﻿namespace SoVet.BlazorWebClient.Models;
 
 public static class UserClaims
 {
