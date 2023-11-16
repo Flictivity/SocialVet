@@ -42,7 +42,8 @@
             @foreach (var time in _availableTimes)
             {
                 <MudItem>
-                    <MudButton Disabled="@(_date is null && _veterinarian is null)" Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(async () => await OpenDialogWindow(time))">
+                    <MudButton Disabled="@(_date is null && _veterinarian is null)" Variant="Variant.Outlined" 
+                               Color="Color.Primary" OnClick="@(async () => await OpenDialogWindow(time))">
                         @($"{time:hh\\:mm}")
                     </MudButton>
                 </MudItem>

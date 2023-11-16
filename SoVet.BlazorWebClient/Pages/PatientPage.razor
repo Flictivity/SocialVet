@@ -1,26 +1,32 @@
 ﻿@page "/patient"
+@using Appointment = SoVet.BlazorWebClient.Models.Appointment.Appointment
 
-<MudTabs Color="Color.Secondary" Rounded="true">
-    <MudTabPanel Text="История приемов">
-        @if (!_appointmentOpen)
+@inject ISnackbar Snackbar;
+
+<MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndexChanged="IndexChange">
+    <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History">
+        @if (_appointment is null)
         {
-            <Appointments/>
-            <MudButton OnClick="@ChangeTab">Открыть</MudButton>
+            <Appointments AppointmentSelect="x => _appointment = x"></Appointments>
         }
         else
         {
-            <Appointment ChangeTab="ChangeTab"/>
+            <Appointment AppointmentModel="_appointment" AppointmentSelect="x => _appointment = x"></Appointment>
         }
     </MudTabPanel>
-    <MudTabPanel Text="Вакцинации">
-        
+    <MudTabPanel Text="Вакцинации" Icon="@Icons.Material.Filled.Vaccines">
+
     </MudTabPanel>
-    <MudTabPanel Text="Профиль">
-            <PatientInfo></PatientInfo>
+    <MudTabPanel Text="Профиль" Icon="@Icons.Material.Filled.CrueltyFree">
+        <PatientInfo></PatientInfo>
     </MudTabPanel>
 </MudTabs>
 
 @code {
-    private bool _appointmentOpen;
-    private void ChangeTab() => _appointmentOpen = !_appointmentOpen;
+    private Appointment? _appointment;
+
+    private void IndexChange(int n)
+    {
+        Snackbar.Add($"Test{n}", Severity.Error);
+    }
 }

@@ -4,78 +4,89 @@
 @inject IPatientService PatientService;
 @inject ISnackbar Snackbar;
 
+@if (Model is null)
+{
+    return;
+}
 @if (MudDialog is null)
 {
     <MudCard>
         <MudCardContent>
             <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
-            <MudGrid Spacing="3">
-                <MudItem xs="12">
-                    <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)"
-                              T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true" />
-                </MudItem>
-                <MudItem xs="12">
-                    <MudNumericField Required="true" Variant="Variant.Outlined" Min="1"
-                                 @bind-Value="Model.Age" Immediate For="@(() => Model.Age)" FullWidth="true" Label="Возраст (мес.)" />
-                </MudItem>
-                <MudItem xs="12">
-                    <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
-                                 ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
-                    </MudAutocomplete>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudAutocomplete T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
-                                 ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
-                    </MudAutocomplete>
-                </MudItem>
-            </MudGrid>
-        </MudForm>
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)"
+                                      T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudNumericField Required="true" Variant="Variant.Outlined" Min="1"
+                                         @bind-Value="Model.Age" Immediate For="@(() => Model.Age)" FullWidth="true" Label="Возраст (мес.)"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField Required="false" Placeholder="Особые примечания" Variant="Variant.Outlined" Immediate For="@(() => Model.Comment)"
+                                      T="string" @bind-Value="Model.Comment" Label="Комментарий" FullWidth="true" Lines="3"/>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
         </MudCardContent>
         <MudCardActions>
             <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
         </MudCardActions>
     </MudCard>
 }
-
-<MudDialog>
-    <DialogContent>
-        <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
-            <MudGrid Spacing="3">
-                <MudItem xs="12">
-                    <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)"
-                                  T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true" />
-                </MudItem>
-                <MudItem xs="12">
-                    <MudNumericField Required="true" Variant="Variant.Outlined" Min="1"
-                                     @bind-Value="Model.Age" Immediate For="@(() => Model.Age)" FullWidth="true" Label="Возраст (мес.)" />
-                </MudItem>
-                <MudItem xs="12">
-                    <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
-                                     ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
-                    </MudAutocomplete>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudAutocomplete T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
-                                     ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
-                    </MudAutocomplete>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudTextField Required="false" Placeholder="Особые примечания" Variant="Variant.Outlined" Immediate For="@(() => Model.Comment)"
-                                  T="string" @bind-Value="Model.Comment" Label="Комментарий" FullWidth="true" />
-                </MudItem>
-            </MudGrid>
-        </MudForm>
-    </DialogContent>
-    <DialogActions>
-        <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
-    </DialogActions>
-</MudDialog>
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)"
+                                      T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudNumericField Required="true" Variant="Variant.Outlined" Min="1"
+                                         @bind-Value="Model.Age" Immediate For="@(() => Model.Age)" FullWidth="true" Label="Возраст (мес.)"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField Required="false" Placeholder="Особые примечания" Variant="Variant.Outlined" Immediate For="@(() => Model.Comment)"
+                                      T="string" @bind-Value="Model.Comment" Label="Комментарий" FullWidth="true" Lines="3"/>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
 
 @code {
+
     [Parameter]
     public Patient? Model { get; set; }
 
-    [CascadingParameter] 
+    [CascadingParameter]
     public MudDialogInstance? MudDialog { get; set; }
 
     private MudForm _form = null!;
@@ -94,7 +105,7 @@
         {
             _isEdit = true;
         }
-        
+
         var clients = await ClientService.GetClients();
         if (clients is not null)
         {
@@ -114,7 +125,7 @@
         var res = _clients.Where(x => x.Name.Contains(value));
         return Task.FromResult(res);
     }
-    
+
     private Task<IEnumerable<AnimalType>> GetAnimalTypes(string value)
     {
         var res = _animalTypes.Where(x => x.Name.Contains(value));
@@ -126,7 +137,7 @@
         BaseResult result;
         if (_isEdit)
         {
-           result = await PatientService.UpdatePatient(Model!);
+            result = await PatientService.UpdatePatient(Model!);
         }
         else
         {
@@ -141,4 +152,5 @@
         Snackbar.Add("Успешно!", Severity.Success);
         MudDialog?.Close(DialogResult.Ok(true));
     }
+
 }

@@ -23,11 +23,5 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
-
-
-
-    <ItemGroup>
-      <Folder Include="Models\Patient\" />
-    </ItemGroup>
     
 </Project>

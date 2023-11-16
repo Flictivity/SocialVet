@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SoVet.Data;
@@ -11,9 +12,11 @@ using SoVet.Data;
 namespace SoVet.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20231116212946_ChangeAppointment")]
+    partial class ChangeAppointment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,9 +87,9 @@ namespace SoVet.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("purpose");
 
-                    b.Property<string>("Recommendations")
-                        .HasColumnType("text")
-                        .HasColumnName("recommendations");
+                    b.Property<int>("RecommendationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("recommendation_id");
 
                     b.HasKey("Id")
                         .HasName("pk_appointments");
@@ -96,6 +99,9 @@ namespace SoVet.Data.Migrations
 
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_appointments_patient_id");
+
+                    b.HasIndex("RecommendationId")
+                        .HasDatabaseName("ix_appointments_recommendation_id");
 
                     b.ToTable("appointments", (string)null);
                 });
@@ -408,6 +414,29 @@ namespace SoVet.Data.Migrations
                     b.ToTable("payments", (string)null);
                 });
 
+            modelBuilder.Entity("SoVet.Data.Entities.Recommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("RecommendationsForCare")
+                        .HasColumnType("text")
+                        .HasColumnName("recommendations_for_care");
+
+                    b.Property<string>("TreatmentPlan")
+                        .HasColumnType("text")
+                        .HasColumnName("treatment_plan");
+
+                    b.HasKey("Id")
+                        .HasName("pk_recommendations");
+
+                    b.ToTable("recommendations", (string)null);
+                });
+
             modelBuilder.Entity("SoVet.Data.Entities.Registration", b =>
                 {
                     b.Property<int>("Id")
@@ -551,9 +580,18 @@ namespace SoVet.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_appointments_patients_patient_id");
 
+                    b.HasOne("SoVet.Data.Entities.Recommendation", "Recommendation")
+                        .WithMany("Appointments")
+                        .HasForeignKey("RecommendationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_appointments_recommendations_recommendation_id");
+
                     b.Navigation("Employee");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Recommendation");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.AppointmentDiagnosis", b =>
@@ -735,6 +773,11 @@ namespace SoVet.Data.Migrations
             modelBuilder.Entity("SoVet.Data.Entities.FacilityCategory", b =>
                 {
                     b.Navigation("Facilities");
+                });
+
+            modelBuilder.Entity("SoVet.Data.Entities.Recommendation", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.RegistrationType", b =>

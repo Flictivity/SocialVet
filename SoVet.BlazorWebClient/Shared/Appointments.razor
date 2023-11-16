@@ -1,27 +1,55 @@
-﻿@inject HttpClient HttpClient;
+﻿@using SoVet.BlazorWebClient.Models.Appointment
+@inject IAppointmentService AppointmentService;
 
-<div class="mt-5">
-    <MudText>Шарик</MudText>
-    <MudButton>Добавить прием</MudButton>
-    <MudText>Собака: 2 месяца</MudText>
-    @* Таблица с приемами *@
-    <MudSimpleTable>
-        <thead>
-        <tr>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-        </tr>
-        </tbody>
-    </MudSimpleTable>
-</div>
-@code {
+<div class="ma-5">
+    <MudGrid Class="mb-3" Spacing="2">
+        <MudItem xs="12">
+            <MudStack Row>
+                <MudText Typo="Typo.h6" Color="Color.Secondary" Style="font-weight: bolder">Кличка:</MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Style="font-weight: bold">Шарик</MudText>
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12">
+            <MudStack Row>
+                <MudText Typo="Typo.h6" Color="Color.Secondary" Style="font-weight: bolder">Возраст (мес.):</MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Style="font-weight: bold">2</MudText>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
     
+    @* Таблица с приемами *@
+    <MudDataGrid @ref="_dataGrid" Striped="true" T="AppointmentTable" Items="_appointments">
+        <Columns>
+            <PropertyColumn Property="x => x.CreationDate" Title="Дата"/>
+            <PropertyColumn Property="x => x.VeterinarianName" Title="Ветеринар"/>
+            <PropertyColumn Property="x => x.Status" Title="Статус"/>
+            <TemplateColumn>
+                <CellTemplate>  
+                    <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" 
+                                   OnClick="Change"/>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<Models.Appointment.Appointment> AppointmentSelect { get; set; }
+
+    private Models.Appointment.Appointment _appointment = new();
+
+    private List<AppointmentTable> _appointments = null!;
+    private MudDataGrid<AppointmentTable> _dataGrid = null!;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _appointments = await AppointmentService.GetAppointments(1);
+        await base.OnInitializedAsync();
+    }
+
+    private void Change()
+    {
+        AppointmentSelect.InvokeAsync(_appointment);
+    }
 }

@@ -14,7 +14,7 @@
 {
     <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="EndTime"
                      TextProperty="ClientName" SelectedIndex="1" TodayText="Сегодня" AppointmentSelect="RegistrationSelect" Style="height: 90vh">
-        <RadzenDayView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="День" />
+        <RadzenDayView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="День"/>
         <RadzenWeekView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="Неделя" />
     </RadzenScheduler>
 }

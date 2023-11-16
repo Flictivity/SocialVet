@@ -33,8 +33,6 @@ public class ApplicationContext : DbContext
     
     public DbSet<Payment> Payments { get; set; } = null!;
     
-    public DbSet<Recommendation> Recommendations { get; set; } = null!;
-    
     public DbSet<Registration> Registrations { get; set; } = null!;
     
     public DbSet<RegistrationType> RegistrationTypes { get; set; } = null!;

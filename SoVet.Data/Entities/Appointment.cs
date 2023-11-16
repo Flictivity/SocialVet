@@ -13,17 +13,16 @@ public sealed class Appointment
     public string? Anamnesis { get; set; }
     public string? Information { get; set; }
     public DateTime ChangeDate { get; set; }
+    public DateTime CreationDate { get; set; }
+    public int AppointmentStatus { get; set; }
 
     public int EmployeeId { get; set; }
     public Employee Employee { get; set; } = null!;
 
+    public string? Recommendations { get; set; }
     public int PatientId { get; set; }
     [ForeignKey(nameof(PatientId))]
     public Patient Patient { get; set; } = null!;
-
-    public int RecommendationId { get; set; }
-    [ForeignKey(nameof(RecommendationId))]
-    public Recommendation Recommendation { get; set; } = null!;
 
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();
     public ICollection<AppointmentDiagnosis> AppointmentDiagnoses { get; set; } = new List<AppointmentDiagnosis>();

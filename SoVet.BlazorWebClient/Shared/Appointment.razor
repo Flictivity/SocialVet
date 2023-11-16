@@ -1,6 +1,8 @@
-﻿<MudCard Class="pa-4">
-    <MudTabs Rounded="true" Color="Color.Primary">
-        <MudTabPanel Text="Лист осмотра">
+﻿@inject IDialogService DialogService;
+
+<MudCard Class="pa-4">
+    <MudTabs Rounded="true">
+        <MudTabPanel Text="Лист осмотра" Icon="@Icons.Material.Filled.ViewList">
             <MudStack Row="true">
                 <MudTextField T="string" Label="Цель визита" Variant="Variant.Outlined"/>
                 <MudTextField ReadOnly="true" T="string" Label="Ветеринар" Variant="Variant.Outlined">Козлов</MudTextField>
@@ -36,16 +38,24 @@
                     </tbody>
                 </MudSimpleTable>
         </MudTabPanel>
-        <MudTabPanel Text="Рекомендации"></MudTabPanel>
-        <MudTabPanel Text="Услуги"></MudTabPanel>
+        <MudTabPanel Text="Рекомендации" Icon="@Icons.Material.Filled.Recommend"></MudTabPanel>
+        <MudTabPanel Text="Услуги" Icon="@Icons.Material.Filled.Workspaces"></MudTabPanel>
     </MudTabs>
     <MudCardActions>
-        <MudButton OnClick="@ChangeTab" Style="position: fixed;
+        <MudButton OnClick="@Close" Style="position: fixed;
                                                    right: 30px; bottom: 30px;
                                                    padding: 10px;" Variant="Variant.Filled" Color="Color.Error">Close</MudButton>
     </MudCardActions>
 </MudCard>
 @code {
     [Parameter]
-    public Action ChangeTab { get; set; }
+    public EventCallback<Models.Appointment.Appointment> AppointmentSelect { get; set; }
+
+    [Parameter]
+    public Models.Appointment.Appointment AppointmentModel { get; set; } = null!;
+    
+    private void Close()
+    {
+        AppointmentSelect.InvokeAsync(null);
+    }
 }
