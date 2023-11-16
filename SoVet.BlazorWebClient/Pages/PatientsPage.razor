@@ -4,7 +4,6 @@
 @inject IDialogService DialogService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 
-@attribute [Authorize];
 <PageTitle>Пациенты</PageTitle>
 
 <MudDataGrid @ref="_dataGrid" Striped="true" T="Patient" ServerData="GetServerData">
@@ -17,7 +16,7 @@
         {
             <TemplateColumn>
                 <CellTemplate>
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" OnClick="@(async () => await OpenWindow(context.Item))"/>
+                    <MudIconButton Icon="@Icons.Material.Filled.More" Color="Color.Secondary" Variant="Variant.Filled" OnClick="@(async () => await OpenWindow(context.Item))"/>
                 </CellTemplate>
             </TemplateColumn>
         }

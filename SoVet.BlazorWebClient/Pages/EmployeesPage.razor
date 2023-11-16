@@ -16,7 +16,7 @@
         <PropertyColumn Property="x => x.Role" Title="Роль"/>
         <TemplateColumn>
             <CellTemplate>  
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(async () => await OpenCreateWindow(context.Item, context.Item.Email))"/>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Secondary" Variant="Variant.Filled" OnClick="@(async () => await OpenCreateWindow(context.Item, context.Item.Email))"/>
             </CellTemplate>
         </TemplateColumn>
     </Columns>
