@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using SoVet.BlazorWebClient.Models;
-using SoVet.BlazorWebClient.Models.Employee;
 
 namespace SoVet.BlazorWebClient.Services.Impl;
 

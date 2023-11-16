@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using SoVet.Data.Entities;
-using AnimalType = SoVet.Domain.Models.AnimalType;
 
 namespace SoVet.Data;
 
@@ -44,7 +43,7 @@ public class ApplicationContext : DbContext
 
     public DbSet<ValueAddedTax> ValueAddedTaxes { get; set; } = null!;
     
-    public DbSet<AnimalType> AnimalTypes { get; set; } = null!;
+    public DbSet<AnimalType> AnimalType { get; set; } = null!;
 }
 
 public sealed class MigrationApplicationContext : IDesignTimeDbContextFactory<ApplicationContext>

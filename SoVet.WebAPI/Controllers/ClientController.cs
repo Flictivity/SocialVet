@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SoVet.Domain.Queries.Client;
-using SoVet.Domain.Queries.Employee;
 
 namespace SoVet.WebAPI.Controllers;
 

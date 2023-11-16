@@ -1,5 +1,8 @@
-﻿@inject IClientService ClientService;
+﻿@using SoVet.BlazorWebClient.Results
+@inject IClientService ClientService;
 @inject IAnimalTypeService AnimalTypeService;
+@inject IPatientService PatientService;
+@inject ISnackbar Snackbar;
 
 @if (Model is null)
 {
@@ -32,13 +35,16 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Create())">Сохранить</MudButton>
+        <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [Parameter]
     public Patient? Model { get; set; }
+
+    [CascadingParameter] 
+    public MudDialogInstance? MudDialog { get; set; }
 
     private MudForm _form = null!;
     private bool _isValid;
@@ -50,8 +56,11 @@
     {
         if (Model is null)
         {
+            Model = new Patient();
+        }
+        else
+        {
             _isEdit = true;
-            Model = new();
         }
         
         var clients = await ClientService.GetClients();
@@ -80,8 +89,24 @@
         return Task.FromResult(res);
     }
 
-    private async Task Create()
+    private async Task Save()
     {
-        
+        BaseResult result;
+        if (_isEdit)
+        {
+           result = await PatientService.UpdatePatient(Model!);
+        }
+        else
+        {
+            result = await PatientService.CreatePatient(Model!);
+        }
+
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add("Произошла ошибка при сохранении", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно!", Severity.Success);
+        MudDialog?.Close(DialogResult.Ok(true));
     }
 }

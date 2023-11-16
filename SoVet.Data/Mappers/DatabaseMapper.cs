@@ -20,4 +20,10 @@ public sealed partial class DatabaseMapper
     public partial Registration Map(Domain.Models.Registration registration);
     public partial AnimalType Map(Domain.Models.AnimalType animalType);
     public partial Domain.Models.AnimalType Map(AnimalType animalType);
+    
+    public partial Domain.Models.Patient Map(Patient patient);
+    
+    [MapperIgnoreTarget(nameof(Domain.Models.Patient.AnimalType))]
+    [MapperIgnoreTarget(nameof(Domain.Models.Patient.Client))]
+    public partial Patient Map(Domain.Models.Patient patient);
 }

@@ -1,5 +1,4 @@
 ﻿@page "/patients"
-@using SoVet.BlazorWebClient.Shared.Windows
 
 @inject IPatientService PatientService;
 @inject IDialogService DialogService;
@@ -11,7 +10,7 @@
 <MudDataGrid @ref="_dataGrid" Striped="true" T="Patient" ServerData="GetServerData">
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="Кличка"/>
-        <PropertyColumn Property="x => x.Age" Title="Возраст"/>
+        <PropertyColumn Property="x => x.Age" Title="Возраст (мес.)"/>
         <PropertyColumn Property="x => x.AnimalType.Name" Title="Тип животного"/>
         <PropertyColumn Property="x => x.Client.Name" Title="Владелец"/>
         @if (!_isClient)

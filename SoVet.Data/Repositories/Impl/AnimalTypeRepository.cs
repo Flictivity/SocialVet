@@ -1,7 +1,4 @@
-﻿using Dapper;
-using SoVet.Data.Mappers;
-using SoVet.Domain.Models;
-using AnimalType = SoVet.Data.Entities.AnimalType;
+﻿using SoVet.Data.Mappers;
 
 namespace SoVet.Data.Repositories.Impl;
 
@@ -16,8 +13,8 @@ public sealed class AnimalTypeRepository : IAnimalTypeRepository
         _mapper = new DatabaseMapper();
     }
 
-    public async Task<List<Domain.Models.AnimalType>> GetAnimalTypesAsync()
+    public Task<List<Domain.Models.AnimalType>> GetAnimalTypesAsync()
     {
-        return _context.AnimalTypes.Select(type => _mapper.Map(type)).ToList();
+        return Task.FromResult(_context.AnimalType.Select(type => _mapper.Map(type)).ToList());
     }
 }
