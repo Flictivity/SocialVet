@@ -16,17 +16,22 @@
 </head>
 
 <body>
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+<div id="app" style="margin: 0 auto; width: 100vw; height: 100vh">
+    <div class="text-center pt-3" style="color: #3F51B5; font-size: 16pt">
+        Загрузка...
     </div>
+    <div class="text-center mt-3">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                style="font-size: 16pt; width: 36px; height: 36px; color: #3F51B5"></span>
+    </div>
+    <div class="text-center">
+        <img src="/images/logo.png" style="width:10%" alt="Logo"/>
+    </div>
+</div>
 
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
+        Произошла непридвиденная ошибка, пожалуйста перезагрузите страницу
+        <a href="" class="reload">Пероезагрузить</a>
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
