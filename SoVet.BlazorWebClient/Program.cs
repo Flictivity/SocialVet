@@ -2,8 +2,10 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor;
 using MudBlazor.Services;
 using SoVet.BlazorWebClient;
+using SoVet.BlazorWebClient.Localization;
 using SoVet.BlazorWebClient.Services;
 using SoVet.BlazorWebClient.Services.Impl;
 
@@ -31,6 +33,7 @@ builder.Services.AddScoped<IDiagnosisService, DiagnosisService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(connectionString) });
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+builder.Services.AddSingleton<MudLocalizer, RussianMudblazorLocalizer>();
 builder.Services.AddAuthorizationCore();
 
 

@@ -31,9 +31,9 @@
     {
         <MudDataGrid @ref="_dataGrid" Striped="true" T="AppointmentTable" Items="_appointments">
             <Columns>
-                <PropertyColumn Property="x => x.CreationDate" Title="Дата"/>
-                <PropertyColumn Property="x => x.VeterinarianName" Title="Ветеринар"/>
-                <TemplateColumn Title="Статус">
+                <PropertyColumn Property="x => x.CreationDate" Title="Дата" Filterable="true"/>
+                <PropertyColumn Property="x => x.VeterinarianName" Title="Ветеринар" Filterable="true"/>
+                <TemplateColumn Title="Статус" Filterable="true">
                     <CellTemplate>
                         @if (context.Item.Status > -1)
                         {
