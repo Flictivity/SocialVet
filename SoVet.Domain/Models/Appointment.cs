@@ -1,4 +1,4 @@
-﻿namespace SoVet.BlazorWebClient.Models.Appointment;
+﻿namespace SoVet.Domain.Models;
 
 public sealed class Appointment
 {
@@ -9,7 +9,6 @@ public sealed class Appointment
     public DateTime ChangeDate { get; set; }
     public DateTime CreationDate { get; set; }
     public int AppointmentStatus { get; set; }
-    public Employee.Employee Employee { get; set; } = null!;
+    public Employee Employee { get; set; } = null!;
     public string? Recommendations { get; set; }
-    public List<Diagnosis>? Diagnoses;
 }

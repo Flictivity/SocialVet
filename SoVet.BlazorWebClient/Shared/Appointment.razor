@@ -1,42 +1,71 @@
-﻿@inject IDialogService DialogService;
+﻿@using SoVet.BlazorWebClient.Extensions
+@inject IDialogService DialogService;
+@inject IAppointmentService AppointmentService;
+
+@if (_model is null)
+{
+    <MudAlert Severity="Severity.Info" Class="mt-3">Не удалось загрузить информацию о приеме...</MudAlert>
+    return;
+}
 
 <MudCard Class="pa-4">
     <MudTabs Rounded="true">
         <MudTabPanel Text="Лист осмотра" Icon="@Icons.Material.Filled.ViewList">
-            <MudStack Row="true">
-                <MudTextField T="string" Label="Цель визита" Variant="Variant.Outlined"/>
-                <MudTextField ReadOnly="true" T="string" Label="Ветеринар" Variant="Variant.Outlined">Козлов</MudTextField>
-            </MudStack>
-            <MudTextField T="string" Label="Анамнез" Lines="3" FullWidth="true" Variant="Variant.Outlined"/>
-            <MudTextField T="string" Label="Осмотр" Lines="3" FullWidth="true" Variant="Variant.Outlined"/>
-            <MudStack Row="true" Spacing="5">
-                <MudSelect T="string" Variant="Variant.Outlined" Label="Тип">
-                    <MudSelectItem T="string"></MudSelectItem>
-                </MudSelect>
-                <MudTextField T="string" Variant="Variant.Outlined"></MudTextField>
-                <MudSelect T="string" Variant="Variant.Outlined" Label="Результат">
-                    <MudSelectItem T="string"></MudSelectItem>
-                </MudSelect>
-            </MudStack>
-            <MudTextField T="string" Label="Осмотр" Lines="3" FullWidth="true" Variant="Variant.Outlined"/>
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3">Добавить диагноз</MudButton>
-            
+            <MudSelect T="AppointmentStatus" Label="Статус" Variant="Variant.Outlined" Class="pa-0 mt-3">
+                @foreach (AppointmentStatus status in Enum.GetValues(typeof(AppointmentStatus)))
+                {
+                    <MudSelectItem Value="@status">
+                        <MudChip Class="ma-0" Style="@($"color:#FFFFFF; background:{StatusColors.StatusColor[status]};")">
+                            @status.GetDisplayName()
+                        </MudChip>
+                    </MudSelectItem>
+                }
+            </MudSelect>
+            <MudCard Elevation="2" Class="mt-3 mb-3">
+                <MudCardContent>
+                    <MudStack Row="true" Class="mb-3">
+                        <MudTextField T="string" Label="Цель визита" Variant="Variant.Outlined" @bind-Value="_model.Purpose"/>
+                        <MudTextField ReadOnly="true" T="string" Label="Ветеринар" Variant="Variant.Outlined" Value="@_model.Employee.Name"/>
+                    </MudStack>
+                    <MudTextField T="string" Label="Анамнез" Lines="3" FullWidth="true" Variant="Variant.Outlined" @bind-Value="_model.Anamnesis" Class="mb-3"/>
+                    <MudTextField T="string" Label="Осмотр" Lines="3" FullWidth="true" Variant="Variant.Outlined" @bind-Value="_model.Information"/>
+                </MudCardContent>
+            </MudCard>
+
+            <MudCard Elevation="2" Class="mt-3 mb-3">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Новый диагноз</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudStack Row="true" Spacing="3" Justify="Justify.FlexStart" Class="d-flex flex-wrap">
+                        <MudTextField T="string" Variant="Variant.Outlined" Label="Наименование"/>
+                        <MudSelect T="string" Variant="Variant.Outlined" Label="Результат">
+                            <MudSelectItem T="string"></MudSelectItem>
+                        </MudSelect>
+                    </MudStack>
+                    <MudTextField T="string" Label="Описание" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3">Добавить диагноз</MudButton>
+                </MudCardActions>
+            </MudCard>
+
             <MudSimpleTable Class="mt-5">
-                    <thead>
-                    <tr>
-                        <th>1</th>
-                        <th>2</th>
-                        <th>3</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>2</td>
-                        <td>3</td>
-                    </tr>
-                    </tbody>
-                </MudSimpleTable>
+                <thead>
+                <tr>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                </tr>
+                </tbody>
+            </MudSimpleTable>
         </MudTabPanel>
         <MudTabPanel Text="Рекомендации" Icon="@Icons.Material.Filled.Recommend"></MudTabPanel>
         <MudTabPanel Text="Услуги" Icon="@Icons.Material.Filled.Workspaces"></MudTabPanel>
@@ -47,15 +76,31 @@
                                                    padding: 10px;" Variant="Variant.Filled" Color="Color.Error">Close</MudButton>
     </MudCardActions>
 </MudCard>
+
 @code {
-    [Parameter]
-    public EventCallback<Models.Appointment.Appointment> AppointmentSelect { get; set; }
 
     [Parameter]
-    public Models.Appointment.Appointment AppointmentModel { get; set; } = null!;
-    
+    public EventCallback<Models.Appointment.AppointmentTable> AppointmentSelect { get; set; }
+
+    [Parameter]
+    public Models.Appointment.AppointmentTable AppointmentTable { get; set; } = null!;
+
+    private Models.Appointment.Appointment? _model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var appointment = await AppointmentService.GetAppointment(1);
+        if (appointment is null)
+        {
+            _model = new();
+            return;
+        }
+        _model = appointment;
+    }
+
     private void Close()
     {
         AppointmentSelect.InvokeAsync(null);
     }
+
 }

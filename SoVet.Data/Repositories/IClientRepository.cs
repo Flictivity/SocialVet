@@ -4,6 +4,6 @@ namespace SoVet.Data.Repositories;
 
 public interface IClientRepository
 {
-    public Task<Domain.Models.Client> AddClientAsync(Domain.Models.Client client);
-    public Task<List<Domain.Models.Client>> GetClientsAsync(List<UserInfo> users);
+    public Task<Client> AddClientAsync(Client client);
+    public Task<List<Client>> GetClientsAsync(List<UserInfo> users);
 }

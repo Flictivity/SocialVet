@@ -18,13 +18,27 @@ public sealed class AppointmentService : IAppointmentService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<List<AppointmentTable>>($"Appointment/?patientId={patientId}");
+            var response = await _httpClient.GetFromJsonAsync<List<AppointmentTable>>($"Appointment/appointments/?patientId={patientId}");
             return response ?? new List<AppointmentTable>();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
             return new List<AppointmentTable>();
+        }
+    }
+
+    public async Task<Appointment?> GetAppointment(int appointmentId)
+    {
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<Appointment>($"Appointment/appointment/?appointmentId={appointmentId}");
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
         }
     }
 }

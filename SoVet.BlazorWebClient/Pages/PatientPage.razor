@@ -1,5 +1,6 @@
 ﻿@page "/patient"
 @using Appointment = SoVet.BlazorWebClient.Models.Appointment.Appointment
+@using SoVet.BlazorWebClient.Models.Appointment
 
 @inject ISnackbar Snackbar;
 
@@ -11,7 +12,7 @@
         }
         else
         {
-            <Appointment AppointmentModel="_appointment" AppointmentSelect="x => _appointment = x"></Appointment>
+            <Appointment AppointmentTable="_appointment" AppointmentSelect="x => _appointment = x"></Appointment>
         }
     </MudTabPanel>
     <MudTabPanel Text="Вакцинации" Icon="@Icons.Material.Filled.Vaccines">
@@ -23,7 +24,7 @@
 </MudTabs>
 
 @code {
-    private Appointment? _appointment;
+    private AppointmentTable? _appointment;
 
     private void IndexChange(int n)
     {

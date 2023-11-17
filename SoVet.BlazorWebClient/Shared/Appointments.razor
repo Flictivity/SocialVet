@@ -1,13 +1,11 @@
 ﻿@using SoVet.BlazorWebClient.Models.Appointment
+@using SoVet.BlazorWebClient.Extensions
 @inject IAppointmentService AppointmentService;
 
 <div class="ma-5">
     <MudGrid Class="mb-3" Spacing="2">
         <MudItem xs="12">
-            <MudStack Row>
-                <MudText Typo="Typo.h6" Color="Color.Secondary" Style="font-weight: bolder">Кличка:</MudText>
-                <MudText Typo="Typo.h6" Color="Color.Primary" Style="font-weight: bold">Шарик</MudText>
-            </MudStack>
+            <MudText Typo="Typo.h4" Color="Color.Primary" Style="font-weight: bold">Шарик</MudText>
         </MudItem>
         <MudItem xs="12">
             <MudStack Row>
@@ -22,11 +20,19 @@
         <Columns>
             <PropertyColumn Property="x => x.CreationDate" Title="Дата"/>
             <PropertyColumn Property="x => x.VeterinarianName" Title="Ветеринар"/>
-            <PropertyColumn Property="x => x.Status" Title="Статус"/>
+            <TemplateColumn Title="Статус">
+                <CellTemplate>
+                    @if (context.Item.Status > -1)
+                    {
+                        var status = (AppointmentStatus)context.Item.Status;
+                        <MudChip Style="@($"color:#FFFFFF; background:{StatusColors.StatusColor[status]};")">@status.GetDisplayName()</MudChip>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
             <TemplateColumn>
                 <CellTemplate>  
                     <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" 
-                                   OnClick="Change"/>
+                                   OnClick="@Change"/>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -35,9 +41,9 @@
 
 @code {
     [Parameter]
-    public EventCallback<Models.Appointment.Appointment> AppointmentSelect { get; set; }
+    public EventCallback<AppointmentTable> AppointmentSelect { get; set; }
 
-    private Models.Appointment.Appointment _appointment = new();
+    private AppointmentTable _appointment = new();
 
     private List<AppointmentTable> _appointments = null!;
     private MudDataGrid<AppointmentTable> _dataGrid = null!;
@@ -50,6 +56,7 @@
 
     private void Change()
     {
+        var status = (AppointmentStatus)1;
         AppointmentSelect.InvokeAsync(_appointment);
     }
 }

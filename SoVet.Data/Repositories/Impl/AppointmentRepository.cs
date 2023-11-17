@@ -20,4 +20,17 @@ public sealed class AppointmentRepository : IAppointmentRepository
         var res =  (await connection.QueryAsync<AppointmentTable>(AppointmentRepositoryQueries.GetAppointments, new {patientId})).AsList();
         return res;
     }
+
+    public async Task<Appointment?> GetAppointmentAsync(int appointmentId)
+    {
+        var connection = _context.Database.GetDbConnection();
+        var res = await  connection.QueryAsync<Appointment,Employee,Appointment>(AppointmentRepositoryQueries.GetAppointment,
+            (appointment, employee) =>
+            {
+                appointment.Employee = employee;
+                return appointment;
+            },
+            new{appointmentId}, splitOn:"Id");
+        return res.FirstOrDefault();
+    }
 }
