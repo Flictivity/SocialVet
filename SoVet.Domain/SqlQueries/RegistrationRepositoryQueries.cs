@@ -12,10 +12,9 @@ public static class RegistrationRepositoryQueries
                                                             FROM all_hours ah
                                                             WHERE ah.hour not in (select r.start_time from registrations r WHERE r.employee_id = @employeeId and r.start_time::date = @dateReg::date)";
 
-    public const string GetRegistrations = @"SELECT r.start_time as StartTime, c.id as ClientId, c.name as ClientName, e.id as EmployeeId,
-                                                       e.name as EmployeeName, rt.id as RegistrationTypeId, rt.name as TypeName, r.Comment as Comment
+    public const string GetRegistrations = @"SELECT r.id, r.start_time as StartTime, c.id as ClientId, c.name as ClientName, e.id as EmployeeId,
+                                                       e.name as EmployeeName, r.Comment as Comment
                                                 FROM public.registrations r
                                                          JOIN public.clients c on c.id = r.client_id
-                                                         JOIN public.employees e on e.id = r.employee_id
-                                                         JOIN public.registration_types rt on r.registration_type_id = rt.id";
+                                                         JOIN public.employees e on e.id = r.employee_id";
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SoVet.Data;
@@ -11,9 +12,11 @@ using SoVet.Data;
 namespace SoVet.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20231117091545_EditDiagnosis")]
+    partial class EditDiagnosis
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,10 +91,6 @@ namespace SoVet.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("recommendations");
 
-                    b.Property<int>("RegistrationId")
-                        .HasColumnType("integer")
-                        .HasColumnName("registration_id");
-
                     b.HasKey("Id")
                         .HasName("pk_appointments");
 
@@ -100,9 +99,6 @@ namespace SoVet.Data.Migrations
 
                     b.HasIndex("PatientId")
                         .HasDatabaseName("ix_appointments_patient_id");
-
-                    b.HasIndex("RegistrationId")
-                        .HasDatabaseName("ix_appointments_registration_id");
 
                     b.ToTable("appointments", (string)null);
                 });
@@ -414,6 +410,10 @@ namespace SoVet.Data.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("employee_id");
 
+                    b.Property<int>("RegistrationTypeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("registration_type_id");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("start_time");
@@ -427,7 +427,30 @@ namespace SoVet.Data.Migrations
                     b.HasIndex("EmployeeId")
                         .HasDatabaseName("ix_registrations_employee_id");
 
+                    b.HasIndex("RegistrationTypeId")
+                        .HasDatabaseName("ix_registrations_registration_type_id");
+
                     b.ToTable("registrations", (string)null);
+                });
+
+            modelBuilder.Entity("SoVet.Data.Entities.RegistrationType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_registration_types");
+
+                    b.ToTable("registration_types", (string)null);
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.Vaccination", b =>
@@ -509,18 +532,9 @@ namespace SoVet.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_appointments_patients_patient_id");
 
-                    b.HasOne("SoVet.Data.Entities.Registration", "Registration")
-                        .WithMany()
-                        .HasForeignKey("RegistrationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_appointments_registrations_registration_id");
-
                     b.Navigation("Employee");
 
                     b.Navigation("Patient");
-
-                    b.Navigation("Registration");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.AppointmentFacility", b =>
@@ -626,9 +640,18 @@ namespace SoVet.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_registrations_employees_employee_id");
 
+                    b.HasOne("SoVet.Data.Entities.RegistrationType", "RegistrationType")
+                        .WithMany("Appointments")
+                        .HasForeignKey("RegistrationTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_registrations_registration_types_registration_type_id");
+
                     b.Navigation("Client");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("RegistrationType");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.Vaccination", b =>
@@ -679,6 +702,11 @@ namespace SoVet.Data.Migrations
             modelBuilder.Entity("SoVet.Data.Entities.FacilityCategory", b =>
                 {
                     b.Navigation("Facilities");
+                });
+
+            modelBuilder.Entity("SoVet.Data.Entities.RegistrationType", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.ValueAddedTax", b =>

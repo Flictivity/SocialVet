@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.EntityFrameworkCore;
 using SoVet.Data.Mappers;
+using SoVet.Domain.ErrorMessages;
 using SoVet.Domain.Models;
 using SoVet.Domain.Responses;
 using SoVet.Domain.SqlQueries;
@@ -41,8 +42,13 @@ public sealed class AppointmentRepository : IAppointmentRepository
     public async Task<BaseResponse> SaveAppointmentAsync(Appointment appointment)
     {
         _context.ChangeTracker.Clear();
-        var appointmentDb = _mapper.Map(appointment);
+
         var existAppointment = _context.Appointments.FirstOrDefault(x => x.Id == appointment.Id);
+        if (existAppointment is null && _context.Appointments.Any(x => x.RegistrationId == appointment.RegistrationId))
+        {
+            return new BaseResponse { IsSuccess = false, Message = AppointmentErrorMessages.AppointmentToRegistrationAlreadyExist};
+        }
+        var appointmentDb = _mapper.Map(appointment);
         if (existAppointment is null)
         {
             await _context.Appointments.AddAsync(appointmentDb);

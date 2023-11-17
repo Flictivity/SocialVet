@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SoVet.Data.Entities;
 
@@ -15,11 +16,9 @@ public sealed class Registration
     [ForeignKey(nameof(ClientId))]
     public Client Client { get; set; } = null!;
 
-    public int RegistrationTypeId { get; set; }
-    [ForeignKey(nameof(RegistrationTypeId))]
-    public RegistrationType RegistrationType { get; set; } = null!;
-
     public int EmployeeId { get; set; }
     [ForeignKey(nameof(EmployeeId))]
     public Employee Employee { get; set; } = null!;
+
+    public ICollection<Appointment> Appointments = new List<Appointment>();
 }

@@ -1,5 +1,7 @@
-﻿@inject IPatientService PatientService;
+﻿@using SoVet.BlazorWebClient.Models.Employee
+@inject IPatientService PatientService;
 @inject NavigationManager NavigationManager;
+@inject IAppointmentService AppointmentService;
 
 <MudDialog>
     <DialogContent>
@@ -25,7 +27,7 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="OpenAppointment">Перейти к приему</MudButton>
+        <MudButton Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await OpenAppointment())">Перейти к приему</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -36,7 +38,8 @@
     [Parameter]
     public Registration Model { get; set; } = new();
 
-    private Patient _patient = null!;
+    private Patient? _patient;
+    private Employee? _employee;
     private MudForm _form = null!;
     private List<Patient> _patients = new ();
 
@@ -45,6 +48,7 @@
         var patients = await PatientService.GetPatients(Model.ClientId);
         if (patients is not null)
             _patients = patients;
+        
         await base.OnInitializedAsync();
     }
 
@@ -54,9 +58,23 @@
         return Task.FromResult(res);
     }
 
-    private void OpenAppointment()
+    private async Task OpenAppointment()
     {
+        if(_patient is null)
+            return;
         MudDialog.Close();
-        NavigationManager.NavigateTo("/patient");
+        await AppointmentService.SaveAppointment(
+            new Models.Appointment.Appointment
+            {
+                RegistrationId = Model.Id,
+                Purpose = string.Empty,
+                ChangeDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
+                CreationDate =DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
+                AppointmentStatus = 0,
+                Employee = new Employee { Id = Model.EmployeeId, Name = string.Empty},
+                PatientId = _patient.Id
+            });
+        
+        NavigationManager.NavigateTo($"/patient/{_patient.Id}");
     }
 }

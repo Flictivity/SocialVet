@@ -6,16 +6,19 @@
 @inject IPatientService PatientService;
 
 <MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndexChanged="IndexChange">
-    <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History">
-        @if (_appointment is null)
-        {
-            <Appointments AppointmentSelect="x => _appointment = x" PatientId="PatientId    "></Appointments>
-        }
-        else
-        {
-            <Appointment AppointmentTable="_appointment" AppointmentSelect="x => _appointment = x"></Appointment>
-        }
-    </MudTabPanel>
+    @if (_patient is not null)
+    {
+        <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History">
+            @if (_appointment is null)
+            {
+                <Appointments AppointmentSelect="x => _appointment = x" Patient="_patient"></Appointments>
+            }
+            else
+            {
+                <Appointment AppointmentTable="_appointment" AppointmentSelect="x => _appointment = x"></Appointment>
+            }
+        </MudTabPanel>
+    }
     <MudTabPanel Text="Профиль" Icon="@Icons.Material.Filled.CrueltyFree">
         <PatientInfo Model="_patient"></PatientInfo>
     </MudTabPanel>

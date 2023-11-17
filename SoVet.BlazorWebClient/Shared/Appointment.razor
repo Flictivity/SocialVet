@@ -1,6 +1,7 @@
 ﻿@using SoVet.BlazorWebClient.Extensions
 @inject IDialogService DialogService;
 @inject IAppointmentService AppointmentService;
+@inject ISnackbar Snackbar;
 
 @if (!_isLoaded)
 {
@@ -17,10 +18,10 @@
 <MudCard Class="pa-4">
     <MudTabs Rounded="true">
         <MudTabPanel Text="Лист осмотра" Icon="@Icons.Material.Filled.ViewList">
-            <MudSelect T="AppointmentStatus" Label="Статус" Variant="Variant.Outlined" Class="pa-0 mt-3">
+            <MudSelect T="int" Label="Статус" Variant="Variant.Outlined" Class="pa-0 mt-3" @bind-Value="_model.AppointmentStatus">
                 @foreach (AppointmentStatus status in Enum.GetValues(typeof(AppointmentStatus)))
                 {
-                    <MudSelectItem Value="@status">
+                    <MudSelectItem Value="@((int)status)">
                         <MudChip Class="ma-0" Style="@($"color:#FFFFFF; background:{StatusColors.StatusColor[status]};")">
                             @status.GetDisplayName()
                         </MudChip>
@@ -108,7 +109,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var appointment = await AppointmentService.GetAppointment(1);
+        var appointment = await AppointmentService.GetAppointment(AppointmentTable.Id);
         if (appointment is null)
         {
             _model = new();
@@ -141,7 +142,14 @@
     {
         if(_model is null)
             return;
+        _model.ChangeDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
         var result = await AppointmentService.SaveAppointment(_model);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно", Severity.Success);
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
     }
 
     private async Task EditDiagnosis(Diagnosis diagnosis)

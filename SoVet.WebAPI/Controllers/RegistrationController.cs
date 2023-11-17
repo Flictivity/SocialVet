@@ -45,7 +45,6 @@ public sealed class RegistrationController : AuthorizedControllerBase
             StartTime = request.StartTime,
             ClientId = request.ClientId,
             EmployeeId = request.EmployeeId,
-            RegistrationTypeId = request.RegistrationTypeId
         };
         var command = new CreateRegistrationCommand(newRegistration);
         var result = await _sender.Send(command);

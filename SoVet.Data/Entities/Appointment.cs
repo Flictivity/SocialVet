@@ -17,12 +17,17 @@ public sealed class Appointment
     public int AppointmentStatus { get; set; }
 
     public int EmployeeId { get; set; }
+    [ForeignKey(nameof(EmployeeId))]
     public Employee Employee { get; set; } = null!;
 
     public string? Recommendations { get; set; }
     public int PatientId { get; set; }
     [ForeignKey(nameof(PatientId))]
     public Patient Patient { get; set; } = null!;
+    
+    public int RegistrationId { get; set; }
+    [ForeignKey(nameof(RegistrationId))]
+    public Registration? Registration { get; set; }
 
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();
     public ICollection<Diagnosis> AppointmentDiagnoses { get; set; } = new List<Diagnosis>();
