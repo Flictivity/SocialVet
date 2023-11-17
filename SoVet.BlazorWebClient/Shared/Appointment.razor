@@ -2,6 +2,7 @@
 @inject IDialogService DialogService;
 @inject IAppointmentService AppointmentService;
 @inject ISnackbar Snackbar;
+@inject IDiagnosisService DiagnosisService;
 
 @if (!_isLoaded)
 {
@@ -45,16 +46,25 @@
                 </MudCardHeader>
                 <MudCardContent>
                     <MudStack Row="true" Spacing="3" Justify="Justify.FlexStart" Class="d-flex flex-wrap">
-                        <MudTextField T="string" Variant="Variant.Outlined" Label="Наименование" @bind-Value="_diagnosis.Name"/>
-                        <MudSelect T="int" Variant="Variant.Outlined" Label="Результат" @bind-Value="_diagnosis.Result">
-                            <MudSelectItem T="int"></MudSelectItem>
+                        <MudTextField Required="true" RequiredError="Обязательное поле" T="string" Variant="Variant.Outlined" Label="Наименование" @bind-Value="_diagnosis.Name"/>
+                        <MudSelect Required="true" RequiredError="Обязательное поле" T="int" Variant="Variant.Outlined" Label="Результат" @bind-Value="_diagnosis.Result">
+                            @foreach (DiagnosisResult result in Enum.GetValues(typeof(DiagnosisResult)))
+                            {
+                                <MudSelectItem Value="@((int)result)">
+                                    <MudChip Class="ma-0">
+                                        @result.GetDisplayName()
+                                    </MudChip>
+                                </MudSelectItem>
+                            }
                         </MudSelect>
                     </MudStack>
-                    <MudTextField T="string" Label="Описание" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                    <MudTextField Required="true" RequiredError="Обязательное поле" T="string" Label="Описание" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
                                   @bind-Value="_diagnosis.Description"/>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveDiagnosis())">Сохранить диагноз</MudButton>
+                    <MudButton Disabled="@(string.IsNullOrWhiteSpace(_diagnosis.Name)
+                                           || string.IsNullOrWhiteSpace(_diagnosis.Description))" 
+                               Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveDiagnosis())">Сохранить диагноз</MudButton>
                 </MudCardActions>
             </MudCard>
 
@@ -132,15 +142,40 @@
 
     private async Task SaveDiagnosis()
     {
+        if (_model is null)
+            return;
+        _diagnosis.Date = DateOnly.FromDateTime(DateTime.Now);
+        _diagnosis.AppointmentId = _model.Id;
+        var result = await DiagnosisService.SaveDiagnosis(_diagnosis);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно!", Severity.Success);
+            _diagnosis = new Diagnosis();
+            _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
     }
 
     private async Task DeleteDiagnosis(int diagnosisId)
     {
+        if (_model is null)
+            return;
+        var result = await DiagnosisService.DeleteDiagnosis(diagnosisId);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно!", Severity.Success);
+            _diagnosis = new Diagnosis();
+            _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
+        _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
     }
 
     private async Task Save()
     {
-        if(_model is null)
+        if (_model is null)
             return;
         _model.ChangeDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
         var result = await AppointmentService.SaveAppointment(_model);
@@ -157,4 +192,5 @@
         _diagnosis = diagnosis;
         await InvokeAsync(StateHasChanged);
     }
+
 }
