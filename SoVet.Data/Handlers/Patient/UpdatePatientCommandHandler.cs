@@ -16,6 +16,6 @@ public sealed class UpdatePatientCommandHandler : IRequestHandler<UpdatePatientC
 
     public async Task<BaseResponse> Handle(UpdatePatientCommand request, CancellationToken cancellationToken)
     {
-        return await _repository.UpdatePatient(request.Patient);
+        return await _repository.UpdatePatientAsync(request.Patient);
     }
 }

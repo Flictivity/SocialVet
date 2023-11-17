@@ -57,4 +57,17 @@ public sealed class PatientService : IPatientService
             return new BaseResult {IsSuccess = false, Message = ex.Message};
         }
     }
+
+    public async Task<Patient?> GetPatient(int patientId)
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<Patient>($"Patient/patient?patientId={patientId}");
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
 }

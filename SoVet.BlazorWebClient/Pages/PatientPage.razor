@@ -1,8 +1,9 @@
-﻿@page "/patient"
+﻿@page "/patient/{PatientId:int}"
 @using Appointment = SoVet.BlazorWebClient.Models.Appointment.Appointment
 @using SoVet.BlazorWebClient.Models.Appointment
 
 @inject ISnackbar Snackbar;
+@inject IPatientService PatientService;
 
 <MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndexChanged="IndexChange">
     <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History">
@@ -15,19 +16,28 @@
             <Appointment AppointmentTable="_appointment" AppointmentSelect="x => _appointment = x"></Appointment>
         }
     </MudTabPanel>
-    <MudTabPanel Text="Вакцинации" Icon="@Icons.Material.Filled.Vaccines">
-
-    </MudTabPanel>
     <MudTabPanel Text="Профиль" Icon="@Icons.Material.Filled.CrueltyFree">
-        <PatientInfo></PatientInfo>
+        <PatientInfo Model="_patient"></PatientInfo>
     </MudTabPanel>
 </MudTabs>
 
 @code {
+    [Parameter]
+    public int PatientId { get; set; }
+    
+    private Patient? _patient;
+    
     private AppointmentTable? _appointment;
 
     private void IndexChange(int n)
     {
         Snackbar.Add($"Test{n}", Severity.Error);
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _patient = await PatientService.GetPatient(PatientId);
+        await base.OnInitializedAsync();
+    }
+
 }

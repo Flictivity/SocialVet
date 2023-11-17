@@ -18,7 +18,7 @@ public sealed class PatientRepository : IPatientRepository
         _mapper = new DatabaseMapper();
     }
 
-    public async Task<List<Patient>> GetPatients(int? clientId)
+    public async Task<List<Patient>> GetPatientsAsync(int? clientId)
     {
         var builder = new SqlBuilder();
         var selector = builder.AddTemplate(PatientRepositoryQueries.GetPatients);
@@ -37,7 +37,21 @@ public sealed class PatientRepository : IPatientRepository
         return result;
     }
 
-    public async Task<BaseResponse> CreatePatient(Patient patient)
+    public async Task<Patient?> GetPatientAsync(int patientId)
+    {
+        var connection = _context.Database.GetDbConnection();
+        var result = (await connection.QueryAsync<Patient, AnimalType, Client,Patient>(PatientRepositoryQueries.GetPatient,
+            (patient, at, c) =>
+            {
+                patient.AnimalType = at;
+                patient.Client = c;
+                return patient;
+            })).AsList();
+
+        return result.FirstOrDefault();
+    }
+
+    public async Task<BaseResponse> CreatePatientAsync(Patient patient)
     {
         var patientDb = _mapper.Map(patient);
         await _context.Patients.AddAsync(patientDb);
@@ -45,7 +59,7 @@ public sealed class PatientRepository : IPatientRepository
         return new BaseResponse{IsSuccess = true};
     }
 
-    public async Task<BaseResponse> UpdatePatient(Patient patient)
+    public async Task<BaseResponse> UpdatePatientAsync(Patient patient)
     {
         _context.ChangeTracker.Clear();
         var patientDb = _mapper.Map(patient);

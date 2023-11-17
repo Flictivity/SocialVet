@@ -16,6 +16,6 @@ public sealed class CreatePatientCommandHandler : IRequestHandler<CreatePatientC
 
     public async Task<BaseResponse> Handle(CreatePatientCommand request, CancellationToken cancellationToken)
     {
-        return await _repository.CreatePatient(request.Patient);
+        return await _repository.CreatePatientAsync(request.Patient);
     }
 }

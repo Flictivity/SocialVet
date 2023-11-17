@@ -26,6 +26,16 @@ public sealed class PatientController : AuthorizedControllerBase
         return Ok(commandResult);
     }
     
+    [HttpGet]
+    [Route("patient")]
+    public async Task<IActionResult> GetPatient([FromQuery] int patientId)
+    {
+        var command = new GetPatientQuery(patientId);
+        var commandResult = await _sender.Send(command);
+
+        return Ok(commandResult);
+    }
+    
     [HttpPost]
     [Route("create")]
     public async Task<IActionResult> CreatePatient([FromBody] Patient patient)

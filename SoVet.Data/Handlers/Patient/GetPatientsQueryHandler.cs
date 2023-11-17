@@ -15,6 +15,6 @@ public sealed class GetPatientsQueryHandler : IRequestHandler<GetPatientsQuery, 
 
     public Task<List<Domain.Models.Patient>> Handle(GetPatientsQuery request, CancellationToken cancellationToken)
     {
-        return _repository.GetPatients(request.ClientId);
+        return _repository.GetPatientsAsync(request.ClientId);
     }
 }

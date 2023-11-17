@@ -5,7 +5,8 @@ namespace SoVet.Data.Repositories;
 
 public interface IPatientRepository
 {
-    public Task<List<Patient>> GetPatients(int? clientId);
-    public Task<BaseResponse> CreatePatient(Patient patient);
-    public Task<BaseResponse> UpdatePatient(Patient patient);
+    public Task<List<Patient>> GetPatientsAsync(int? clientId);
+    public Task<Patient?> GetPatientAsync(int patientId);
+    public Task<BaseResponse> CreatePatientAsync(Patient patient);
+    public Task<BaseResponse> UpdatePatientAsync(Patient patient);
 }

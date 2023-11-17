@@ -1,8 +1,8 @@
 ﻿@page "/patients"
 
 @inject IPatientService PatientService;
-@inject IDialogService DialogService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject NavigationManager NavigationManager;
 
 <PageTitle>Пациенты</PageTitle>
 
@@ -16,14 +16,12 @@
         {
             <TemplateColumn>
                 <CellTemplate>
-                    <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" OnClick="@(async () => await OpenWindow(context.Item))"/>
+                    <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" Href="@($"patient/{context.Item.Id}")"/>
                 </CellTemplate>
             </TemplateColumn>
         }
     </Columns>
 </MudDataGrid>
-
-<MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenWindow(new Patient()))"></MudFab>
 
 @code {
     MudDataGrid<Patient> _dataGrid = null!;
@@ -46,25 +44,4 @@
         patients ??= new List<Patient>();
         return new GridData<Patient> {Items = patients, TotalItems = patients.Count};
     }
-
-    private async Task OpenWindow(Patient patient)
-    {
-        var options = new DialogOptions
-        {
-            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
-        };
-
-        var parameters = new DialogParameters
-        {
-            {"Model", patient},
-        };
-
-        var dialog = await DialogService.ShowAsync<PatientInfo>("Пациент", parameters, options);
-        var result = await dialog.Result;
-        if (!result.Canceled)
-        {
-            await _dataGrid.ReloadServerData();
-        }
-    }
-
 }
