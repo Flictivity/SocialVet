@@ -68,7 +68,7 @@ public class EmployeeController : AuthorizedControllerBase
             Id = employeeRegistration.Id,
             Name = employeeRegistration.Name
         };
-        var command = new UpdateEmployeeCommand(newEmployee, employeeRegistration.OldEmail, employeeRegistration.Email, employeeRegistration.Role, employeeRegistration.Password);
+        var command = new UpdateEmployeeCommand(newEmployee, employeeRegistration.OldEmail!, employeeRegistration.Email, employeeRegistration.Role, employeeRegistration.Password);
         try
         {
             var commandResult = await _sender.Send(command);
