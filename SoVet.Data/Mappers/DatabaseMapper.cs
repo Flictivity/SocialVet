@@ -26,4 +26,8 @@ public sealed partial class DatabaseMapper
     [MapperIgnoreTarget(nameof(Domain.Models.Patient.AnimalType))]
     [MapperIgnoreTarget(nameof(Domain.Models.Patient.Client))]
     public partial Patient Map(Domain.Models.Patient patient);
+    
+    public partial Diagnosis Map(Domain.Models.Diagnosis patient);
+    
+    public partial Domain.Models.Diagnosis Map(Diagnosis patient);
 }

@@ -25,6 +25,6 @@ public sealed class Appointment
     public Patient Patient { get; set; } = null!;
 
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();
-    public ICollection<AppointmentDiagnosis> AppointmentDiagnoses { get; set; } = new List<AppointmentDiagnosis>();
+    public ICollection<Diagnosis> AppointmentDiagnoses { get; set; } = new List<Diagnosis>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

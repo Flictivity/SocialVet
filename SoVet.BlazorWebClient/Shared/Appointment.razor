@@ -50,22 +50,20 @@
                 </MudCardActions>
             </MudCard>
 
-            <MudSimpleTable Class="mt-5">
-                <thead>
-                <tr>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                </tr>
-                </tbody>
-            </MudSimpleTable>
+            <MudDataGrid Striped="true" T="Diagnosis" Items="_diagnoses"  SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@QuickFilter">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Диагнозы</MudText>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                        AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name" Title="Наименование"/>
+                    <PropertyColumn Property="x => x.Description" Title="Описание"/>
+                    <PropertyColumn Property="x => x.Date" Title="Дата" Filterable="false"/>
+                    <PropertyColumn Property="x => x.Result" Title="Результат" Filterable="false"/>
+                </Columns>
+            </MudDataGrid>
         </MudTabPanel>
         <MudTabPanel Text="Рекомендации" Icon="@Icons.Material.Filled.Recommend"></MudTabPanel>
         <MudTabPanel Text="Услуги" Icon="@Icons.Material.Filled.Workspaces"></MudTabPanel>
@@ -86,6 +84,8 @@
     public Models.Appointment.AppointmentTable AppointmentTable { get; set; } = null!;
 
     private Models.Appointment.Appointment? _model;
+    private List<Diagnosis> _diagnoses = null!;
+    private string? _searchString;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,11 +96,25 @@
             return;
         }
         _model = appointment;
+
+        _diagnoses = await AppointmentService.GetAppointmentDiagnoses(1) ?? new List<Diagnosis>();
+        await base.OnInitializedAsync();
     }
 
     private void Close()
     {
         AppointmentSelect.InvokeAsync(null);
     }
+    
+    private Func<Diagnosis, bool> QuickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
 
 }

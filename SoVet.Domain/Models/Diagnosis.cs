@@ -1,4 +1,4 @@
-﻿namespace SoVet.BlazorWebClient.Models;
+﻿namespace SoVet.Domain.Models;
 
 public sealed class Diagnosis
 {
