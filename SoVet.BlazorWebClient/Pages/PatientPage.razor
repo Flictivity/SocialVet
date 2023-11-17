@@ -9,7 +9,7 @@
     <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History">
         @if (_appointment is null)
         {
-            <Appointments AppointmentSelect="x => _appointment = x"></Appointments>
+            <Appointments AppointmentSelect="x => _appointment = x" PatientId="PatientId    "></Appointments>
         }
         else
         {
@@ -39,5 +39,4 @@
         _patient = await PatientService.GetPatient(PatientId);
         await base.OnInitializedAsync();
     }
-
 }

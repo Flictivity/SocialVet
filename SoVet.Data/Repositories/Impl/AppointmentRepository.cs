@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using Microsoft.EntityFrameworkCore;
+using SoVet.Data.Mappers;
 using SoVet.Domain.Models;
+using SoVet.Domain.Responses;
 using SoVet.Domain.SqlQueries;
 
 namespace SoVet.Data.Repositories.Impl;
@@ -8,10 +10,12 @@ namespace SoVet.Data.Repositories.Impl;
 public sealed class AppointmentRepository : IAppointmentRepository
 {
     private readonly ApplicationContext _context;
+    private readonly DatabaseMapper _mapper;
 
     public AppointmentRepository(ApplicationContext context)
     {
         _context = context;
+        _mapper = new DatabaseMapper();
     }
 
     public async Task<List<AppointmentTable>> GetAppointmentsAsync(int patientId)
@@ -32,5 +36,22 @@ public sealed class AppointmentRepository : IAppointmentRepository
             },
             new{appointmentId}, splitOn:"Id");
         return res.FirstOrDefault();
+    }
+
+    public async Task<BaseResponse> SaveAppointmentAsync(Appointment appointment)
+    {
+        _context.ChangeTracker.Clear();
+        var appointmentDb = _mapper.Map(appointment);
+        var existAppointment = _context.Appointments.FirstOrDefault(x => x.Id == appointment.Id);
+        if (existAppointment is null)
+        {
+            await _context.Appointments.AddAsync(appointmentDb);
+        }
+        else
+        {
+            _context.Appointments.Update(appointmentDb);
+        }
+        await _context.SaveChangesAsync();
+        return new BaseResponse { IsSuccess = true };
     }
 }

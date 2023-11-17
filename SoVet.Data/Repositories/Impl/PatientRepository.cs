@@ -46,7 +46,7 @@ public sealed class PatientRepository : IPatientRepository
                 patient.AnimalType = at;
                 patient.Client = c;
                 return patient;
-            })).AsList();
+            }, new{patientId})).AsList();
 
         return result.FirstOrDefault();
     }

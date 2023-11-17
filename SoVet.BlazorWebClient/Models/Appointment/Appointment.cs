@@ -12,4 +12,5 @@ public sealed class Appointment
     public Employee.Employee Employee { get; set; } = null!;
     public string? Recommendations { get; set; }
     public List<Diagnosis>? Diagnoses;
+    public int PatientId { get; set; }
 }

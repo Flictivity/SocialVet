@@ -1,7 +1,11 @@
 ﻿@using SoVet.BlazorWebClient.Models.Appointment
 @using SoVet.BlazorWebClient.Extensions
 @inject IAppointmentService AppointmentService;
-
+@if (!_isLoaded)
+{
+    <MudProgressLinear/>
+    return;
+}
 <div class="ma-5">
     <MudGrid Class="mb-3" Spacing="2">
         <MudItem xs="12">
@@ -42,21 +46,24 @@
 @code {
     [Parameter]
     public EventCallback<AppointmentTable> AppointmentSelect { get; set; }
+    [Parameter]
+    public int PatientId { get; set; }
 
     private AppointmentTable _appointment = new();
 
     private List<AppointmentTable> _appointments = null!;
     private MudDataGrid<AppointmentTable> _dataGrid = null!;
+    private bool _isLoaded;
     
     protected override async Task OnInitializedAsync()
     {
-        _appointments = await AppointmentService.GetAppointments(1);
+        _appointments = await AppointmentService.GetAppointments(PatientId);
+        _isLoaded = true;
         await base.OnInitializedAsync();
     }
 
     private void Change()
     {
-        var status = (AppointmentStatus)1;
         AppointmentSelect.InvokeAsync(_appointment);
     }
 }

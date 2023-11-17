@@ -15,6 +15,7 @@ public static class AppointmentRepositoryQueries
                                                   a.creation_date as CreationDate,
                                                   a.appointment_status as AppointmentStatus,
                                                   a.recommendations,
+                                                  a.patient_id as PatientId,
                                                   e.*
                                             FROM appointments a
                                                      JOIN public.employees e on e.id = a.employee_id

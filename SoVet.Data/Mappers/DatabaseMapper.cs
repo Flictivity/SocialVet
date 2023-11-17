@@ -27,7 +27,10 @@ public sealed partial class DatabaseMapper
     [MapperIgnoreTarget(nameof(Domain.Models.Patient.Client))]
     public partial Patient Map(Domain.Models.Patient patient);
     
-    public partial Diagnosis Map(Domain.Models.Diagnosis patient);
+    public partial Diagnosis Map(Domain.Models.Diagnosis diagnosis);
     
-    public partial Domain.Models.Diagnosis Map(Diagnosis patient);
+    public partial Domain.Models.Diagnosis Map(Diagnosis diagnosis);
+    public partial Domain.Models.Appointment Map(Appointment appointment);
+    [MapperIgnoreTarget(nameof(Domain.Models.Appointment.Employee))]
+    public partial Appointment Map(Domain.Models.Appointment appointment);
 }

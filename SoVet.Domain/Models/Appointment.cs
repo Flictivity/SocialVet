@@ -11,4 +11,5 @@ public sealed class Appointment
     public int AppointmentStatus { get; set; }
     public Employee Employee { get; set; } = null!;
     public string? Recommendations { get; set; }
+    public int PatientId { get; set; }
 }

@@ -2,6 +2,12 @@
 @inject IDialogService DialogService;
 @inject IAppointmentService AppointmentService;
 
+@if (!_isLoaded)
+{
+    <MudProgressLinear/>
+    return;
+}
+
 @if (_model is null)
 {
     <MudAlert Severity="Severity.Info" Class="mt-3">Не удалось загрузить информацию о приеме...</MudAlert>
@@ -34,34 +40,44 @@
 
             <MudCard Elevation="2" Class="mt-3 mb-3">
                 <MudCardHeader>
-                    <MudText Typo="Typo.h6">Новый диагноз</MudText>
+                    <MudText Typo="Typo.h6">Диагноз</MudText>
                 </MudCardHeader>
                 <MudCardContent>
                     <MudStack Row="true" Spacing="3" Justify="Justify.FlexStart" Class="d-flex flex-wrap">
-                        <MudTextField T="string" Variant="Variant.Outlined" Label="Наименование"/>
-                        <MudSelect T="string" Variant="Variant.Outlined" Label="Результат">
-                            <MudSelectItem T="string"></MudSelectItem>
+                        <MudTextField T="string" Variant="Variant.Outlined" Label="Наименование" @bind-Value="_diagnosis.Name"/>
+                        <MudSelect T="int" Variant="Variant.Outlined" Label="Результат" @bind-Value="_diagnosis.Result">
+                            <MudSelectItem T="int"></MudSelectItem>
                         </MudSelect>
                     </MudStack>
-                    <MudTextField T="string" Label="Описание" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"/>
+                    <MudTextField T="string" Label="Описание" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                                  @bind-Value="_diagnosis.Description"/>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3">Добавить диагноз</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveDiagnosis())">Сохранить диагноз</MudButton>
                 </MudCardActions>
             </MudCard>
 
-            <MudDataGrid Striped="true" T="Diagnosis" Items="_diagnoses"  SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@QuickFilter">
+            <MudDataGrid Striped="true" T="Diagnosis" Items="_diagnoses" SortMode="SortMode.Multiple" QuickFilter="@QuickFilter">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Диагнозы</MudText>
-                    <MudSpacer />
+                    <MudSpacer/>
                     <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
-                        AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+                    </MudTextField>
                 </ToolBarContent>
                 <Columns>
                     <PropertyColumn Property="x => x.Name" Title="Наименование"/>
                     <PropertyColumn Property="x => x.Description" Title="Описание"/>
-                    <PropertyColumn Property="x => x.Date" Title="Дата" Filterable="false"/>
-                    <PropertyColumn Property="x => x.Result" Title="Результат" Filterable="false"/>
+                    <PropertyColumn Property="x => x.Date" Title="Дата изменения"/>
+                    <PropertyColumn Property="x => x.Result" Title="Результат"/>
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudStack Row Class="d-flex flex-wrap">
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" OnClick="@(async () => await DeleteDiagnosis(context.Item.Id))"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await EditDiagnosis(context.Item))"></MudIconButton>
+                            </MudStack>
+                        </CellTemplate>
+                    </TemplateColumn>
                 </Columns>
             </MudDataGrid>
         </MudTabPanel>
@@ -69,9 +85,10 @@
         <MudTabPanel Text="Услуги" Icon="@Icons.Material.Filled.Workspaces"></MudTabPanel>
     </MudTabs>
     <MudCardActions>
-        <MudButton OnClick="@Close" Style="position: fixed;
-                                                   right: 30px; bottom: 30px;
-                                                   padding: 10px;" Variant="Variant.Filled" Color="Color.Error">Close</MudButton>
+        <MudStack Style="position: fixed; right: 0; bottom: 0; padding: 10px; width: 100vw" Row Justify="Justify.FlexEnd">
+            <MudButton OnClick="@(async () => await Save())" Variant="Variant.Filled" Color="Color.Secondary">Сохранить</MudButton>
+            <MudIconButton OnClick="@Close" Icon="@Icons.Material.Filled.Close" Variant="Variant.Filled" Color="Color.Error"/>
+        </MudStack>
     </MudCardActions>
 </MudCard>
 
@@ -86,6 +103,8 @@
     private Models.Appointment.Appointment? _model;
     private List<Diagnosis> _diagnoses = null!;
     private string? _searchString;
+    private bool _isLoaded;
+    private Diagnosis _diagnosis = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,7 +116,8 @@
         }
         _model = appointment;
 
-        _diagnoses = await AppointmentService.GetAppointmentDiagnoses(1) ?? new List<Diagnosis>();
+        _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+        _isLoaded = true;
         await base.OnInitializedAsync();
     }
 
@@ -105,16 +125,28 @@
     {
         AppointmentSelect.InvokeAsync(null);
     }
-    
-    private Func<Diagnosis, bool> QuickFilter => x =>
+
+    private Func<Diagnosis, bool> QuickFilter => x => string.IsNullOrWhiteSpace(_searchString)
+                                                      || x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+
+    private async Task SaveDiagnosis()
     {
-        if (string.IsNullOrWhiteSpace(_searchString))
-            return true;
+    }
 
-        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
+    private async Task DeleteDiagnosis(int diagnosisId)
+    {
+    }
 
-        return false;
-    };
+    private async Task Save()
+    {
+        if(_model is null)
+            return;
+        var result = await AppointmentService.SaveAppointment(_model);
+    }
 
+    private async Task EditDiagnosis(Diagnosis diagnosis)
+    {
+        _diagnosis = diagnosis;
+        await InvokeAsync(StateHasChanged);
+    }
 }

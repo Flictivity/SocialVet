@@ -16,7 +16,7 @@
         {
             <TemplateColumn>
                 <CellTemplate>
-                    <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" Href="@($"patient/{context.Item.Id}")"/>
+                    <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" OnClick="@(() => GoToPatient(context.Item.Id))"/>
                 </CellTemplate>
             </TemplateColumn>
         }
@@ -43,5 +43,10 @@
         }
         patients ??= new List<Patient>();
         return new GridData<Patient> {Items = patients, TotalItems = patients.Count};
+    }
+
+    private void GoToPatient(int patientId)
+    {
+        NavigationManager.NavigateTo($"/patient/{patientId}");
     }
 }

@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SoVet.Domain.Commands.Appointment;
+using SoVet.Domain.Models;
 using SoVet.Domain.Queries.Appointment;
 using SoVet.Domain.Queries.Diagnosis;
 
@@ -36,6 +38,15 @@ public class AppointmentController : AuthorizedControllerBase
     public async Task<IActionResult> GetAppointmentDiagnoses([FromQuery] int appointmentId)
     {
         var command = new GetAppointmentDiagnosesQuery(appointmentId);
+        var result = await _sender.Send(command);
+
+        return Ok(result);
+    }
+
+    [HttpPost("save")]
+    public async Task<IActionResult> SaveAppointment([FromBody] Appointment appointment)
+    {
+        var command = new SaveAppointmentCommand(appointment);
         var result = await _sender.Send(command);
 
         return Ok(result);

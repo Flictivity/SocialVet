@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using SoVet.BlazorWebClient.Models;
 using SoVet.BlazorWebClient.Models.Appointment;
+using SoVet.BlazorWebClient.Results;
 
 namespace SoVet.BlazorWebClient.Services.Impl;
 
@@ -54,6 +55,21 @@ public sealed class AppointmentService : IAppointmentService
         {
             _logger.LogError(ex.Message);
             return null;
+        }
+    }
+
+    public async Task<BaseResult> SaveAppointment(Appointment appointment)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("Appointment/save", appointment);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при сохранении приема"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult {IsSuccess = false, Message = ex.Message};
         }
     }
 }
