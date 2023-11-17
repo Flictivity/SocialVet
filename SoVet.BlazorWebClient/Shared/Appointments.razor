@@ -23,27 +23,34 @@
     </MudGrid>
     
     @* Таблица с приемами *@
-    <MudDataGrid @ref="_dataGrid" Striped="true" T="AppointmentTable" Items="_appointments">
-        <Columns>
-            <PropertyColumn Property="x => x.CreationDate" Title="Дата"/>
-            <PropertyColumn Property="x => x.VeterinarianName" Title="Ветеринар"/>
-            <TemplateColumn Title="Статус">
-                <CellTemplate>
-                    @if (context.Item.Status > -1)
-                    {
-                        var status = (AppointmentStatus)context.Item.Status;
-                        <MudChip Style="@($"color:#FFFFFF; background:{StatusColors.StatusColor[status]};")">@status.GetDisplayName()</MudChip>
-                    }
-                </CellTemplate>
-            </TemplateColumn>
-            <TemplateColumn>
-                <CellTemplate>  
-                    <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" 
-                                   OnClick="@(() => Change(context.Item))"/>
-                </CellTemplate>
-            </TemplateColumn>
-        </Columns>
-    </MudDataGrid>
+    @if (_appointments is not null && _appointments.Count == 0)
+    {
+         <MudAlert Icon="@Icons.Material.Filled.FilterNone" Severity="Severity.Info" Class="mt-3">Приемы не найдены...</MudAlert>
+    }
+    else
+    {
+        <MudDataGrid @ref="_dataGrid" Striped="true" T="AppointmentTable" Items="_appointments">
+            <Columns>
+                <PropertyColumn Property="x => x.CreationDate" Title="Дата"/>
+                <PropertyColumn Property="x => x.VeterinarianName" Title="Ветеринар"/>
+                <TemplateColumn Title="Статус">
+                    <CellTemplate>
+                        @if (context.Item.Status > -1)
+                        {
+                            var status = (AppointmentStatus)context.Item.Status;
+                            <MudChip Style="@($"color:#FFFFFF; background:{StatusColors.StatusColor[status]};")">@status.GetDisplayName()</MudChip>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled"
+                                       OnClick="@(() => Change(context.Item))"/>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    }
 </div>
 
 @code {
@@ -55,7 +62,7 @@
 
     private AppointmentTable _appointment = new();
 
-    private List<AppointmentTable> _appointments = null!;
+    private List<AppointmentTable>? _appointments = null!;
     private MudDataGrid<AppointmentTable> _dataGrid = null!;
     private bool _isLoaded;
     

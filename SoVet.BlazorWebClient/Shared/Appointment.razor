@@ -3,6 +3,7 @@
 @inject IAppointmentService AppointmentService;
 @inject ISnackbar Snackbar;
 @inject IDiagnosisService DiagnosisService;
+@inject IJSRuntime JSR;
 
 @if (!_isLoaded)
 {
@@ -92,7 +93,14 @@
                 </Columns>
             </MudDataGrid>
         </MudTabPanel>
-        <MudTabPanel Text="Рекомендации" Icon="@Icons.Material.Filled.Recommend"></MudTabPanel>
+        <MudTabPanel Text="Рекомендации" Icon="@Icons.Material.Filled.Recommend">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Variant="Variant.Outlined" Label="Рекомендации" Placeholder="Особые примечения по уходу"
+                                                  @bind-Value="@_model.Recommendations" Lines="4"/>
+                </MudCardContent>
+            </MudCard>
+        </MudTabPanel>
         <MudTabPanel Text="Услуги" Icon="@Icons.Material.Filled.Workspaces"></MudTabPanel>
     </MudTabs>
     <MudCardActions>
