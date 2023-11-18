@@ -30,8 +30,6 @@ public class ApplicationContext : DbContext
     public DbSet<Patient> Patients { get; set; } = null!;
     public DbSet<Registration> Registrations { get; set; } = null!;
     
-    public DbSet<Vaccination> Vaccinations { get; set; } = null!;
-    
     public DbSet<AnimalType> AnimalType { get; set; } = null!;
 }
 

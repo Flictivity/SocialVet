@@ -389,45 +389,6 @@ namespace SoVet.Data.Migrations
                     b.ToTable("registrations", (string)null);
                 });
 
-            modelBuilder.Entity("SoVet.Data.Entities.Vaccination", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("DateRevaccination")
-                        .HasColumnType("date")
-                        .HasColumnName("date_revaccination");
-
-                    b.Property<DateOnly>("DateVaccination")
-                        .HasColumnType("date")
-                        .HasColumnName("date_vaccination");
-
-                    b.Property<int>("ExpirationTime")
-                        .HasColumnType("integer")
-                        .HasColumnName("expiration_time");
-
-                    b.Property<int>("PatientId")
-                        .HasColumnType("integer")
-                        .HasColumnName("patient_id");
-
-                    b.Property<string>("VaccineNumber")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("vaccine_number");
-
-                    b.HasKey("Id")
-                        .HasName("pk_vaccinations");
-
-                    b.HasIndex("PatientId")
-                        .HasDatabaseName("ix_vaccinations_patient_id");
-
-                    b.ToTable("vaccinations", (string)null);
-                });
-
             modelBuilder.Entity("SoVet.Data.Entities.Appointment", b =>
                 {
                     b.HasOne("SoVet.Data.Entities.Employee", "Employee")
@@ -543,18 +504,6 @@ namespace SoVet.Data.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("SoVet.Data.Entities.Vaccination", b =>
-                {
-                    b.HasOne("SoVet.Data.Entities.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_vaccinations_patients_patient_id");
-
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.AnimalType", b =>
