@@ -4,6 +4,7 @@
 @using DialogOptions = MudBlazor.DialogOptions
 @using DialogPosition = MudBlazor.DialogPosition
 @using Radzen
+@using Colors = MudBlazor.Colors
 
 @inject IRegistrationService RegistrationService;
 @inject IDialogService DialogService;
@@ -16,7 +17,8 @@
 @if (_registrations?.Count != 0)
 {
     <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="EndTime"
-                     TextProperty="ClientName" SelectedIndex="1" TodayText="Сегодня" AppointmentSelect="RegistrationSelect" Style="height: 90vh">
+                     TextProperty="ScheduleText" SelectedIndex="1" TodayText="Сегодня" AppointmentSelect="RegistrationSelect" Style="height: 90vh"
+                     AppointmentRender="@OnAppointmentRender">
         <RadzenDayView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="День"/>
         <RadzenWeekView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="Неделя"/>
     </RadzenScheduler>
@@ -62,4 +64,8 @@ else
         var result = await dialog.Result;
     }
 
+    private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Registration> args)
+    {
+        args.Attributes["style"] = "background: #3F51B5";
+    }
 }

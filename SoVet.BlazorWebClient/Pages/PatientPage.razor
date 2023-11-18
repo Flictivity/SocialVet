@@ -3,14 +3,15 @@
 @using SoVet.BlazorWebClient.Models.Appointment
 
 @inject ISnackbar Snackbar;
+@inject IDialogService DialogService;
 @inject IPatientService PatientService;
 
 <AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")"></AuthorizeView>
 
-<MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndexChanged="IndexChange">
+<MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndex="_index">
     @if (_patient is not null)
     {
-        <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History">
+        <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History" OnClick="@(async () => await ChangeTab(1))">
             @if (_appointment is null)
             {
                 <Appointments AppointmentSelect="x => _appointment = x" Patient="_patient"></Appointments>
@@ -21,7 +22,7 @@
             }
         </MudTabPanel>
     }
-    <MudTabPanel Text="Профиль" Icon="@Icons.Material.Filled.CrueltyFree">
+    <MudTabPanel Text="Профиль" Icon="@Icons.Material.Filled.CrueltyFree" OnClick="@(async () => await ChangeTab(0))">
         <PatientInfo Model="_patient"></PatientInfo>
     </MudTabPanel>
 </MudTabs>
@@ -34,9 +35,22 @@
     
     private AppointmentTable? _appointment;
 
-    private void IndexChange(int n)
+    private int _index;
+
+    private async Task ChangeTab(int n)
     {
-        Snackbar.Add($"Test{n}", Severity.Error);
+        var result = await DialogService.ShowMessageBox(
+            "Осторожно!",
+            "Несохраненные данные будут утеряны",
+            yesText: "Выход", cancelText: "Отмена");
+
+        var canChange = result is not null;
+        if (canChange)
+        {
+            _index = n;
+        }
+
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
