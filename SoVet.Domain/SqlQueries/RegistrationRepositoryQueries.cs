@@ -16,5 +16,5 @@ public static class RegistrationRepositoryQueries
                                                        e.name as EmployeeName, r.Comment as Comment
                                                 FROM public.registrations r
                                                          JOIN public.clients c on c.id = r.client_id
-                                                         JOIN public.employees e on e.id = r.employee_id";
+                                                         JOIN public.employees e on e.id = r.employee_id /**where**/";
 }

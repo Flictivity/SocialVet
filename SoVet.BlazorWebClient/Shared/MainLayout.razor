@@ -10,12 +10,14 @@
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        <MudLink Href="/">
+            <MudImage Src="/images/logo2.png" Width="70" Height="55"/>
+        </MudLink>
         <MudSpacer/>
         <AuthorizeView>
             <Authorized>
                 <MudStack Row="true" Class="d-flex align-center">
-                    <MudText>Hello, @context.User.Identity?.Name</MudText>
+                    <MudText>@context.User.Identity?.Name</MudText>
                     <MudTooltip Text="Выход">
                         <MudIconButton Color="Color.Secondary" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Logout" OnClick="@(async () => await LogOut())"/>
                     </MudTooltip>
