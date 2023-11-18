@@ -2,7 +2,7 @@
 <PageTitle>Главная</PageTitle>
 
 <AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")">
-    <h1>QQ</h1>
+    <EmployeeMainComponent/>
 </AuthorizeView>
 <AuthorizeView Roles="@($"{Role.Client}")">
     <ClientMainComponent/>

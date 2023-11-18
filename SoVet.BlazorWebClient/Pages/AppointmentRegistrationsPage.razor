@@ -18,23 +18,31 @@
     <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="EndTime"
                      TextProperty="ClientName" SelectedIndex="1" TodayText="Сегодня" AppointmentSelect="RegistrationSelect" Style="height: 90vh">
         <RadzenDayView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="День"/>
-        <RadzenWeekView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="Неделя" />
+        <RadzenWeekView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="Неделя"/>
     </RadzenScheduler>
 }
+else
+{
+    <MudAlert Severity="Severity.Info" Class="mt-3">Записи для отсутсвуют...</MudAlert>
+}
+
 @code {
     RadzenScheduler<Registration> _scheduler = null!;
     private List<Registration>? _registrations = new();
-    
+
     public static TimeSpan StartTime = new(8, 0, 0);
     public static TimeSpan EndTime = new(23, 0, 0);
-    
-    
+
+
     protected override async Task OnInitializedAsync()
     {
         var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
         var employeeId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.EmployeeId).Value);
+
+        _registrations = userIdentity.IsInRole(Role.Administrator) 
+            ? await RegistrationService.GetRegistrations(null) 
+            : await RegistrationService.GetRegistrations(employeeId);
         
-        _registrations = await RegistrationService.GetRegistrations(employeeId);
         await base.OnInitializedAsync();
     }
 
@@ -49,7 +57,7 @@
         {
             { "Model", args.Data }
         };
-        
+
         var dialog = await DialogService.ShowAsync<CreateAppointmentWindow>("Прием", parameters, options);
         var result = await dialog.Result;
     }

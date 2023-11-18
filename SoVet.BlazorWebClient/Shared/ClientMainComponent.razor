@@ -2,17 +2,24 @@
 @inject NavigationManager NavigationManager;
 
 <div Class="d-flex flex-row justify-content-center align-items-center" style="height: 100vh;">
-    <MudStack Class="mr-5">
-        <MudText Typo="Typo.h1" Style="font-family: 'Montserrat SemiBold'">
-            Ветеринарная клиника
-        </MudText>
-        <MudText Typo="Typo.h4" Style="font-family: 'Montserrat SemiBold'">
-            Широкий спектр ветеринарных услуг от лучших врачей
-        </MudText>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="pa-3" OnClick="@(async () => await GoToRegistrationPage())">Записаться</MudButton>
-    </MudStack>
-    <img class="ml-5" src="images/dog.jpg" style="width: 40vw; height: 55vh; border-radius: 50%;"  alt=""/>
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <MudStack Class="mr-5">
+                <MudText Typo="Typo.h1" Style="font-family: 'Montserrat SemiBold'">
+                    Ветеринарная клиника
+                </MudText>
+                <MudText Typo="Typo.h4" Style="font-family: 'Montserrat SemiBold'">
+                    Широкий спектр ветеринарных услуг от лучших врачей
+                </MudText>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="pa-3" OnClick="@(async () => await GoToRegistrationPage())">Записаться</MudButton>
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <img class="ml-5" src="images/dog.jpg" style="width: 40vw; height: 55vh; border-radius: 50%;" alt=""/>
+        </MudItem>
+    </MudGrid>
 </div>
+
 @code {
 
     private async Task GoToRegistrationPage()
@@ -27,4 +34,5 @@
             NavigationManager.NavigateTo("/register");
         }
     }
+
 }

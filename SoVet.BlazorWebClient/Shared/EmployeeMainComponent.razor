@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject NavigationManager NavigationManager;
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
+        NavigationManager.NavigateTo(userIdentity is {IsAuthenticated: true } ? "/appointment-registrations" : "/register");
+    }
+}
