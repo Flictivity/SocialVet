@@ -28,14 +28,9 @@ public class ApplicationContext : DbContext
     public DbSet<FacilityCategory> FacilityCategories { get; set; } = null!;
     
     public DbSet<Patient> Patients { get; set; } = null!;
-    
-    public DbSet<Payment> Payments { get; set; } = null!;
-    
     public DbSet<Registration> Registrations { get; set; } = null!;
     
     public DbSet<Vaccination> Vaccinations { get; set; } = null!;
-
-    public DbSet<ValueAddedTax> ValueAddedTaxes { get; set; } = null!;
     
     public DbSet<AnimalType> AnimalType { get; set; } = null!;
 }
@@ -45,7 +40,7 @@ public sealed class MigrationApplicationContext : IDesignTimeDbContextFactory<Ap
     public ApplicationContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<ApplicationContext>()
-            .UseNpgsql("Host=localhost;Port=7432;Database=social_vet;Username=postgres;Password=postgreS12;")
+            .UseNpgsql("Host=localhost;Port=5432;Database=social_vet;Username=postgres;Password=postgres;")
             .UseSnakeCaseNamingConvention()
             .Options;
         return new ApplicationContext(options);

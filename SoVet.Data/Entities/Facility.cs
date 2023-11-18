@@ -15,9 +15,5 @@ public sealed class Facility
     [ForeignKey(nameof(FacilityCategoryId))]
     public FacilityCategory FacilityCategory { get; set; } = null!;
 
-    public int ValueAddedTaxId { get; set; }
-    [ForeignKey(nameof(ValueAddedTaxId))]
-    public ValueAddedTax ValueAddedTax { get; set; } = null!;
-
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();
 }

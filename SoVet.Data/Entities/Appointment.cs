@@ -31,5 +31,4 @@ public sealed class Appointment
 
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();
     public ICollection<Diagnosis> AppointmentDiagnoses { get; set; } = new List<Diagnosis>();
-    public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }
