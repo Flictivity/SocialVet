@@ -5,7 +5,7 @@
 @inject NavigationManager NavigationManager;
 @inject IDialogService DialogService;
 
-<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")"></AuthorizeView>
+@attribute [Authorize(Roles=$"{Role.Administrator}, {Role.Veterinarian}")]
 
 <PageTitle>Пациенты</PageTitle>
 

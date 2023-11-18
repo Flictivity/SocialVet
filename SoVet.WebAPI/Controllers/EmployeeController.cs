@@ -35,6 +35,14 @@ public class EmployeeController : AuthorizedControllerBase
         var res = await _sender.Send(command);
         return Ok(res);
     }
+    
+    [HttpGet("employee")]
+    public async Task<IActionResult> GetEmployee([FromQuery] string email)
+    {
+        var command = new GetEmployeeQuery(email);
+        var res = await _sender.Send(command);
+        return Ok(res);
+    }
 
     [HttpPost]
     [Route("create")]

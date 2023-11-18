@@ -6,6 +6,7 @@ public interface IEmployeeRepository
 {
     public Task<List<Employee>> GetEmployeesByIds(int[] employeeIds);
     public Task<List<EmployeeUser>> GetEmployees(List<UserInfo> users);
+    public Task<EmployeeUser?> GetEmployee(List<UserInfo> users,string email);
     public Task<Employee> CreateEmployee(Employee employee);
     public Task<Employee> UpdateEmployee(Employee employee);
 }

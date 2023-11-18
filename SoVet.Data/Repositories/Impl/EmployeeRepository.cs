@@ -35,6 +35,16 @@ public sealed class EmployeeRepository : IEmployeeRepository
         return Task.FromResult(res);
     }
 
+    public Task<EmployeeUser?> GetEmployee(List<UserInfo> users, string email)
+    {
+        var employeeUser = users.FirstOrDefault(x => x.Email == email);
+        if (employeeUser is null)
+            return Task.FromResult<EmployeeUser?>(null);
+        var client = _context.Employees.FirstOrDefault(x => x.Id == employeeUser.Id);
+        return Task.FromResult(client is null ? null : new EmployeeUser
+            { Id = client.Id, Name = client.Name, Email = employeeUser.Email, Role = employeeUser.RoleName});
+    }
+
     public async Task<Employee> CreateEmployee(Employee employee)
     {
         var employeeDb = _mapper.Map(employee);

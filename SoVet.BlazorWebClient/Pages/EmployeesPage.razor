@@ -41,7 +41,7 @@
             {"OldEmail", email}
         };
 
-        var dialog = await DialogService.ShowAsync<EmployeeWindow>("Сотрудник", parameters, options);
+        var dialog = await DialogService.ShowAsync<EmployeeInfo>("Сотрудник", parameters, options);
         var result = await dialog.Result;
         if (!result.Canceled)
         {

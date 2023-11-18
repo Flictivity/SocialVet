@@ -6,7 +6,7 @@
 @inject IDialogService DialogService;
 @inject IPatientService PatientService;
 
-<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")"></AuthorizeView>
+@attribute [Authorize(Roles=$"{Role.Administrator}, {Role.Veterinarian}")]
 
 <MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndex="_index">
     @if (_patient is not null)

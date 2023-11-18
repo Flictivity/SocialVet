@@ -1,8 +1,10 @@
 ﻿@page "/profile/{OldEmail}"
 
-
+@using SoVet.BlazorWebClient.Shared.Windows
+@using SoVet.BlazorWebClient.Models.Employee
 @inject IClientService ClientService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject IEmployeeService EmployeeService;
 @inject ISnackbar Snackbar;
 
 <PageTitle>Профиль</PageTitle>
@@ -27,15 +29,19 @@
                                   @bind-Value="_model.Address" Immediate For="@(() => _model.Address)" FullWidth="true" Label="Адрес"/>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" T="string"
-                                  @bind-Value="_password" Immediate For="@(() => _model.Password)" FullWidth="true" Label="Новый пароль"/>
+                    <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="_password" Immediate For="@(() => _model.Password)"
+                                  InputType="InputType.Password" FullWidth="true" Label="Новый пароль"/>
                 </MudItem>
                 <MudItem xs="12">
-                   <MudButton OnClick="@(async () => await Save())" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Сохранить</MudButton>
+                    <MudButton OnClick="@(async () => await Save())" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Сохранить</MudButton>
                 </MudItem>
             </MudGrid>
         </MudStack>
     </MudForm>
+</AuthorizeView>
+
+<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")">
+    <EmployeeInfo Model="_modelEmployee" OldEmail="@OldEmail"/>
 </AuthorizeView>
 
 @code {
@@ -46,6 +52,7 @@
     private MudForm _form = null!;
     private bool _isValid;
     private Client _model = new Client();
+    private EmployeeUser _modelEmployee = new EmployeeUser();
     private string? _password;
 
     protected override async Task OnInitializedAsync()
@@ -54,6 +61,10 @@
         if (user.IsInRole(Role.Client))
         {
             _model = await ClientService.GetClient(OldEmail) ?? new Client();
+        }
+        else
+        {
+            _modelEmployee = await EmployeeService.GetEmployee(OldEmail) ?? new EmployeeUser();
         }
         await base.OnInitializedAsync();
     }

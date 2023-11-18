@@ -41,6 +41,19 @@ public sealed class EmployeeService : IEmployeeService
         }
     }
 
+    public async Task<EmployeeUser?> GetEmployee(string email)
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<EmployeeUser>($"Employee/employee?email={email}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
+
     public async Task<BaseResult> CreateEmployee(EmployeeUser employeeUser)
     {
         try

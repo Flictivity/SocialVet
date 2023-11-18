@@ -4,15 +4,14 @@
 @using DialogOptions = MudBlazor.DialogOptions
 @using DialogPosition = MudBlazor.DialogPosition
 @using Radzen
-@using Colors = MudBlazor.Colors
 
 @inject IRegistrationService RegistrationService;
 @inject IDialogService DialogService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 
 <PageTitle>Записи</PageTitle>
+@attribute [Authorize(Roles=$"{Role.Administrator}, {Role.Veterinarian}")]
 
-<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")"></AuthorizeView>
 
 @if (_registrations?.Count != 0)
 {

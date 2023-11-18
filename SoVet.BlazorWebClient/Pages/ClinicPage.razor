@@ -3,7 +3,7 @@
 @inject IClinicService ClinicService;
 @inject ISnackbar Snackbar;
 
-@attribute [Authorize(Roles = "Администратор")]
+@attribute [Authorize(Roles = Role.Administrator)]
 <PageTitle>Информация о клинике</PageTitle>
 
 @if (!_isLoaded)
