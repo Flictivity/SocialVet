@@ -32,4 +32,10 @@ public sealed partial class DatabaseMapper
     public partial Domain.Models.Appointment Map(Appointment appointment);
     [MapperIgnoreTarget(nameof(Domain.Models.Appointment.Employee))]
     public partial Appointment Map(Domain.Models.Appointment appointment);
+    [MapperIgnoreTarget(nameof(Domain.Models.Facility.FacilityCategory))]
+    public partial Facility Map(Domain.Models.Facility facility);
+    public partial Domain.Models.Facility Map(Facility facility);
+    public partial Domain.Models.AppointmentFacility Map(AppointmentFacility appointmentFacility);
+    [MapperIgnoreTarget(nameof(Domain.Models.AppointmentFacility.Facility))]
+    public partial AppointmentFacility Map(Domain.Models.AppointmentFacility appointmentFacility);
 }

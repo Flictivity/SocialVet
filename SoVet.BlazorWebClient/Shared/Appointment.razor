@@ -1,9 +1,10 @@
 ﻿@using SoVet.BlazorWebClient.Extensions
+@using SoVet.BlazorWebClient.Services.Impl
 @inject IDialogService DialogService;
 @inject IAppointmentService AppointmentService;
 @inject ISnackbar Snackbar;
 @inject IDiagnosisService DiagnosisService;
-@inject IJSRuntime JSR;
+@inject IFacilityService FacilityService;
 
 @if (!_isLoaded)
 {
@@ -101,7 +102,55 @@
                 </MudCardContent>
             </MudCard>
         </MudTabPanel>
-        <MudTabPanel Text="Услуги" Icon="@Icons.Material.Filled.Workspaces"></MudTabPanel>
+        <MudTabPanel Text="Услуги" Icon="@Icons.Material.Filled.Workspaces">
+            <MudCard Elevation="2" Class="mt-3 mb-3">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Услуга</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudSelect Required="true" RequiredError="Обязательное поле" T="int" Variant="Variant.Outlined" Label="Результат" @bind-Value="_diagnosis.Result">
+                        @foreach (Facility facility in _facilities)
+                        {
+                            <MudSelectItem Value="@(facility)">
+                                @facility.Name
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField Required="true" RequiredError="Обязательное поле" T="string" Label="Описание" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                                  @bind-Value="_diagnosis.Description"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Disabled="@(string.IsNullOrWhiteSpace(_diagnosis.Name) || string.IsNullOrWhiteSpace(_diagnosis.Description))"
+                               Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveDiagnosis())">
+                        Сохранить диагноз
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+
+            <MudDataGrid Striped="true" T="Diagnosis" Items="_diagnoses" SortMode="SortMode.Multiple" QuickFilter="@QuickFilter">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Диагнозы</MudText>
+                    <MudSpacer/>
+                    <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+                    </MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name" Title="Наименование"/>
+                    <PropertyColumn Property="x => x.Description" Title="Описание"/>
+                    <PropertyColumn Property="x => x.Date" Title="Дата изменения"/>
+                    <PropertyColumn Property="x => x.Result" Title="Результат"/>
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudStack Row Class="d-flex flex-wrap">
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" OnClick="@(async () => await DeleteDiagnosis(context.Item.Id))"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await EditDiagnosis(context.Item))"></MudIconButton>
+                            </MudStack>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </MudTabPanel>
     </MudTabs>
     <MudCardActions>
         <MudStack Style="position: fixed; right: 0; bottom: 0; padding: 10px; width: 100vw" Row Justify="Justify.FlexEnd">
@@ -124,6 +173,7 @@
     private string? _searchString;
     private bool _isLoaded;
     private Diagnosis _diagnosis = new();
+    private List<Facility> _facilities = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,6 +186,7 @@
         _model = appointment;
 
         _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+        _facilities = await FacilityService.Get
         _isLoaded = true;
         await base.OnInitializedAsync();
     }
