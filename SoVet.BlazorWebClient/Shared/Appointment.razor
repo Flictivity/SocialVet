@@ -108,7 +108,7 @@
                     <MudText Typo="Typo.h6">Услуга</MudText>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudSelect Required="true" RequiredError="Обязательное поле" T="int" Variant="Variant.Outlined" Label="Результат" @bind-Value="_diagnosis.Result">
+                    <MudSelect Required="true" RequiredError="Обязательное поле" T="int" Variant="Variant.Outlined" Label="Услуга" @bind-Value="_appointmentFacility.Facility">
                         @foreach (Facility facility in _facilities)
                         {
                             <MudSelectItem Value="@(facility)">
@@ -116,8 +116,12 @@
                             </MudSelectItem>
                         }
                     </MudSelect>
-                    <MudTextField Required="true" RequiredError="Обязательное поле" T="string" Label="Описание" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
-                                  @bind-Value="_diagnosis.Description"/>
+                    <MudNumericField Min="1" Required="true" RequiredError="Обязательное поле" T="string" Label="Количество" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                                     @bind-Value="_appointmentFacility.Count"/>
+                    <MudNumericField Min="1" Required="true" RequiredError="Обязательное поле" T="string" Label="Скидка (%)" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                                     @bind-Value="_appointmentFacility.Discount"/>
+                    <MudTextField ReadOnly="true" Required="true" RequiredError="Обязательное поле" T="string" Label="Скидка (%)" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                                                         @bind-Value="_appointmentFacility.Sum"/>
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton Disabled="@(string.IsNullOrWhiteSpace(_diagnosis.Name) || string.IsNullOrWhiteSpace(_diagnosis.Description))"
@@ -173,6 +177,7 @@
     private string? _searchString;
     private bool _isLoaded;
     private Diagnosis _diagnosis = new();
+    private AppointmentFacility _appointmentFacility = new();
     private List<Facility> _facilities = null!;
 
     protected override async Task OnInitializedAsync()
@@ -186,7 +191,6 @@
         _model = appointment;
 
         _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
-        _facilities = await FacilityService.Get
         _isLoaded = true;
         await base.OnInitializedAsync();
     }
