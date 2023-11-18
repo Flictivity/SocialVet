@@ -5,7 +5,7 @@ using SoVet.Domain.Models;
 using SoVet.Domain.Responses;
 using SoVet.Domain.SqlQueries;
 
-namespace SoVet.Data.Repositories;
+namespace SoVet.Data.Repositories.Impl;
 
 public sealed class FacilityRepository : IFacilityRepository
 {

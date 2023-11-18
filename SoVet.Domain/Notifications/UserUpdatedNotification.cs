@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SoVet.Domain.Models;
-using Client = LanguageExt.Pipes.Client;
 
 namespace SoVet.Domain.Notifications;
 

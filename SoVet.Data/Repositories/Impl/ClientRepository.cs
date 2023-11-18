@@ -35,4 +35,23 @@ public sealed class ClientRepository : IClientRepository
 
         return Task.FromResult(res);
     }
+
+    public Task<Client?> GetClientAsync(List<UserInfo> user, string email)
+    {
+        var clientUser = user.FirstOrDefault(x => x.Email == email);
+        if (clientUser is null)
+            return Task.FromResult<Client?>(null);
+        var client = _context.Clients.FirstOrDefault(x => x.Id == clientUser.Id);
+        return Task.FromResult(client is null ? null : new Client
+            { Id = client.Id, Name = client.Name, Email = clientUser.Email, Address = client.Address});
+    }
+
+    public async Task<Client> UpdateClientAsync(Client client)
+    {
+        _context.ChangeTracker.Clear();
+        var clientDb = _mapper.Map(client);
+        _context.Clients.Update(clientDb);
+        await _context.SaveChangesAsync();
+        return _mapper.Map(clientDb);
+    }
 }

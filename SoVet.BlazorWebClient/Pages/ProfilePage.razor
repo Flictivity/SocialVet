@@ -1,0 +1,76 @@
+﻿@page "/profile/{OldEmail}"
+
+
+@inject IClientService ClientService;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject ISnackbar Snackbar;
+
+<PageTitle>Профиль</PageTitle>
+
+<AuthorizeView Roles="@Role.Client">
+    <MudForm @ref="_form" @bind-IsValid="_isValid" Model="_model">
+        <MudStack Row="true" Class="d-flex flex-row">
+            @if (!string.IsNullOrWhiteSpace(_model.Name))
+            {
+                <MudAvatar Class="d-flex align-center" Style="height:200px;width:200px; font-size: 2rem;" Color="Color.Primary" Variant="Variant.Filled">@_model.Name[0]</MudAvatar>
+            }
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudTextField Required="true" RequiredError="Обязательное поле" Variant="Variant.Outlined" Immediate For="@(() => _model.Name)" T="string" @bind-Value="_model.Name" Label="ФИО" FullWidth="true"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Required="true" RequiredError="Обязательное поле" Variant="Variant.Outlined" InputType="InputType.Email" T="string"
+                                  @bind-Value="_model.Email" Immediate For="@(() => _model.Email)" FullWidth="true" Label="Email"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Required="true" RequiredError="Обязательное поле" Variant="Variant.Outlined" T="string"
+                                  @bind-Value="_model.Address" Immediate For="@(() => _model.Address)" FullWidth="true" Label="Адрес"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" T="string"
+                                  @bind-Value="_password" Immediate For="@(() => _model.Password)" FullWidth="true" Label="Новый пароль"/>
+                </MudItem>
+                <MudItem xs="12">
+                   <MudButton OnClick="@(async () => await Save())" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Сохранить</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </MudForm>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public string OldEmail { get; set; } = null!;
+
+    private MudForm _form = null!;
+    private bool _isValid;
+    private Client _model = new Client();
+    private string? _password;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if (user.IsInRole(Role.Client))
+        {
+            _model = await ClientService.GetClient(OldEmail) ?? new Client();
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Save()
+    {
+        var result = await ClientService.UpdateClient(_model, OldEmail, _password);
+        if (!result!.IsSuccess)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно", Severity.Success);
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if (user.IsInRole(Role.Client))
+        {
+            _model = await ClientService.GetClient(OldEmail) ?? new Client();
+        }
+    }
+}
