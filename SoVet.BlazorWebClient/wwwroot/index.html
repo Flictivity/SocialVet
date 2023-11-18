@@ -16,22 +16,19 @@
 </head>
 
 <body>
-<div id="app" style="margin: 0 auto; width: 100vw; height: 100vh">
-    <div class="text-center pt-3" style="color: #3F51B5; font-size: 16pt">
-        Загрузка...
+<div id="app" class="d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+    <div class="text-center">
+        <img src="/images/logo.png" style="width:50%" alt="Logo"/>
     </div>
     <div class="text-center mt-3">
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
                 style="font-size: 16pt; width: 36px; height: 36px; color: #3F51B5"></span>
     </div>
-    <div class="text-center">
-        <img src="/images/logo.png" style="width:10%" alt="Logo"/>
-    </div>
 </div>
 
     <div id="blazor-error-ui">
-        Произошла непридвиденная ошибка, пожалуйста перезагрузите страницу
-        <a href="" class="reload">Пероезагрузить</a>
+        Произошла ошибка, пожалуйста перезагрузите страницу
+        <a href="" class="reload">Перезагрузить</a>
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>

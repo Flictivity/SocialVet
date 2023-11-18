@@ -54,6 +54,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<IDiagnosisRepository, DiagnosisRepository>();
+        services.AddScoped<IFacilityRepository, FacilityRepository>();
         SqlMapper.AddTypeHandler(new DapperSqlDateOnlyTypeHandler());
 
         return services;

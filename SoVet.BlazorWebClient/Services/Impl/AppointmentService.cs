@@ -58,6 +58,20 @@ public sealed class AppointmentService : IAppointmentService
         }
     }
 
+    public async Task<List<AppointmentFacility>?> GetAppointmentFacilities(int appointmentId)
+    {
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<List<AppointmentFacility>>($"Appointment/facilities/?appointmentId={appointmentId}");
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
+
     public async Task<BaseResult> SaveAppointment(Appointment appointment)
     {
         try

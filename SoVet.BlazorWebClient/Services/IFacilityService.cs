@@ -6,5 +6,6 @@ namespace SoVet.BlazorWebClient.Services;
 public interface IFacilityService
 {
     public Task<BaseResult> SaveFacilityInAppointment(AppointmentFacility appointmentFacility);
-    public Task<List<Facility>> GetFacilities();
+    public Task<BaseResult> DeleteFacilityInAppointment(int appointmentFacilityId);
+    public Task<List<Facility>?> GetFacilities();
 }

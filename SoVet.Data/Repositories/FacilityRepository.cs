@@ -36,6 +36,18 @@ public sealed class FacilityRepository : IFacilityRepository
         return new BaseResponse { IsSuccess = true };
     }
 
+    public async Task<BaseResponse> DeleteFacilityInAppointmentAsync(int appointmentFacilityId)
+    {
+        _context.ChangeTracker.Clear();
+        var appointmentFacilityDb = _context.AppointmentFacilities.FirstOrDefault(x => x.Id == appointmentFacilityId);
+        if (appointmentFacilityDb is null)
+            return new BaseResponse{ IsSuccess = false, Message = "Услуга не найден" };
+
+        _context.AppointmentFacilities.Remove(appointmentFacilityDb);
+        await _context.SaveChangesAsync();
+        return new BaseResponse{ IsSuccess = true};
+    }
+
     public async Task<List<AppointmentFacility>> GetFacilitiesInAppointment(int appointmentId)
     {
         var connection = _context.Database.GetDbConnection();
@@ -46,6 +58,20 @@ public sealed class FacilityRepository : IFacilityRepository
                 appointmentFacility.Facility = facility;
                 return appointmentFacility;
             },new{appointmentId})).AsList();
+
+        return result;
+    }
+
+    public async Task<List<Facility>> GetFacilitiesAsync()
+    {
+        var connection = _context.Database.GetDbConnection();
+        var result = (await connection.QueryAsync<Facility,FacilityCategory,Facility>(
+            FacilityRepositoryQueries.GetFacilities, 
+            (facility, facilityCategory) =>
+            {
+                facility.FacilityCategory = facilityCategory;
+                return facility;
+            })).AsList();
 
         return result;
     }

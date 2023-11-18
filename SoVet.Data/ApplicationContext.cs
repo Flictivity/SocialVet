@@ -40,7 +40,7 @@ public sealed class MigrationApplicationContext : IDesignTimeDbContextFactory<Ap
     public ApplicationContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<ApplicationContext>()
-            .UseNpgsql("Host=localhost;Port=5432;Database=social_vet;Username=postgres;Password=postgres;")
+            .UseNpgsql("Host=localhost;Port=7432;Database=social_vet;Username=postgres;Password=postgreS12;")
             .UseSnakeCaseNamingConvention()
             .Options;
         return new ApplicationContext(options);

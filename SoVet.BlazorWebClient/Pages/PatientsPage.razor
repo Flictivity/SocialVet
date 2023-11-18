@@ -3,6 +3,9 @@
 @inject IPatientService PatientService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject NavigationManager NavigationManager;
+@inject IDialogService DialogService;
+
+<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")"></AuthorizeView>
 
 <PageTitle>Пациенты</PageTitle>
 
@@ -22,6 +25,8 @@
         }
     </Columns>
 </MudDataGrid>
+
+<MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenWindow( null))"></MudFab>
 
 @code {
     MudDataGrid<Patient> _dataGrid = null!;
@@ -48,5 +53,25 @@
     private void GoToPatient(int patientId)
     {
         NavigationManager.NavigateTo($"/patient/{patientId}");
+    }
+    
+    private async Task OpenWindow(Patient? patient)
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            {"Model", patient},
+        };
+
+        var dialog = await DialogService.ShowAsync<PatientInfo>("Пациент", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await _dataGrid.ReloadServerData();
+        }
     }
 }

@@ -10,6 +10,8 @@
 
 <PageTitle>Записи</PageTitle>
 
+<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")"></AuthorizeView>
+
 @if (_registrations?.Count != 0)
 {
     <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="EndTime"

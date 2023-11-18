@@ -29,6 +29,7 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IAnimalTypeService, AnimalTypeService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IDiagnosisService, DiagnosisService>();
+builder.Services.AddScoped<IFacilityService, FacilityService>();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(connectionString) });
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();

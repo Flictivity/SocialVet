@@ -29,12 +29,31 @@
         </AuthorizeView>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <MudNavMenu>
-            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-            <MudNavLink Href="/counter" Icon="@Icons.Material.Filled.PlusOne">Counter</MudNavLink>
-            <AuthorizeView>
+        <MudNavMenu Color="Color.Secondary">
+            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>
+            <AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")">
                 <Authorized>
-                    <MudNavLink Href="/fetchdata" Icon="@Icons.Material.Filled.Weekend">Fetch Data</MudNavLink>
+                    <MudNavLink Href="/appointment-registrations" Icon="@Icons.Material.Filled.Schedule">Записи</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@($"{Role.Administrator}")">
+                <Authorized>
+                    <MudNavLink Href="/clinic" Icon="@Icons.Material.Filled.AccountBalance">Информация об организации</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@($"{Role.Administrator}")">
+                <Authorized>
+                    <MudNavLink Href="/employees" Icon="@Icons.Material.Filled.PeopleAlt">Сотрудники</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")">
+                <Authorized>
+                    <MudNavLink Href="/patients" Icon="@Icons.Custom.Brands.Linux">Пациенты</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Client">
+                <Authorized>
+                    <MudNavLink Href="/registrate-to-appointment" Icon="@Icons.Material.Filled.PlaylistAdd">Записаться</MudNavLink>
                 </Authorized>
             </AuthorizeView>
         </MudNavMenu>

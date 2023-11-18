@@ -29,4 +29,32 @@ public class FacilityService : IFacilityService
             return new BaseResult {IsSuccess = false, Message  = "Произошла ошибка при обновлении"};
         }
     }
+
+    public async Task<BaseResult> DeleteFacilityInAppointment(int appointmentFacilityId)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"Facility/delete-in-appointment", appointmentFacilityId);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при обновлении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult {IsSuccess = false, Message  = "Произошла ошибка при обновлении"};
+        }
+    }
+
+    public async Task<List<Facility>?> GetFacilities()
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<List<Facility>>($"Facility");
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
 }

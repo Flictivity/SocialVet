@@ -5,6 +5,8 @@
 @inject ISnackbar Snackbar;
 @inject IPatientService PatientService;
 
+<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")"></AuthorizeView>
+
 <MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndexChanged="IndexChange">
     @if (_patient is not null)
     {

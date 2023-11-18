@@ -70,11 +70,11 @@
                 </MudCardActions>
             </MudCard>
 
-            <MudDataGrid Striped="true" T="Diagnosis" Items="_diagnoses" SortMode="SortMode.Multiple" QuickFilter="@QuickFilter">
+            <MudDataGrid Striped="true" T="Diagnosis" Items="_diagnoses" SortMode="SortMode.Multiple" QuickFilter="@DiagnosisQuickFilter">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Диагнозы</MudText>
                     <MudSpacer/>
-                    <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                    <MudTextField @bind-Value="_diagnosisSearchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
                                   AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
                     </MudTextField>
                 </ToolBarContent>
@@ -82,7 +82,15 @@
                     <PropertyColumn Property="x => x.Name" Title="Наименование"/>
                     <PropertyColumn Property="x => x.Description" Title="Описание"/>
                     <PropertyColumn Property="x => x.Date" Title="Дата изменения"/>
-                    <PropertyColumn Property="x => x.Result" Title="Результат"/>
+                    <TemplateColumn Title="Результат" Filterable="true">
+                        <CellTemplate>
+                            @if (context.Item.Result > -1)
+                            {
+                                var result = (DiagnosisResult)context.Item.Result;
+                                <MudChip>@result.GetDisplayName()</MudChip>
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
                     <TemplateColumn>
                         <CellTemplate>
                             <MudStack Row Class="d-flex flex-wrap">
@@ -108,47 +116,49 @@
                     <MudText Typo="Typo.h6">Услуга</MudText>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudSelect Required="true" RequiredError="Обязательное поле" T="int" Variant="Variant.Outlined" Label="Услуга" @bind-Value="_appointmentFacility.Facility">
+                    <MudSelect Required="true" ToStringFunc="@(x => x.Name)" RequiredError="Обязательное поле" T="Facility" Variant="Variant.Outlined" Label="Услуга" @bind-Value="_appointmentFacility.Facility">
                         @foreach (Facility facility in _facilities)
                         {
-                            <MudSelectItem Value="@(facility)">
-                                @facility.Name
-                            </MudSelectItem>
+                            <MudSelectItem Value="@(facility)"/>
                         }
                     </MudSelect>
-                    <MudNumericField Min="1" Required="true" RequiredError="Обязательное поле" T="string" Label="Количество" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                    <MudNumericField Min="1" Required="true" RequiredError="Обязательное поле" Label="Количество" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
                                      @bind-Value="_appointmentFacility.Count"/>
-                    <MudNumericField Min="1" Required="true" RequiredError="Обязательное поле" T="string" Label="Скидка (%)" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
+                    <MudNumericField Min="1" Required="true" RequiredError="Обязательное поле" Label="Скидка (%)" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
                                      @bind-Value="_appointmentFacility.Discount"/>
-                    <MudTextField ReadOnly="true" Required="true" RequiredError="Обязательное поле" T="string" Label="Скидка (%)" Lines="3" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
-                                                         @bind-Value="_appointmentFacility.Sum"/>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Disabled="@(string.IsNullOrWhiteSpace(_diagnosis.Name) || string.IsNullOrWhiteSpace(_diagnosis.Description))"
-                               Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveDiagnosis())">
-                        Сохранить диагноз
+                    <MudButton Disabled="@(_appointmentFacility.Facility is null)"
+                               Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveFacility())">
+                        Сохранить услугу
                     </MudButton>
                 </MudCardActions>
             </MudCard>
 
-            <MudDataGrid Striped="true" T="Diagnosis" Items="_diagnoses" SortMode="SortMode.Multiple" QuickFilter="@QuickFilter">
+            <MudDataGrid Striped="true" T="AppointmentFacility" Items="_appointmentFacilities" SortMode="SortMode.Multiple" QuickFilter="@FacilityQuickFilter">
                 <ToolBarContent>
-                    <MudText Typo="Typo.h6">Диагнозы</MudText>
+                    <MudText Typo="Typo.h6">Услуги</MudText>
                     <MudSpacer/>
-                    <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                    <MudTextField @bind-Value="_facilitySearchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
                                   AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
                     </MudTextField>
                 </ToolBarContent>
                 <Columns>
-                    <PropertyColumn Property="x => x.Name" Title="Наименование"/>
-                    <PropertyColumn Property="x => x.Description" Title="Описание"/>
-                    <PropertyColumn Property="x => x.Date" Title="Дата изменения"/>
-                    <PropertyColumn Property="x => x.Result" Title="Результат"/>
+                    <PropertyColumn Property="x => x.Facility.Name" Title="Наименование">
+                        <FooterTemplate>
+                            <MudText>
+                                <b>Итого</b>
+                            </MudText>
+                        </FooterTemplate>
+                    </PropertyColumn>
+                    <PropertyColumn Property="x => x.Count" Title="Количество" AggregateDefinition="_sumAggregator"/>
+                    <PropertyColumn Property="x => x.Discount" Title="Скидка (%)"/>
+                    <PropertyColumn Property="x => x.Sum" Title="Итоговая стоимость" AggregateDefinition="_sumAggregator"/>
                     <TemplateColumn>
                         <CellTemplate>
                             <MudStack Row Class="d-flex flex-wrap">
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" OnClick="@(async () => await DeleteDiagnosis(context.Item.Id))"></MudIconButton>
-                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await EditDiagnosis(context.Item))"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" OnClick="@(async () => await DeleteFacility(context.Item.Id))"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await EditFacility(context.Item))"></MudIconButton>
                             </MudStack>
                         </CellTemplate>
                     </TemplateColumn>
@@ -174,11 +184,13 @@
 
     private Models.Appointment.Appointment? _model;
     private List<Diagnosis> _diagnoses = null!;
-    private string? _searchString;
+    private string? _diagnosisSearchString;
+    private string? _facilitySearchString;
     private bool _isLoaded;
     private Diagnosis _diagnosis = new();
     private AppointmentFacility _appointmentFacility = new();
     private List<Facility> _facilities = null!;
+    private List<AppointmentFacility> _appointmentFacilities = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -191,6 +203,8 @@
         _model = appointment;
 
         _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+        _appointmentFacilities = await AppointmentService.GetAppointmentFacilities(_model.Id) ?? new List<AppointmentFacility>();
+        _facilities = await FacilityService.GetFacilities() ?? new List<Facility>();
         _isLoaded = true;
         await base.OnInitializedAsync();
     }
@@ -200,8 +214,11 @@
         AppointmentSelect.InvokeAsync(null);
     }
 
-    private Func<Diagnosis, bool> QuickFilter => x => string.IsNullOrWhiteSpace(_searchString)
-                                                      || x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+    private Func<Diagnosis, bool> DiagnosisQuickFilter => x => string.IsNullOrWhiteSpace(_diagnosisSearchString)
+                                                      || x.Name.Contains(_diagnosisSearchString, StringComparison.OrdinalIgnoreCase);
+    
+    private Func<AppointmentFacility, bool> FacilityQuickFilter => x => string.IsNullOrWhiteSpace(_diagnosisSearchString)
+                                                               || x.Facility!.Name.Contains(_diagnosisSearchString, StringComparison.OrdinalIgnoreCase);
 
     private async Task SaveDiagnosis()
     {
@@ -220,20 +237,20 @@
         Snackbar.Add(result.Message, Severity.Error);
     }
 
-    private async Task DeleteDiagnosis(int diagnosisId)
+    private async Task DeleteFacility(int facilityId)
     {
         if (_model is null)
             return;
-        var result = await DiagnosisService.DeleteDiagnosis(diagnosisId);
+        var result = await FacilityService.DeleteFacilityInAppointment(facilityId);
         if (result.IsSuccess)
         {
             Snackbar.Add("Успешно!", Severity.Success);
-            _diagnosis = new Diagnosis();
-            _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+            _appointmentFacility = new AppointmentFacility();
+            _appointmentFacilities = await AppointmentService.GetAppointmentFacilities(_model.Id) ?? new List<AppointmentFacility>();
             return;
         }
         Snackbar.Add(result.Message, Severity.Error);
-        _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+        _appointmentFacilities = await AppointmentService.GetAppointmentFacilities(_model.Id) ?? new List<AppointmentFacility>();
     }
 
     private async Task Save()
@@ -255,5 +272,47 @@
         _diagnosis = diagnosis;
         await InvokeAsync(StateHasChanged);
     }
+    private async Task EditFacility(AppointmentFacility appointmentFacility)
+    {
+        _appointmentFacility = appointmentFacility;
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task SaveFacility()
+    {
+        if (_model is null)
+            return;
+        _appointmentFacility.AppointmentId = _model.Id;
+        var result = await FacilityService.SaveFacilityInAppointment(_appointmentFacility);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно!", Severity.Success);
+            _appointmentFacility = new AppointmentFacility();
+            _appointmentFacilities = await AppointmentService.GetAppointmentFacilities(_model.Id) ?? new List<AppointmentFacility>();
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
+    }
 
+    private async Task DeleteDiagnosis(int diagnosisId)
+    {
+        if (_model is null)
+            return;
+        var result = await DiagnosisService.DeleteDiagnosis(diagnosisId);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно!", Severity.Success);
+            _diagnosis = new Diagnosis();
+            _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
+        _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<Diagnosis>();
+    }
+    
+    AggregateDefinition<AppointmentFacility> _sumAggregator = new()
+    {
+        Type = AggregateType.Sum,
+        DisplayFormat = "{value}"
+    };
 }

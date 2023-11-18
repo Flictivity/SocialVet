@@ -4,6 +4,7 @@ using SoVet.Domain.Commands.Appointment;
 using SoVet.Domain.Models;
 using SoVet.Domain.Queries.Appointment;
 using SoVet.Domain.Queries.Diagnosis;
+using SoVet.Domain.Queries.Facility;
 
 namespace SoVet.WebAPI.Controllers;
 
@@ -40,6 +41,14 @@ public class AppointmentController : AuthorizedControllerBase
         var command = new GetAppointmentDiagnosesQuery(appointmentId);
         var result = await _sender.Send(command);
 
+        return Ok(result);
+    }
+    
+    [HttpGet("facilities")]
+    public async Task<IActionResult> GetFacilitiesInAppointment([FromQuery] int appointmentId)
+    {
+        var command = new GetFacilitiesInAppointmentQuery(appointmentId);
+        var result = await _sender.Send(command);
         return Ok(result);
     }
 

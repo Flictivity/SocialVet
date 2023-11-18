@@ -7,5 +7,5 @@ public class AppointmentFacility
     public int Discount { get; set; }
     public decimal Sum { get; set; }
     public int AppointmentId { get; set; }
-    public Facility Facility { get; set; } = null!;
+    public Facility? Facility { get; set; } = null!;
 }

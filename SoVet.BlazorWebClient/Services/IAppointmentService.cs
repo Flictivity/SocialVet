@@ -9,5 +9,6 @@ public interface IAppointmentService
     public Task<List<AppointmentTable>> GetAppointments(int patientId);
     public Task<Appointment?> GetAppointment(int appointmentId);
     public Task<List<Diagnosis>?> GetAppointmentDiagnoses(int appointmentId);
+    public Task<List<AppointmentFacility>?> GetAppointmentFacilities(int appointmentId);
     public Task<BaseResult> SaveAppointment(Appointment appointment);
 }

@@ -16,6 +16,7 @@ public sealed class SaveFacilityCommandHandler : IRequestHandler<SaveFacilityCom
 
     public async Task<BaseResponse> Handle(SaveFacilityCommand request, CancellationToken cancellationToken)
     {
+        request.Facility.Sum = request.Facility.Facility.Cost * request.Facility.Count * (1 - (decimal)request.Facility.Discount/100); 
         return await _repository.SaveFacilityInAppointmentAsync(request.Facility);
     }
 };
