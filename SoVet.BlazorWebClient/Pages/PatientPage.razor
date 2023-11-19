@@ -11,7 +11,7 @@
 <MudTabs Rounded="true" Color="Color.Primary" ActivePanelIndex="_index">
     @if (_patient is not null)
     {
-        <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History" OnClick="@(async () => await ChangeTab(1))">
+        <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History" OnClick="@(async () => await ChangeTab(0))">
             @if (_appointment is null)
             {
                 <Appointments AppointmentSelect="x => _appointment = x" Patient="_patient"></Appointments>
@@ -21,10 +21,10 @@
                 <Appointment AppointmentTable="_appointment" AppointmentSelect="x => _appointment = x"></Appointment>
             }
         </MudTabPanel>
+        <MudTabPanel Text="Профиль" Icon="@Icons.Material.Filled.CrueltyFree" OnClick="@(async () => await ChangeTab(1))">
+            <PatientInfo Model="_patient"></PatientInfo>
+        </MudTabPanel>
     }
-    <MudTabPanel Text="Профиль" Icon="@Icons.Material.Filled.CrueltyFree" OnClick="@(async () => await ChangeTab(0))">
-        <PatientInfo Model="_patient"></PatientInfo>
-    </MudTabPanel>
 </MudTabs>
 
 @code {
