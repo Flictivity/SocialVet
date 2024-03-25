@@ -19,8 +19,8 @@
                                       T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudNumericField Required="true" Variant="Variant.Outlined" Min="1"
-                                         @bind-Value="Model.Age" Immediate For="@(() => Model.Age)" FullWidth="true" Label="Возраст (мес.)"/>
+                        @* <MudDatePicker Required="true" Variant="Variant.Outlined" MaxDate="DateTime.Today" *@
+                        @*                  @bind-Date="Model.BirthDate" Label="Возраст"/> *@
                     </MudItem>
                     <MudItem xs="12">
                         <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
@@ -55,8 +55,9 @@ else
                                       T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudNumericField Required="true" Variant="Variant.Outlined" Min="1"
-                                         @bind-Value="Model.Age" Immediate For="@(() => Model.Age)" FullWidth="true" Label="Возраст (мес.)"/>
+                        @*TODO:
+                        @* <MudNumericField Required="true" Variant="Variant.Outlined" Min="1" *@
+                        @*                  @bind-Value="Model.BirthDate" Immediate For="@(() => Model.BirthDate)" FullWidth="true" Label="Возраст (мес.)"/> *@
                     </MudItem>
                     <MudItem xs="12">
                         <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"

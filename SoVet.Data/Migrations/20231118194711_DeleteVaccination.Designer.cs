@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SoVet.Data;
@@ -11,9 +12,11 @@ using SoVet.Data;
 namespace SoVet.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20231118194711_DeleteVaccination")]
+    partial class DeleteVaccination
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,13 +322,13 @@ namespace SoVet.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Age")
+                        .HasColumnType("integer")
+                        .HasColumnName("age");
+
                     b.Property<int>("AnimalTypeId")
                         .HasColumnType("integer")
                         .HasColumnName("animal_type_id");
-
-                    b.Property<DateOnly>("BirthDate")
-                        .HasColumnType("date")
-                        .HasColumnName("birth_date");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("integer")
