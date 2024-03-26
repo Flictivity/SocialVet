@@ -19,8 +19,8 @@
                                       T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
                     </MudItem>
                     <MudItem xs="12">
-                        @* <MudDatePicker Required="true" Variant="Variant.Outlined" MaxDate="DateTime.Today" *@
-                        @*                  @bind-Date="Model.BirthDate" Label="Возраст"/> *@
+                        <MudDatePicker Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
+                                                               Editable="true" @bind-Date="_birthDate" Placeholder="Дата рождения" />
                     </MudItem>
                     <MudItem xs="12">
                         <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
@@ -55,9 +55,8 @@ else
                                       T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
                     </MudItem>
                     <MudItem xs="12">
-                        @*TODO:
-                        @* <MudNumericField Required="true" Variant="Variant.Outlined" Min="1" *@
-                        @*                  @bind-Value="Model.BirthDate" Immediate For="@(() => Model.BirthDate)" FullWidth="true" Label="Возраст (мес.)"/> *@
+                        <MudDatePicker Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
+                                       Editable="true" @bind-Date="_birthDate" Placeholder="Дата рождения" />
                     </MudItem>
                     <MudItem xs="12">
                         <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
@@ -87,6 +86,8 @@ else
     [Parameter]
     public Patient? Model { get; set; }
 
+    private DateTime? _birthDate;
+
     [CascadingParameter]
     public MudDialogInstance? MudDialog { get; set; }
 
@@ -101,10 +102,12 @@ else
         if (Model is null)
         {
             Model = new Patient();
+            _birthDate = DateTime.Today;
         }
         else
         {
             _isEdit = true;
+            _birthDate = Model.BirthDate.ToDateTime(TimeOnly.MinValue);
         }
 
         var clients = await ClientService.GetClients();
@@ -135,6 +138,7 @@ else
 
     private async Task Save()
     {
+        Model!.BirthDate = DateOnly.FromDateTime(_birthDate!.Value);
         BaseResult result;
         if (_isEdit)
         {
