@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using SoVet.Auth.Models;
 using SoVet.Domain.ErrorMessages;
 using SoVet.Domain.Exceptions;
+using SoVet.Domain.Models;
 using SoVet.Domain.Notifications;
 
 namespace SoVet.Auth.Handlers;
