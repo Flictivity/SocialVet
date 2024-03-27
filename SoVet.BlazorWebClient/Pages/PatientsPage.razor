@@ -12,7 +12,7 @@
 <MudDataGrid @ref="_dataGrid" Striped="true" T="Patient" ServerData="GetServerData">
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="Кличка"/>
-        <PropertyColumn Property="x => x.Age" Title="Возраст (мес.)"/>
+        <PropertyColumn Property="x => x.BirthDate" Title="Дата рождения"/>
         <PropertyColumn Property="x => x.AnimalType.Name" Title="Тип животного"/>
         <PropertyColumn Property="x => x.Client.Name" Title="Владелец"/>
         @if (!_isClient)

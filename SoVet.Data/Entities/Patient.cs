@@ -8,7 +8,7 @@ namespace SoVet.Data.Entities;
 public sealed class Patient
 {
     public int Id { get; set; }
-    public int Age { get; set; }
+    public DateOnly BirthDate { get; set; }
     public string Name { get; set; } = null!;
     public string? Comment { get; set; }
 

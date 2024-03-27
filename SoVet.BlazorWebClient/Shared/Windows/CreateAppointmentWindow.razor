@@ -20,7 +20,7 @@
                 <MudItem xs="12">
                     <MudStack Row>
                         <MudAutocomplete T="Patient" Label="Пациент" Variant="Variant.Outlined" @bind-Value="_patient" SearchFunc="@(GetClientPatients)"
-                                         ToStringFunc="@(e => e is null ? null : $"{e.Name} Возраст(в месяцах) - {e.Age} ")">
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name} Дата рождения: {e.BirthDate}")">
                         </MudAutocomplete>
                         <MudFab Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenWindow(null))"></MudFab>
                     </MudStack>
