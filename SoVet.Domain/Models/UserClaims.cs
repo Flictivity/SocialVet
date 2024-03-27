@@ -1,4 +1,4 @@
-﻿namespace SoVet.Auth.Models;
+﻿namespace SoVet.Domain.Models;
 
 public static class UserClaims
 {

@@ -4,6 +4,7 @@ using Serilog.Events;
 using SoVet.Auth;
 using SoVet.Data;
 using SoVet.Domain;
+using SoVet.WebAPI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,9 @@ builder.Services.AddDatabase(builder.Configuration)
                 }
             });
         });
+
+//Add hosted service for send emails to clients
+builder.Services.AddHostedService<TimedHostedService>();
 
 var app = builder.Build();
 
