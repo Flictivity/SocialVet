@@ -8,7 +8,6 @@ namespace SoVet.Domain.Services;
 
 public class TimedHostedService : IHostedService, IDisposable
 {
-    private int executionCount = 0;
     private readonly ILogger<TimedHostedService> _logger;
     private readonly IServiceProvider _services;
     private Timer? _timer = null;
@@ -21,7 +20,7 @@ public class TimedHostedService : IHostedService, IDisposable
 
     private async void SendEmail(object? state)
     {
-        _logger.LogInformation("Message sended");
+        _logger.LogInformation("Time Hosted Service send command");
         using var scope = _services.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         
@@ -33,7 +32,7 @@ public class TimedHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Timed Hosted Service running.");
         _timer = new Timer(SendEmail, null, TimeSpan.Zero,
-            TimeSpan.FromSeconds(15));
+            TimeSpan.FromDays(1));
 
         return Task.CompletedTask;
     }

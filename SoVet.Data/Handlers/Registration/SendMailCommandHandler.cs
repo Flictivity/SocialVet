@@ -39,8 +39,8 @@ public sealed class SendMailCommandHandler : IRequestHandler<SendMailCommand, Ba
             if(client is null)
                 continue;
             
-            return await _emailService.SendEmailAsync(email, "Запись на прием", $"Здравствуйте,{client.Name}! " +
-                $"Хотим сообщить вам, что у вас присутсвует запись на {registration.StartTime}. Если вы не имеете связи с данным письмом, просим проигнорировать его. Ждем вас в нашей клинике!");
+            return await _emailService.SendEmailAsync(email, "Запись на прием", $"Здравствуйте, {client.Name}! " +
+                $"Хотим сообщить вам, что у вас присутсвует запись на {registration.StartTime}. Ждем вас в нашей клинике!");
         }
 
         return new BaseResponse { IsSuccess = true };
