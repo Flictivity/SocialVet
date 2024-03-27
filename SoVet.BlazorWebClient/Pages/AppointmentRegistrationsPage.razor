@@ -4,9 +4,11 @@
 @using DialogOptions = MudBlazor.DialogOptions
 @using DialogPosition = MudBlazor.DialogPosition
 @using Radzen
+@using Variant = MudBlazor.Variant
 
 @inject IRegistrationService RegistrationService;
 @inject IDialogService DialogService;
+@inject NavigationManager NavigationManager;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 
 <PageTitle>Записи</PageTitle>
@@ -21,10 +23,12 @@
         <RadzenDayView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="День"/>
         <RadzenWeekView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="Неделя"/>
     </RadzenScheduler>
+    
+    <MudButton Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@OpenCreatePage">Новая запись</MudButton>
 }
 else
 {
-    <MudAlert Severity="Severity.Info" Class="mt-3">Записи для отсутсвуют...</MudAlert>
+    <MudAlert Severity="Severity.Info" Class="mt-3">Записи отсутствуют...</MudAlert>
 }
 
 @code {
@@ -47,6 +51,11 @@ else
         await base.OnInitializedAsync();
     }
 
+    private void OpenCreatePage()
+    {
+        NavigationManager.NavigateTo("/registrate-to-appointment");
+    }
+    
     private async Task RegistrationSelect(SchedulerAppointmentSelectEventArgs<Registration> args)
     {
         var options = new DialogOptions

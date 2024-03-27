@@ -5,10 +5,11 @@
 
 @inject IRegistrationService RegistrationService;
 @inject IEmployeeService EmployeeService;
+@inject IClientService ClientService;
 @inject IDialogService DialogService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 
-@attribute [Authorize(Roles = Role.Client)]
+@attribute [Authorize(Roles=$"{Role.Client}, {Role.Administrator}")]
 <PageTitle>Запись на прием</PageTitle>
 
 <MudGrid Class="d-flex align-center justify-center" Style="height:90vh;">
@@ -16,6 +17,17 @@
         <MudImage Elevation="7" Src="images/close-up-on-veterinarian-taking-care-of-dog.jpg" Alt="Doc" Class="rounded-lg" Fluid="true"></MudImage>
     </MudItem>
     <MudItem xs="12" sm="6">
+        <AuthorizeView Roles="@Role.Administrator">
+            @if (_clients is not null)
+            {
+                <MudSelect Class="mb-5" T="Client" Variant="Variant.Outlined" Label="Клиент" @bind-Value="_client">
+                    @foreach (var client in _clients)
+                    {
+                        <MudSelectItem T="Client" Value="client">@client.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            }
+        </AuthorizeView>
         @if (_veterinarians is not null)
         {
             <MudSelect T="Employee" Variant="Variant.Outlined" Label="Врач" ValueChanged="VeterinarianChanged">
@@ -55,13 +67,16 @@
 @code {
     private DateTime? _date;
     private List<Employee>? _veterinarians = new();
+    private List<Client>? _clients = new();
     private List<TimeSpan>? _availableTimes = new();
     private Employee? _veterinarian;
+    private Client? _client;
     private RegistrationCreateRequest _model = null!;
 
     protected override async Task OnInitializedAsync()
     {
         _veterinarians = await EmployeeService.GetVeterinarians();
+        _clients = await ClientService.GetClients();
     }
 
     private async Task DateChanged(DateTime? value)
@@ -92,7 +107,11 @@
     private async Task OpenDialogWindow(TimeSpan time)
     {
         var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
-        var clientId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.ClientId).Value);
+        var clientId = _client!.Id;
+        if (userIdentity.IsInRole(Role.Client))
+        {
+            clientId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.ClientId).Value);
+        }
 
         _model = new RegistrationCreateRequest
         {
