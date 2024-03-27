@@ -39,7 +39,7 @@ public sealed class EmailService : IEmailService
             await client.ConnectAsync("smpt.mail.ru", 465, true);
             await client.AuthenticateAsync("computerservlse@mail.ru",_mailPassword);
             await client.SendAsync(sendMessage);
-            _logger.LogInformation("Письмо успешно отправлено");
+            _logger.LogInformation("Email succesfully sended");
             return new BaseResponse{IsSuccess = true};
         }
         catch (Exception ex)

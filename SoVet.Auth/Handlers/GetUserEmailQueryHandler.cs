@@ -19,8 +19,8 @@ public sealed class GetUserEmailQueryHandler : IRequestHandler<GetUserEmailQuery
     {
         var connection = _context.Database.GetDbConnection();
         var result = await connection
-            .QueryFirstOrDefaultAsync<string>(UserQueries.GetEmployeesUsersByRole,
-                new { userId = request.UserId, claimType = request.ClaimType });
+            .QueryFirstOrDefaultAsync<string>(UserQueries.GetUserEmail,
+                new { userId = request.UserId.ToString(), claimType = request.ClaimType });
 
         return result ?? string.Empty;
     }

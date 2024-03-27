@@ -15,5 +15,5 @@ public static class UserQueries
 
     public const string GetUserEmail = @"SELECT u.""Email"" FROM identity.""AspNetUserClaims"" c 
                                                 JOIN identity.""AspNetUsers"" u on c.""UserId"" = u.""Id""
-                                                WHERE c.""ClaimType"" = @claimType and c.""ClaimValue"" == @userId";
+                                                WHERE c.""ClaimType"" = @claimType and c.""ClaimValue"" = @userId";
 }

@@ -4,6 +4,7 @@ using Serilog.Events;
 using SoVet.Auth;
 using SoVet.Data;
 using SoVet.Domain;
+using SoVet.Domain.Services;
 using SoVet.WebAPI;
 
 var builder = WebApplication.CreateBuilder(args);
