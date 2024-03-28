@@ -10,7 +10,7 @@ public static class RegistrationRepositoryQueries
                                        )
                                        SELECT hour FROM all_hours ah WHERE ah.hour not in (select r.start_time from registrations r 
                                             WHERE r.employee_id = @employeeId and r.start_time::date = @dateReg::date) 
-                                                and EXTRACT(HOUR FROM ah.hour) > EXTRACT(HOUR FROM now() AT TIME ZONE 'Europe/Moscow')";
+                                                and ah.hour > now() AT TIME ZONE 'Europe/Moscow'";
 
     public const string GetRegistrations =
         @"SELECT r.id, r.start_time as StartTime, c.id as ClientId, c.name as ClientName, e.id as EmployeeId,
