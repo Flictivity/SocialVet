@@ -107,7 +107,7 @@
     private async Task OpenDialogWindow(TimeSpan time)
     {
         var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
-        var clientId = _client!.Id;
+        var clientId = _client is null ? 0 : _client!.Id;
         if (userIdentity.IsInRole(Role.Client))
         {
             clientId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.ClientId).Value);
