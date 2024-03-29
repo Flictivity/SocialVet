@@ -17,7 +17,7 @@
 
 @if (_registrations?.Count != 0)
 {
-    <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="EndTime"
+    <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="StartTime"
                      TextProperty="ScheduleText" SelectedIndex="1" TodayText="Сегодня" AppointmentSelect="RegistrationSelect" Style="height: 90vh"
                      AppointmentRender="@OnAppointmentRender">
         <RadzenDayView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="День"/>

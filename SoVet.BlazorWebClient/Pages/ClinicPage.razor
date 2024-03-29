@@ -28,6 +28,14 @@
             <MudTimePicker @bind-Time="_model.EndTime" Variant="Variant.Outlined" Label="Время закрытия" Editable="true"></MudTimePicker>
         </MudItem>
     </MudGrid>
+    <MudGrid Spacing="2" Justify="Justify.SpaceBetween">
+        <MudItem xs=12 sm=6>
+            <MudSlider @bind-Value="_model.AppointmentDuration" Min="0.5" Max="3" Step="0.5" Color="Color.Primary">Время приема (ч.): @_model.AppointmentDuration</MudSlider>
+        </MudItem>
+        <MudItem xs=12 sm=6>
+            <MudSlider @bind-Value="_model.PauseDuration" Min="15" Max="60" Step="5" Color="Color.Primary">Время перерыва между приемами (мин.): @_model.PauseDuration</MudSlider>
+        </MudItem>
+    </MudGrid>
 </MudStack>
 
 
