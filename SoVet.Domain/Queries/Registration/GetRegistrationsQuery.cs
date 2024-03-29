@@ -2,4 +2,4 @@
 
 namespace SoVet.Domain.Queries.Registration;
 
-public sealed record GetRegistrationsQuery(int? EmployeeId) : IRequest<List<Models.Registration>?>;
+public sealed record GetRegistrationsQuery(int? EmployeeId, int? ClientId = null) : IRequest<List<Models.Registration>?>;

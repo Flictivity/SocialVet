@@ -46,13 +46,13 @@ public sealed class RegistrationService : IRegistrationService
         }
     }
 
-    public async Task<List<Registration>?> GetRegistrations(int? employeeId)
+    public async Task<List<Registration>?> GetRegistrations(int? employeeId, int? clientId = null)
     {
         try
         {
             var result =
                 await _httpClient.GetFromJsonAsync<List<Registration>>(
-                    $"registration?employeeId={employeeId}");
+                    $"registration?employeeId={employeeId}&clientId={clientId}");
             return result;
         }
         catch

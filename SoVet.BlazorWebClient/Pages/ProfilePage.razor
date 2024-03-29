@@ -11,7 +11,7 @@
 
 <AuthorizeView Roles="@Role.Client">
     <MudForm @ref="_form" @bind-IsValid="_isValid" Model="_model">
-        <MudStack Row="true" Class="d-flex flex-row">
+        <MudStack Row="true" Class="d-flex align-items-center">
             @if (!string.IsNullOrWhiteSpace(_model.Name))
             {
                 <MudAvatar Class="d-flex align-center" Style="height:200px;width:200px; font-size: 2rem;" Color="Color.Primary" Variant="Variant.Filled">@_model.Name[0]</MudAvatar>

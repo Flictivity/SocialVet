@@ -38,12 +38,14 @@ public sealed class RegistrationRepository : IRegistrationRepository
         return new BaseResponse { IsSuccess = true };
     }
 
-    public async Task<List<Registration>> GetRegistrations(int? employeeId)
+    public async Task<List<Registration>> GetRegistrations(int? employeeId, int? clientId = null)
     {
         var builder = new SqlBuilder();
         var selector = builder.AddTemplate(RegistrationRepositoryQueries.GetRegistrations);
         if (employeeId is not null)
             builder.Where($"r.employee_id = {employeeId}");
+        if (clientId is not null)
+            builder.Where($"r.client_id = {clientId}");
         var connection = _context.Database.GetDbConnection();
         var result = (await connection
                 .QueryAsync<Registration>(selector.RawSql)
