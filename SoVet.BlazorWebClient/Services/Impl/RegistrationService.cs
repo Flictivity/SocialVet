@@ -60,4 +60,18 @@ public sealed class RegistrationService : IRegistrationService
             return new List<Registration>();
         }
     }
+
+    public async Task<BaseResult> DeleteRegistration(int registrationId)
+    {
+        try
+        {
+            var result = await _httpClient.DeleteFromJsonAsync<BaseResult>($"registration?registrationId={registrationId}");
+            return result ?? new BaseResult { IsSuccess = false, Message = "Ошибка при отмене записи. Вроверьте соединение с сервером" };
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError("Error:{1}", ex.Message);
+            return new BaseResult { IsSuccess = false, Message = "Ошибка при отмене записи. Вроверьте соединение с сервером" };
+        }
+    }
 }

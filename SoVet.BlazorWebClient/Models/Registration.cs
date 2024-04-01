@@ -11,4 +11,6 @@ public sealed class Registration
     public int EmployeeId { get; set; }
     public string? EmployeeName { get; set; }
     public string? ScheduleText => Comment is null ? ClientName : $"{ClientName} - {Comment}";
+    public string? PatientName { get; set; }
+    public DateTime? AppointmentChangeDate { get; set; }
 }

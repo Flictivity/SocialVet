@@ -9,4 +9,5 @@ public interface IRegistrationRepository
     public Task<BaseResponse> CreateRegistration(Registration registration);
 
     public Task<List<Registration>> GetRegistrations(int? employeeId, int? clientId = null);
+    public Task<BaseResponse> DeleteRegistration(int registrationId);
 }

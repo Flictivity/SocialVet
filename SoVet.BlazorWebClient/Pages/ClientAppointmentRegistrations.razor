@@ -2,6 +2,8 @@
 @attribute [Authorize(Roles = Role.Client)]
 @inject IRegistrationService RegistrationService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject ISnackbar Snackbar;
+@inject IDialogService DialogService;
 
 <MudExpansionPanels>
     <MudExpansionPanel Text="Прошедшие">
@@ -34,10 +36,12 @@
                             </MudGrid>
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Variant="Variant.Filled" Color="Color.Default"
-                                       OnClick="@(async () => await DeleteRegistration(registration.Id))">
-                                Отменить запись
-                            </MudButton>
+                            <MudTooltip Text="Отменить запись нельзя т.к. время записи уже прошло">
+                                <MudButton Variant="Variant.Filled" Color="Color.Default"
+                                           Disabled="true">
+                                    Отменить запись
+                                </MudButton>
+                            </MudTooltip>
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -74,10 +78,14 @@
                             </MudGrid>
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Variant="Variant.Filled" Color="Color.Default"
-                                       OnClick="@(async () => await DeleteRegistration(registration.Id))">
-                                Отменить запись
-                            </MudButton>
+                            <MudTooltip Text="@(registration.AppointmentChangeDate != DateTime.MinValue ? 
+                                                  "Отменить запись нельзя из-за наличия существующих приемов" : "")">
+                                <MudButton Variant="Variant.Filled" Color="Color.Default"
+                                           OnClick="@(async () => await DeleteRegistration(registration.Id))"
+                                           Disabled="@(registration.AppointmentChangeDate != DateTime.MinValue)">
+                                    Отменить запись
+                                </MudButton>
+                            </MudTooltip>
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -92,6 +100,11 @@
     private string? _appointmentSearchString;
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadRegistrations();
+    }
+
+    private async Task LoadRegistrations()
     {
         int? clientId = null;
         var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
@@ -110,6 +123,22 @@
 
     private async Task DeleteRegistration(int registrationId)
     {
-    }
+        var dialogResult = await DialogService.ShowMessageBox("Сообщение",
+            "Вы действительно хотите отменить запись?","Отменить","Отмена");
 
+        if (dialogResult == null)
+        {
+            return;
+        }
+        
+        var deleteRegistrationResult = await RegistrationService.DeleteRegistration(registrationId);
+
+        if (!deleteRegistrationResult.IsSuccess)
+        {
+            Snackbar.Add(deleteRegistrationResult.Message, Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно!", Severity.Success);
+        await LoadRegistrations();
+    }
 }

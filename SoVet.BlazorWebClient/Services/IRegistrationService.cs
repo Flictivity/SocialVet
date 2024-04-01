@@ -9,4 +9,5 @@ public interface IRegistrationService
     public Task<List<TimeSpan>?> GetAvailableRegistrationTimes(GetAvailableRegistrationsRequest request);
     public Task<BaseResult> CreateRegistration(RegistrationCreateRequest request);
     public Task<List<Registration>?> GetRegistrations(int? employeeId, int? clientId = null);
+    public Task<BaseResult> DeleteRegistration(int registrationId);
 }

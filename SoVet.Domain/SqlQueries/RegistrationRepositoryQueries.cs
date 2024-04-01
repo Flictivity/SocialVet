@@ -16,8 +16,10 @@ public static class RegistrationRepositoryQueries
 
     public const string GetRegistrations =
         @"SELECT r.id, r.start_time as StartTime, c.id as ClientId, c.name as ClientName, e.id as EmployeeId,
-                                                       e.name as EmployeeName, r.Comment as Comment
+                                                       e.name as EmployeeName, r.Comment as Comment, ap.change_date as AppointmentChangeDate, p.name as PatientName
                                                 FROM public.registrations r
                                                          JOIN public.clients c on c.id = r.client_id
-                                                         JOIN public.employees e on e.id = r.employee_id /**where**/";
+                                                         JOIN public.employees e on e.id = r.employee_id
+                                                         LEFT JOIN public.appointments ap on ap.registration_id = r.id
+                                                         LEFT JOIN public.patients p on ap.patient_id = p.id /**where**/";
 }

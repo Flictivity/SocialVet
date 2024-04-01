@@ -32,6 +32,14 @@ public sealed class RegistrationRepository : IRegistrationRepository
     public async Task<BaseResponse> CreateRegistration(Registration registration)
     {
         registration.StartTime = DateTime.SpecifyKind(registration.StartTime, DateTimeKind.Utc);
+        
+        var existRegistration = await _context.Registrations.FirstOrDefaultAsync(x => x.StartTime == registration.StartTime);
+
+        if (existRegistration is not null)
+        {
+            return new BaseResponse { IsSuccess = false, Message = "На данное время уже существует запись!" };
+        }
+        
         var registrationDb = _mapper.Map(registration);
         _context.Registrations.Add(registrationDb);
         await _context.SaveChangesAsync();
@@ -52,5 +60,17 @@ public sealed class RegistrationRepository : IRegistrationRepository
             ).AsList();
 
         return result;
+    }
+
+    public async Task<BaseResponse> DeleteRegistration(int registrationId)
+    {
+        var registration = await _context.Registrations.FirstOrDefaultAsync(x => x.Id == registrationId);
+
+        if (registration is null)
+            return new BaseResponse { IsSuccess = false, Message = "Не удалось удалить запись" };
+        _context.Registrations.Remove(registration);
+        await _context.SaveChangesAsync();
+
+        return new BaseResponse { IsSuccess = true };
     }
 }
