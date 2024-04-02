@@ -60,6 +60,11 @@
                     <MudNavLink Href="/registrate-to-appointment" Icon="@Icons.Material.Filled.PlaylistAdd">Записаться</MudNavLink>
                 </Authorized>
             </AuthorizeView>
+            <AuthorizeView Roles="@Role.Client">
+                <Authorized>
+                    <MudNavLink Href="/client-registrations" Icon="@Icons.Material.Filled.ViewTimeline">Мои записи</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>

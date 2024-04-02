@@ -9,4 +9,6 @@ public sealed class Clinic
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public string ClinicName { get; set; } = "SoVet";
+    public double AppointmentDuration { get; set; }
+    public double PauseDuration { get; set; }
 }

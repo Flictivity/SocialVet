@@ -6,4 +6,6 @@ public sealed class Clinic
     public TimeSpan? StartTime { get; set; }
     public TimeSpan? EndTime { get; set; }
     public string ClinicName { get; set; } = null!;
+    public double AppointmentDuration { get; set; } = 0.5;
+    public double PauseDuration { get; set; } = 30;
 }

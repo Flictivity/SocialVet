@@ -46,18 +46,32 @@ public sealed class RegistrationService : IRegistrationService
         }
     }
 
-    public async Task<List<Registration>?> GetRegistrations(int? employeeId)
+    public async Task<List<Registration>?> GetRegistrations(int? employeeId, int? clientId = null)
     {
         try
         {
             var result =
                 await _httpClient.GetFromJsonAsync<List<Registration>>(
-                    $"registration?employeeId={employeeId}");
+                    $"registration?employeeId={employeeId}&clientId={clientId}");
             return result;
         }
         catch
         {
             return new List<Registration>();
+        }
+    }
+
+    public async Task<BaseResult> DeleteRegistration(int registrationId)
+    {
+        try
+        {
+            var result = await _httpClient.DeleteFromJsonAsync<BaseResult>($"registration?registrationId={registrationId}");
+            return result ?? new BaseResult { IsSuccess = false, Message = "Ошибка при отмене записи. Вроверьте соединение с сервером" };
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError("Error:{1}", ex.Message);
+            return new BaseResult { IsSuccess = false, Message = "Ошибка при отмене записи. Вроверьте соединение с сервером" };
         }
     }
 }

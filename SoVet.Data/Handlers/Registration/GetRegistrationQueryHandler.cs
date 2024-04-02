@@ -15,6 +15,6 @@ public sealed class GetRegistrationQueryHandler : IRequestHandler<GetRegistratio
 
     public async Task<List<Domain.Models.Registration>?> Handle(GetRegistrationsQuery request, CancellationToken cancellationToken)
     {
-        return await _repository.GetRegistrations(request.EmployeeId);
+        return await _repository.GetRegistrations(request.EmployeeId, request.ClientId);
     }
 }

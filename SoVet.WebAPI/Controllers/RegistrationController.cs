@@ -54,12 +54,23 @@ public sealed class RegistrationController : AuthorizedControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetRegistrations([FromQuery(Name = "employeeId")] int? employeeId)
+    public async Task<IActionResult> GetRegistrations([FromQuery(Name = "employeeId")] int? employeeId,
+        [FromQuery(Name = "clientId")] int? clientId)
     {
-        var command = new GetRegistrationsQuery(employeeId);
+        var command = new GetRegistrationsQuery(employeeId, clientId);
         var commandResult = await _sender.Send(command);
         if (commandResult is null)
             return BadRequest();
+        return Ok(commandResult);
+    }
+    
+    [HttpDelete]
+    public async Task<IActionResult> DeleteRegistration([FromQuery(Name = "registrationId")] int registrationId)
+    {
+        var command = new DeleteRegistrationCommand(registrationId);
+        var commandResult = await _sender.Send(command);
+        if (!commandResult.IsSuccess)
+            return BadRequest(commandResult);
         return Ok(commandResult);
     }
 }
