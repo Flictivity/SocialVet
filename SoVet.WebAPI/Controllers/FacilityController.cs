@@ -46,4 +46,14 @@ public sealed class FacilityController : AuthorizedControllerBase
         var result = await _sender.Send(command);
         return Ok(result);
     }
+    
+    [HttpPut]
+    public async Task<IActionResult> UpdateFacility([FromBody] Facility facility)
+    {
+        var updateClinicCommand = new UpdateFacilityCommand(facility);
+        var commandResult = await _sender.Send(updateClinicCommand);
+        if (!commandResult.IsSuccess)
+            return BadRequest();
+        return Ok(commandResult);
+    }
 }

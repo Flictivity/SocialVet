@@ -48,6 +48,17 @@ public sealed class FacilityRepository : IFacilityRepository
         return new BaseResponse{ IsSuccess = true};
     }
 
+    public async Task<BaseResponse> UpdateFacility(Facility facility)
+    {
+        var facilityDb = _mapper.Map(facility);
+        _context.Facilities.Update(facilityDb);
+        await _context.SaveChangesAsync();
+        
+        _context.ChangeTracker.Clear();
+
+        return new BaseResponse { IsSuccess = true };
+    }
+
     public async Task<List<AppointmentFacility>> GetFacilitiesInAppointment(int appointmentId)
     {
         var connection = _context.Database.GetDbConnection();

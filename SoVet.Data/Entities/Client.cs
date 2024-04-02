@@ -9,6 +9,8 @@ public sealed class Client
     public string Name { get; set; } = null!;
     public string? Address { get; set; }
 
+    public bool IsDeleted { get; set; }
+    
     public ICollection<Patient> Patients { get; set; } = new List<Patient>();
     public ICollection<Registration> Appointments { get; set; } = new List<Registration>();
 }

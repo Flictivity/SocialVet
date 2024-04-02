@@ -70,4 +70,19 @@ public class FacilityService : IFacilityService
             return null;
         }
     }
+
+    public async Task<BaseResult> UpdateFacility(Facility facility)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync("facility",facility);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult{IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
+    }
 }

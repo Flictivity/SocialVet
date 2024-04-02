@@ -1,56 +1,87 @@
 ﻿@inject IFacilityService FacilityService;
+@inject ISnackbar Snackbar;
 
 <MudDialog>
     <DialogContent>
         <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
             <MudGrid Spacing="3">
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Immediate For="@(() => Model.Name)" T="string"
+                    <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)" T="string"
                                   @bind-Value="Model.Name" Label="Наименование" FullWidth="true"/>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" Immediate For="@(() => Model.Cost)" T="decimal"
-                                  @bind-Value="Model.Cost" Label="Стоимость" FullWidth="true"/>
+                    <MudNumericField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Cost)" T="decimal"
+                                     @bind-Value="Model.Cost" Label="Стоимость" FullWidth="true"/>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudAutocomplete Variant="Variant.Outlined" Immediate For="@(() => Model.FacilityCategory)" T="FacilityCategory"
-                                     @bind-Value="Model.FacilityCategory" Label="Категория" FullWidth="true" SearchFunc="@SearchFacilityCategory"
-                                     ToStringFunc="@(e => e == null ? null : e.Name)"/>
-                </MudItem>
+                    <MudAutocomplete Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.FacilityCategory)" T="FacilityCategory"
+                                     @bind-Value="Model.FacilityCategory" SearchFunc="@SearchFacilityCategory" Label="Категория" 
+                                     FullWidth="true" ToStringFunc="@(e => e is null ? null : e.Name)"/>
+                </MudItem>  
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled"
+        <MudButton Disabled="@(!_isValid)" Class="ma-3" Color="Color.Primary" Variant="Variant.Filled"
                    ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">
             Сохранить
         </MudButton>
+        @if (IsEdit)
+        {
+            <MudButton Class="ma-3" Color="Color.Error" Variant="Variant.Text"
+                       ButtonType="ButtonType.Submit" OnClick="@(async () => await Delete())">
+                Удалить
+            </MudButton>
+        }
     </DialogActions>
 </MudDialog>
 
 @code {
-
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = null!;
     
     [Parameter]
     public Facility Model { get; set; } = null!;
+    [Parameter]
+    public bool IsEdit { get; set; }
 
     private MudForm _form = null!;
     private bool _isValid;
-
+    
     private List<FacilityCategory>? _facilityCategories = new();
 
     protected override async Task OnInitializedAsync()
     {
         _facilityCategories = await FacilityService.GetFacilityCategories();
+        if (IsEdit)
+        {
+            await _form.Validate();
+        }
     }
-
     private async Task Save()
     {
+        var result = await FacilityService.UpdateFacility(Model);
+
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
         MudDialog.Close(DialogResult.Ok(true));
     }
+    private async Task Delete()
+    {
+        Model.IsDeleted = true;
+        var result = await FacilityService.UpdateFacility(Model);
 
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    
     private Task<IEnumerable<FacilityCategory>> SearchFacilityCategory(string value)
     {
         if (_facilityCategories is null)
@@ -60,5 +91,4 @@
             ? _facilityCategories 
             : _facilityCategories.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
     }
-
 }
