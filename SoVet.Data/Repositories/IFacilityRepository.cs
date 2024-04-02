@@ -9,4 +9,5 @@ public interface IFacilityRepository
     public Task<BaseResponse> DeleteFacilityInAppointmentAsync(int appointmentFacilityId);
     public Task<List<AppointmentFacility>> GetFacilitiesInAppointment(int appointmentId);
     public Task<List<Facility>> GetFacilitiesAsync();
+    public Task<List<FacilityCategory>> GetFacilityCategoriesAsync();
 }

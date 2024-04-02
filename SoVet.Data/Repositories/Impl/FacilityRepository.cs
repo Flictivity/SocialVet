@@ -75,4 +75,9 @@ public sealed class FacilityRepository : IFacilityRepository
 
         return result;
     }
+
+    public Task<List<FacilityCategory>> GetFacilityCategoriesAsync()
+    {
+        return Task.FromResult(_context.FacilityCategories.Select(x => _mapper.Map(x)).ToList());
+    }
 }

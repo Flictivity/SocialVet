@@ -38,4 +38,12 @@ public sealed class FacilityController : AuthorizedControllerBase
         var result = await _sender.Send(command);
         return Ok(result);
     }
+    
+    [HttpGet("facility-categories")]
+    public async Task<IActionResult> GetFacilityCategories()
+    {
+        var command = new GetFacilityCategoriesQuery();
+        var result = await _sender.Send(command);
+        return Ok(result);
+    }
 }

@@ -49,7 +49,20 @@ public class FacilityService : IFacilityService
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<List<Facility>>($"Facility");
+            return await _httpClient.GetFromJsonAsync<List<Facility>>("Facility");
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
+    
+    public async Task<List<FacilityCategory>?> GetFacilityCategories()
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<List<FacilityCategory>>("Facility/facility-categories");
         }
         catch(Exception ex)
         {
