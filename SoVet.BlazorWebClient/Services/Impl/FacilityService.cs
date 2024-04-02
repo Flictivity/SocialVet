@@ -85,4 +85,19 @@ public class FacilityService : IFacilityService
             return new BaseResult{IsSuccess = false, Message = "Произошла ошибка при сохранении"};
         }
     }
+
+    public async Task<BaseResult> UpdateFacilityCategory(FacilityCategory facilityCategory)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync("facility/update-facility-category",facilityCategory);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult{IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
+    }
 }

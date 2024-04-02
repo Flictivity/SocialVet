@@ -59,6 +59,17 @@ public sealed class FacilityRepository : IFacilityRepository
         return new BaseResponse { IsSuccess = true };
     }
 
+    public async Task<BaseResponse> UpdateFacilityCategory(FacilityCategory facilityCategory)
+    {
+        var facilityCategoryDb = _mapper.Map(facilityCategory);
+        _context.FacilityCategories.Update(facilityCategoryDb);
+        await _context.SaveChangesAsync();
+        
+        _context.ChangeTracker.Clear();
+
+        return new BaseResponse { IsSuccess = true };
+    }
+
     public async Task<List<AppointmentFacility>> GetFacilitiesInAppointment(int appointmentId)
     {
         var connection = _context.Database.GetDbConnection();
@@ -89,6 +100,7 @@ public sealed class FacilityRepository : IFacilityRepository
 
     public Task<List<FacilityCategory>> GetFacilityCategoriesAsync()
     {
-        return Task.FromResult(_context.FacilityCategories.Select(x => _mapper.Map(x)).ToList());
+        return Task.FromResult(_context.FacilityCategories.Where(x => !x.IsDeleted)
+            .Select(x => _mapper.Map(x)).ToList());
     }
 }

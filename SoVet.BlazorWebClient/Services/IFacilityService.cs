@@ -10,4 +10,5 @@ public interface IFacilityService
     public Task<List<Facility>?> GetFacilities();
     public Task<List<FacilityCategory>?> GetFacilityCategories();
     public Task<BaseResult> UpdateFacility(Facility facility);
+    public Task<BaseResult> UpdateFacilityCategory(FacilityCategory facilityCategory);
 }

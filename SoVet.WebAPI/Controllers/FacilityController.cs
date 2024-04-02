@@ -50,8 +50,17 @@ public sealed class FacilityController : AuthorizedControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateFacility([FromBody] Facility facility)
     {
-        var updateClinicCommand = new UpdateFacilityCommand(facility);
-        var commandResult = await _sender.Send(updateClinicCommand);
+        var updateFacilityCommand = new UpdateFacilityCommand(facility);
+        var commandResult = await _sender.Send(updateFacilityCommand);
+        if (!commandResult.IsSuccess)
+            return BadRequest();
+        return Ok(commandResult);
+    }
+    [HttpPut("update-facility-category")]
+    public async Task<IActionResult> UpdateFacilityCategory([FromBody] FacilityCategory facilityCategory)
+    {
+        var updateFacilityCategoryCommand = new UpdateFacilityCategoryCommand(facilityCategory);
+        var commandResult = await _sender.Send(updateFacilityCategoryCommand);
         if (!commandResult.IsSuccess)
             return BadRequest();
         return Ok(commandResult);
