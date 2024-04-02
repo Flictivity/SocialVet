@@ -41,7 +41,7 @@
 
 @code {
     private Clinic _model = new();
-    private bool _isLoaded = false;
+    private bool _isLoaded;
     
     protected override async Task OnInitializedAsync()
     {
@@ -49,7 +49,6 @@
 
         if (result is null)
         {
-            Snackbar.Add("Информация о клинике не найдена",Severity.Error);
             return;
         }
         

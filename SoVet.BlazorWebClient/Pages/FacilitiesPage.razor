@@ -29,7 +29,7 @@
 <MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenEditWindow(new Facility(), false))"></MudFab>
 
 @code {
-    private List<Facility>? _facilities = null!;
+    private List<Facility>? _facilities;
     private MudDataGrid<Facility> _dataGrid = null!;
 
     private string _searchString = null!;

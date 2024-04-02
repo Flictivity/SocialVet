@@ -1,4 +1,6 @@
 ﻿@page "/facility-categories"
+
+@attribute [Authorize(Roles = Role.Administrator)]
 @using SoVet.BlazorWebClient.Shared.Windows
 @inject IFacilityService FacilityService;
 @inject IDialogService DialogService;
