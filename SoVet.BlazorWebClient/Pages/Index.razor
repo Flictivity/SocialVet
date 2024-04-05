@@ -1,8 +1,11 @@
 ﻿@page "/"
 <PageTitle>Главная</PageTitle>
 
-<AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")">
+<AuthorizeView Roles="@($"{Role.Veterinarian}")">
     <EmployeeMainComponent/>
+</AuthorizeView>
+<AuthorizeView Roles="@(Role.Administrator)">
+    <AdminDashboard/>
 </AuthorizeView>
 <AuthorizeView Roles="@($"{Role.Client}")">
     <ClientMainComponent/>
