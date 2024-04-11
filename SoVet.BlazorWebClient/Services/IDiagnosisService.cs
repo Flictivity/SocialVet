@@ -7,4 +7,5 @@ public interface IDiagnosisService
 {
     public Task<BaseResult> SaveDiagnosis(Diagnosis diagnosis);
     public Task<BaseResult> DeleteDiagnosis(int diagnosisId);
+    public Task<List<Diagnosis>?> GetDiagnoses();
 }

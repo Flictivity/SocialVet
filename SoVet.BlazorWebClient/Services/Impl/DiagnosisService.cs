@@ -44,4 +44,17 @@ public sealed class DiagnosisService : IDiagnosisService
             return new BaseResult {IsSuccess = false, Message  = "Произошла ошибка при обновлении"};
         }
     }
+    
+    public async Task<List<Diagnosis>?> GetDiagnoses()
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<List<Diagnosis>>("Diagnosis");
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
 }

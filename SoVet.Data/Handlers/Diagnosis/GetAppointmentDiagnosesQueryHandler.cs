@@ -4,7 +4,7 @@ using SoVet.Domain.Queries.Diagnosis;
 
 namespace SoVet.Data.Handlers.Diagnosis;
 
-public sealed class GetAppointmentDiagnosesQueryHandler : IRequestHandler<GetAppointmentDiagnosesQuery, List<Domain.Models.Diagnosis>>
+public sealed class GetAppointmentDiagnosesQueryHandler : IRequestHandler<GetAppointmentDiagnosesQuery, List<Domain.Models.AppointmentDiagnoses>>
 {
     private readonly IDiagnosisRepository _repository;
 
@@ -13,8 +13,8 @@ public sealed class GetAppointmentDiagnosesQueryHandler : IRequestHandler<GetApp
         _repository = repository;
     }
 
-    public Task<List<Domain.Models.Diagnosis>> Handle(GetAppointmentDiagnosesQuery request, CancellationToken cancellationToken)
+    public Task<List<Domain.Models.AppointmentDiagnoses>> Handle(GetAppointmentDiagnosesQuery request, CancellationToken cancellationToken)
     {
-        return _repository.GetDiagnosesAsync(request.AppointmentId);
+        return _repository.GetAppointmentDiagnosesAsync(request.AppointmentId);
     }
 }

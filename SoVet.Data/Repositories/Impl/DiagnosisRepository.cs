@@ -4,6 +4,7 @@ using SoVet.Data.Mappers;
 using SoVet.Domain.Models;
 using SoVet.Domain.Responses;
 using SoVet.Domain.SqlQueries;
+using Diagnosis = SoVet.Domain.Models.Diagnosis;
 
 namespace SoVet.Data.Repositories.Impl;
 
@@ -18,10 +19,19 @@ public sealed class DiagnosisRepository : IDiagnosisRepository
         _mapper = new DatabaseMapper();
     }
 
-    public async Task<List<Diagnosis>> GetDiagnosesAsync(int appointmentId)
+    public async Task<List<AppointmentDiagnoses>> GetAppointmentDiagnosesAsync(int appointmentId)
     {
         var connection = _context.Database.GetDbConnection();
-        return (await connection.QueryAsync<Diagnosis>(DiagnosisRepositoryQueries.GetDiagnoses, new {appointmentId})).AsList();
+        
+        var result = (await connection.QueryAsync<AppointmentDiagnoses,Diagnosis,AppointmentDiagnoses>(
+            DiagnosisRepositoryQueries.GetDiagnoses, 
+            (appointmentDiagnosis, diagnosis) =>
+            {
+                appointmentDiagnosis.Diagnosis = diagnosis;
+                return appointmentDiagnosis;
+            },new{appointmentId})).AsList();
+
+        return result;
     }
 
     public async Task<BaseResponse> SaveDiagnosisAsync(Diagnosis diagnosis)
@@ -52,5 +62,10 @@ public sealed class DiagnosisRepository : IDiagnosisRepository
         _context.Diagnoses.Remove(diagnosisDb);
         await _context.SaveChangesAsync();
         return new BaseResponse{ IsSuccess = true};
+    }
+
+    public async Task<List<Diagnosis>> GetDiagnosesAsync()
+    {
+        return await _context.Diagnoses.Select(x => _mapper.Map(x)).ToListAsync();
     }
 }

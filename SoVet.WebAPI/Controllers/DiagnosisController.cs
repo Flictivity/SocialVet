@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SoVet.Domain.Commands.Appointment;
 using SoVet.Domain.Commands.Diagnosis;
 using SoVet.Domain.Models;
+using SoVet.Domain.Queries.Diagnosis;
 
 namespace SoVet.WebAPI.Controllers;
 
@@ -31,4 +32,29 @@ public sealed class DiagnosisController : AuthorizedControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetDiagnoses()
+    {
+        var command = new GetDiagnosesQuery();
+        var result = await _sender.Send(command);
+
+        return Ok(result);
+    }
+    
+    // [HttpPost("save-in-appointment")]
+    // public async Task<IActionResult> SaveFacilityInAppointment([FromBody] AppointmentFacility facility)
+    // {
+    //     var command = new SaveDiagnosisInAppointmentCommand(facility);
+    //     var result = await _sender.Send(command);
+    //     return Ok(result);
+    // }
+    //
+    // [HttpPut("delete-in-appointment")]
+    // public async Task<IActionResult> DeleteFacilityInAppointment([FromBody] int appointmentDiagnosisId)
+    // {
+    //     var command = new DeleteDiagnosisInAppointmentCommand(appointmentDiagnosisId);
+    //     var result = await _sender.Send(command);
+    //     return Ok(result);
+    // }
 }
