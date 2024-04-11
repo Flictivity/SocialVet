@@ -107,6 +107,43 @@ namespace SoVet.Data.Migrations
                     b.ToTable("appointments", (string)null);
                 });
 
+            modelBuilder.Entity("SoVet.Data.Entities.AppointmentDiagnoses", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppointmentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("appointment_id");
+
+                    b.Property<int>("DiagnosisId")
+                        .HasColumnType("integer")
+                        .HasColumnName("diagnosis_id");
+
+                    b.Property<DateOnly>("EditDate")
+                        .HasColumnType("date")
+                        .HasColumnName("edit_date");
+
+                    b.Property<int>("Result")
+                        .HasColumnType("integer")
+                        .HasColumnName("result");
+
+                    b.HasKey("Id")
+                        .HasName("pk_appointment_diagnoses");
+
+                    b.HasIndex("AppointmentId")
+                        .HasDatabaseName("ix_appointment_diagnoses_appointment_id");
+
+                    b.HasIndex("DiagnosisId")
+                        .HasDatabaseName("ix_appointment_diagnoses_diagnosis_id");
+
+                    b.ToTable("appointment_diagnoses", (string)null);
+                });
+
             modelBuilder.Entity("SoVet.Data.Entities.AppointmentFacility", b =>
                 {
                     b.Property<int>("Id")
@@ -217,14 +254,6 @@ namespace SoVet.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AppointmentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("appointment_id");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date")
-                        .HasColumnName("date");
-
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
@@ -234,15 +263,8 @@ namespace SoVet.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<int>("Result")
-                        .HasColumnType("integer")
-                        .HasColumnName("result");
-
                     b.HasKey("Id")
                         .HasName("pk_diagnoses");
-
-                    b.HasIndex("AppointmentId")
-                        .HasDatabaseName("ix_diagnoses_appointment_id");
 
                     b.ToTable("diagnoses", (string)null);
                 });
@@ -439,6 +461,27 @@ namespace SoVet.Data.Migrations
                     b.Navigation("Registration");
                 });
 
+            modelBuilder.Entity("SoVet.Data.Entities.AppointmentDiagnoses", b =>
+                {
+                    b.HasOne("SoVet.Data.Entities.Appointment", "Appointment")
+                        .WithMany("AppointmentDiagnoses")
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_appointment_diagnoses_appointments_appointment_id");
+
+                    b.HasOne("SoVet.Data.Entities.Diagnosis", "Diagnosis")
+                        .WithMany("AppointmentDiagnosis")
+                        .HasForeignKey("DiagnosisId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_appointment_diagnoses_diagnoses_diagnosis_id");
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("Diagnosis");
+                });
+
             modelBuilder.Entity("SoVet.Data.Entities.AppointmentFacility", b =>
                 {
                     b.HasOne("SoVet.Data.Entities.Appointment", "Appointment")
@@ -458,18 +501,6 @@ namespace SoVet.Data.Migrations
                     b.Navigation("Appointment");
 
                     b.Navigation("Facility");
-                });
-
-            modelBuilder.Entity("SoVet.Data.Entities.Diagnosis", b =>
-                {
-                    b.HasOne("SoVet.Data.Entities.Appointment", "Appointment")
-                        .WithMany("AppointmentDiagnoses")
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_diagnoses_appointments_appointment_id");
-
-                    b.Navigation("Appointment");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.Facility", b =>
@@ -543,6 +574,11 @@ namespace SoVet.Data.Migrations
                     b.Navigation("Appointments");
 
                     b.Navigation("Patients");
+                });
+
+            modelBuilder.Entity("SoVet.Data.Entities.Diagnosis", b =>
+                {
+                    b.Navigation("AppointmentDiagnosis");
                 });
 
             modelBuilder.Entity("SoVet.Data.Entities.Employee", b =>
