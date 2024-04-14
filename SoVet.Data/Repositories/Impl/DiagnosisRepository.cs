@@ -64,6 +64,37 @@ public sealed class DiagnosisRepository : IDiagnosisRepository
         return new BaseResponse{ IsSuccess = true};
     }
 
+    public async Task<BaseResponse> DeleteDiagnosisInAppointmentAsync(int appointmentDiagnosisId)
+    {
+        _context.ChangeTracker.Clear();
+        var appointmentDiagnosisDb = _context.AppointmentDiagnoses.FirstOrDefault(x => x.Id == appointmentDiagnosisId);
+        if (appointmentDiagnosisDb is null)
+            return new BaseResponse{ IsSuccess = false, Message = "Диагноз не найден" };
+
+        _context.AppointmentDiagnoses.Remove(appointmentDiagnosisDb);
+        await _context.SaveChangesAsync();
+        return new BaseResponse{ IsSuccess = true};
+    }
+
+    public async Task<BaseResponse> SaveDiagnosisInAppointmentAsync(AppointmentDiagnoses appointmentDiagnosis)
+    {
+        _context.ChangeTracker.Clear();
+        
+        
+        var existDiagnosis = _context.AppointmentDiagnoses.FirstOrDefault(x => x.Id == appointmentDiagnosis.Id);
+        var appointmentDiagnosisDb = _mapper.Map(appointmentDiagnosis);
+        if (existDiagnosis is null)
+        {
+            await _context.AppointmentDiagnoses.AddAsync(appointmentDiagnosisDb);
+        }
+        else
+        {
+            _context.AppointmentDiagnoses.Update(appointmentDiagnosisDb);
+        }
+        await _context.SaveChangesAsync();
+        return new BaseResponse { IsSuccess = true };
+    }
+
     public async Task<List<Diagnosis>> GetDiagnosesAsync()
     {
         return await _context.Diagnoses.Select(x => _mapper.Map(x)).ToListAsync();

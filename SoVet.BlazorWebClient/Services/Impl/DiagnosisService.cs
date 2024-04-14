@@ -30,6 +30,36 @@ public sealed class DiagnosisService : IDiagnosisService
         }
     }
 
+    public async Task<BaseResult> SaveDiagnosisInAppointment(AppointmentDiagnoses appointmentDiagnoses)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync($"Diagnosis/save-in-appointment",appointmentDiagnoses);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при обновлении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult {IsSuccess = false, Message  = "Произошла ошибка при обновлении"};
+        }
+    }
+
+    public async Task<BaseResult> DeleteDiagnosisInAppointment(int appointmentDiagnosisId)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"Diagnosis/delete-in-appointment", appointmentDiagnosisId);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при обновлении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult {IsSuccess = false, Message  = "Произошла ошибка при обновлении"};
+        }
+    }
+
     public async Task<BaseResult> DeleteDiagnosis( int diagnosisId)
     {
         try

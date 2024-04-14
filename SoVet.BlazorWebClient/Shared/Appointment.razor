@@ -1,5 +1,7 @@
 ﻿@using SoVet.BlazorWebClient.Extensions
+@using SoVet.BlazorWebClient.Models.Appointment
 @using SoVet.BlazorWebClient.Services.Impl
+@using SoVet.BlazorWebClient.Shared.Windows
 @inject IDialogService DialogService;
 @inject IAppointmentService AppointmentService;
 @inject ISnackbar Snackbar;
@@ -57,13 +59,13 @@
                                                          @bind-Value="@(_appointmentDiagnosis.Diagnosis)" SearchFunc="@SearchDiagnosis" Label="Диагноз"
                                                          FullWidth="true" ToStringFunc="@(e => e is null ? null : e.Name)"
                                                          Clearable="true" OnClearButtonClick="@(() => { _appointmentDiagnosis = new(); })"/>
-                                        @if (_appointmentDiagnosis.Id == 0)
+                                        @if (_appointmentDiagnosis.Diagnosis is null)
                                         {
-                                            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Add"/>
+                                            <MudFab Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenDiagnosisWindow(new Diagnosis(), false))"/>
                                         }
                                         else
                                         {
-                                            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit"/>
+                                            <MudFab Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" OnClick="@(async () => await OpenDiagnosisWindow(_appointmentDiagnosis.Diagnosis,true))"/>
                                         }
                                     </MudStack>
                                     <MudSelect Class="mt-3" Disabled="@(_appointmentDiagnosis?.Diagnosis is null)" Required="true" RequiredError="Обязательное поле" T="int" Variant="Variant.Outlined" Label="Результат" @bind-Value="_appointmentDiagnosis.Result">
@@ -77,7 +79,7 @@
                                         }
                                     </MudSelect>
 
-                                    @if (_appointmentDiagnosis.Diagnosis is not null)
+                                    @if (_appointmentDiagnosis!.Diagnosis is not null)
                                     {
                                         <MudTextField T="string" ReadOnly="true" Label="Описание" Lines="4" FullWidth="true" Variant="Variant.Outlined" Class="mt-3"
                                                       @bind-Value="@(_appointmentDiagnosis.Diagnosis.Description)"/>
@@ -89,7 +91,7 @@
                                 </MudCardContent>
                                 <MudCardActions>
                                     <MudButton Disabled="@(_appointmentDiagnosis.Diagnosis is null)"
-                                               Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveDiagnosis())">
+                                               Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3" OnClick="@(async () => await SaveAppointmentDiagnosis())">
                                         Сохранить диагноз
                                     </MudButton>
                                 </MudCardActions>
@@ -121,8 +123,8 @@
                             <TemplateColumn>
                                 <CellTemplate>
                                     <MudStack Row Class="d-flex flex-wrap">
-                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" OnClick="@(async () => await DeleteDiagnosis(context.Item.Id))"></MudIconButton>
-                                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await EditDiagnosis(context.Item))"></MudIconButton>
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" OnClick="@(async () => await DeleteAppointmentDiagnosis(context.Item.Id))"></MudIconButton>
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await EditAppointmentDiagnosis(context.Item))"></MudIconButton>
                                     </MudStack>
                                 </CellTemplate>
                             </TemplateColumn>
@@ -207,11 +209,13 @@
 
 @code {
 
-    [Parameter]
-    public EventCallback<Models.Appointment.AppointmentTable> AppointmentSelect { get; set; }
+    #region Properties
 
     [Parameter]
-    public Models.Appointment.AppointmentTable AppointmentTable { get; set; } = null!;
+    public EventCallback<AppointmentTable> AppointmentSelect { get; set; }
+
+    [Parameter]
+    public AppointmentTable AppointmentTable { get; set; } = null!;
 
     private string _empty = string.Empty;
     private Models.Appointment.Appointment? _model;
@@ -227,6 +231,8 @@
     private List<Facility> _facilities = new();
     private List<AppointmentFacility> _appointmentFacilities = null!;
 
+    #endregion
+
     protected override async Task OnInitializedAsync()
     {
         var appointment = await AppointmentService.GetAppointment(AppointmentTable.Id);
@@ -241,15 +247,11 @@
         _appointmentFacilities = await AppointmentService.GetAppointmentFacilities(_model.Id) ?? new List<AppointmentFacility>();
 
         _facilities = await FacilityService.GetFacilities() ?? new List<Facility>();
-        _diagnoses = await DiagnosisService.GetDiagnoses() ?? new List<Diagnosis>();
+        _diagnoses = (await DiagnosisService.GetDiagnoses() ?? new List<Diagnosis>())
+            .Where(x => _appointmentDiagnoses.FirstOrDefault(z => z.Diagnosis!.Id == x.Id) is null).ToList();
 
         _isLoaded = true;
         await base.OnInitializedAsync();
-    }
-
-    private void Close()
-    {
-        AppointmentSelect.InvokeAsync(null);
     }
 
     private Func<AppointmentDiagnoses, bool> DiagnosisQuickFilter => x => string.IsNullOrWhiteSpace(_diagnosisSearchString)
@@ -258,22 +260,82 @@
     private Func<AppointmentFacility, bool> FacilityQuickFilter => x => string.IsNullOrWhiteSpace(_diagnosisSearchString)
                                                                         || x.Facility!.Name.Contains(_diagnosisSearchString, StringComparison.OrdinalIgnoreCase);
 
-    private async Task SaveDiagnosis()
+    #region Diagnosis
+
+    private async Task OpenDiagnosisWindow(Diagnosis diagnosis, bool isEdit)
     {
-    // if (_model is null)
-    //     return;
-    // _diagnosis.Date = DateOnly.FromDateTime(DateTime.Now);
-    // _diagnosis.AppointmentId = _model.Id;
-    // var result = await DiagnosisService.SaveDiagnosis(_diagnosis);
-    // if (result.IsSuccess)
-    // {
-    //     Snackbar.Add("Успешно!", Severity.Success);
-    //     _diagnosis = new Diagnosis();
-    //     _diagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
-    //     return;
-    // }
-    // Snackbar.Add(result.Message, Severity.Error);
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Model", diagnosis },
+            { "IsEdit", isEdit }
+        };
+
+        var dialog = await DialogService.ShowAsync<DiagnosisWindow>("Диагноз", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Snackbar.Add("Успешно", Severity.Success);
+            _diagnoses = _diagnoses = (await DiagnosisService.GetDiagnoses() ?? new List<Diagnosis>())
+                .Where(x => _appointmentDiagnoses.FirstOrDefault(z => z.Diagnosis!.Id == x.Id) is null).ToList();
+        }
     }
+    
+    private async Task EditAppointmentDiagnosis(AppointmentDiagnoses appointmentDiagnosis)
+    {
+        _appointmentDiagnosis = appointmentDiagnosis;
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task SaveAppointmentDiagnosis()
+    {
+        if (_model is null)
+            return;
+        _appointmentDiagnosis.EditDate = DateOnly.FromDateTime(DateTime.Now);
+        _appointmentDiagnosis.AppointmentId = _model.Id;
+        var result = await DiagnosisService.SaveDiagnosisInAppointment(_appointmentDiagnosis);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно!", Severity.Success);
+            _appointmentDiagnosis = new AppointmentDiagnoses();
+            _appointmentDiagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
+    }
+    
+    private async Task DeleteAppointmentDiagnosis(int appointmentDiagnosisId)
+    {
+        if (_model is null)
+            return;
+        var result = await DiagnosisService.DeleteDiagnosisInAppointment(appointmentDiagnosisId);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно!", Severity.Success);
+            _appointmentDiagnosis = new AppointmentDiagnoses();
+            _appointmentDiagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
+        _appointmentDiagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
+    }
+
+
+    private Task<IEnumerable<Diagnosis>> SearchDiagnosis(string value)
+    {
+        return Task.FromResult(string.IsNullOrEmpty(value)
+            ? _diagnoses
+            : _diagnoses.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
+    #endregion
+
+    #region Facility
 
     private async Task DeleteFacility(int facilityId)
     {
@@ -290,27 +352,7 @@
         Snackbar.Add(result.Message, Severity.Error);
         _appointmentFacilities = await AppointmentService.GetAppointmentFacilities(_model.Id) ?? new List<AppointmentFacility>();
     }
-
-    private async Task Save()
-    {
-        if (_model is null)
-            return;
-        _model.ChangeDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
-        var result = await AppointmentService.SaveAppointment(_model);
-        if (result.IsSuccess)
-        {
-            Snackbar.Add("Успешно", Severity.Success);
-            return;
-        }
-        Snackbar.Add(result.Message, Severity.Error);
-    }
-
-    private async Task EditDiagnosis(AppointmentDiagnoses appointmentDiagnosis)
-    {
-        _appointmentDiagnosis = appointmentDiagnosis;
-        await InvokeAsync(StateHasChanged);
-    }
-
+    
     private async Task EditFacility(AppointmentFacility appointmentFacility)
     {
         _appointmentFacility = appointmentFacility;
@@ -333,34 +375,30 @@
         Snackbar.Add(result.Message, Severity.Error);
     }
 
-    private async Task DeleteDiagnosis(int diagnosisId)
+    #endregion
+    
+    private async Task Save()
     {
-    // if (_model is null)
-    //     return;
-    // var result = await DiagnosisService.DeleteDiagnosis(diagnosisId);
-    // if (result.IsSuccess)
-    // {
-    //     Snackbar.Add("Успешно!", Severity.Success);
-    //     _appointmentDiagnosis = new Diagnosis();
-    //     _appointmentDiagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
-    //     return;
-    // }
-    // Snackbar.Add(result.Message, Severity.Error);
-    // _appointmentDiagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
+        if (_model is null)
+            return;
+        _model.ChangeDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+        var result = await AppointmentService.SaveAppointment(_model);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Успешно", Severity.Success);
+            return;
+        }
+        Snackbar.Add(result.Message, Severity.Error);
     }
-
-
-    private Task<IEnumerable<Diagnosis>> SearchDiagnosis(string value)
+    
+    private void Close()
     {
-        return Task.FromResult(string.IsNullOrEmpty(value)
-            ? _diagnoses
-            : _diagnoses.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+        AppointmentSelect.InvokeAsync(null);
     }
-
+    
     AggregateDefinition<AppointmentFacility> _sumAggregator = new()
     {
         Type = AggregateType.Sum,
         DisplayFormat = "{value}"
     };
-
 }

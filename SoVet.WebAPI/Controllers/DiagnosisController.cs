@@ -42,19 +42,19 @@ public sealed class DiagnosisController : AuthorizedControllerBase
         return Ok(result);
     }
     
-    // [HttpPost("save-in-appointment")]
-    // public async Task<IActionResult> SaveFacilityInAppointment([FromBody] AppointmentFacility facility)
-    // {
-    //     var command = new SaveDiagnosisInAppointmentCommand(facility);
-    //     var result = await _sender.Send(command);
-    //     return Ok(result);
-    // }
-    //
-    // [HttpPut("delete-in-appointment")]
-    // public async Task<IActionResult> DeleteFacilityInAppointment([FromBody] int appointmentDiagnosisId)
-    // {
-    //     var command = new DeleteDiagnosisInAppointmentCommand(appointmentDiagnosisId);
-    //     var result = await _sender.Send(command);
-    //     return Ok(result);
-    // }
+    [HttpPost("save-in-appointment")]
+    public async Task<IActionResult> SaveDiagnosisInAppointment([FromBody] AppointmentDiagnoses appointmentDiagnoses)
+    {
+        var command = new SaveDiagnosisInAppointmentCommand(appointmentDiagnoses);
+        var result = await _sender.Send(command);
+        return Ok(result);
+    }
+    
+    [HttpPut("delete-in-appointment")]
+    public async Task<IActionResult> DeleteDiagnosisInAppointment([FromBody] int appointmentDiagnosisId)
+    {
+        var command = new DeleteDiagnosisInAppointmentCommand(appointmentDiagnosisId);
+        var result = await _sender.Send(command);
+        return Ok(result);
+    }
 }

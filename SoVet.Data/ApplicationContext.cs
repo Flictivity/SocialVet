@@ -14,6 +14,7 @@ public class ApplicationContext : DbContext
     public DbSet<Appointment> Appointments { get; set; } = null!;
     
     public DbSet<AppointmentFacility> AppointmentFacilities { get; set; } = null!;
+    public DbSet<AppointmentDiagnoses> AppointmentDiagnoses { get; set; } = null!;
     
     public DbSet<Client> Clients { get; set; } = null!;
     

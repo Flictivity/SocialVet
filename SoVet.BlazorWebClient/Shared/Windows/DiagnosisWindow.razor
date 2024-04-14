@@ -1,0 +1,62 @@
+﻿@inject IDiagnosisService DiagnosisService;
+@inject ISnackbar Snackbar;
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)" T="string"
+                                  @bind-Value="Model.Name" Label="Наименование" FullWidth="true"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" Immediate For="@(() => Model.Description)" T="string"
+                                                      @bind-Value="Model.Description" Label="Описание" FullWidth="true"/>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Disabled="@(!_isValid)" Class="ma-3" Color="Color.Primary" Variant="Variant.Filled"
+                   ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">
+            Сохранить
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public Diagnosis Model { get; set; } = null!;
+
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    private MudForm _form = null!;
+    private bool _isValid;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (IsEdit)
+        {
+            await _form.Validate();
+        }
+    }
+
+    private async Task Save()
+    {
+        var result = await DiagnosisService.SaveDiagnosis(Model);
+        
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+}
