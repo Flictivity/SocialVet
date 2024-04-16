@@ -49,12 +49,55 @@ public class FacilityService : IFacilityService
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<List<Facility>>($"Facility");
+            return await _httpClient.GetFromJsonAsync<List<Facility>>("Facility");
         }
         catch(Exception ex)
         {
             _logger.LogError(ex.Message);
             return null;
+        }
+    }
+    
+    public async Task<List<FacilityCategory>?> GetFacilityCategories()
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<List<FacilityCategory>>("Facility/facility-categories");
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
+
+    public async Task<BaseResult> UpdateFacility(Facility facility)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync("facility",facility);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult{IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
+    }
+
+    public async Task<BaseResult> UpdateFacilityCategory(FacilityCategory facilityCategory)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync("facility/update-facility-category",facilityCategory);
+            var result = await response.Content.ReadFromJsonAsync<BaseResult>();
+            return result ?? new BaseResult {IsSuccess = false, Message = "Произошла ошибка при сохранении"};
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new BaseResult{IsSuccess = false, Message = "Произошла ошибка при сохранении"};
         }
     }
 }

@@ -2,6 +2,6 @@
 
 public static class DiagnosisRepositoryQueries
 {
-    public const string GetDiagnoses = @"SELECT d.id, d.name, d.description, d.date, d.result, d.appointment_id as AppointmentId 
-                                            FROM diagnoses d WHERE d.appointment_id = @appointmentId";
+    public const string GetDiagnoses = @"SELECT ad.id, ad.edit_date as EditDate, ad.result, ad.appointment_id as AppointmentId, d.*
+                                            FROM diagnoses d JOIN appointment_diagnoses ad on d.id = ad.diagnosis_id WHERE ad.appointment_id = @appointmentId";
 }

@@ -30,5 +30,5 @@ public sealed class Appointment
     public Registration? Registration { get; set; }
 
     public ICollection<AppointmentFacility> AppointmentFacilities { get; set; } = new List<AppointmentFacility>();
-    public ICollection<Diagnosis> AppointmentDiagnoses { get; set; } = new List<Diagnosis>();
+    public ICollection<AppointmentDiagnoses> AppointmentDiagnoses { get; set; } = new List<AppointmentDiagnoses>();
 }

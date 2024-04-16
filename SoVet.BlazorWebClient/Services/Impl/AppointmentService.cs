@@ -44,11 +44,11 @@ public sealed class AppointmentService : IAppointmentService
         }
     }
 
-    public async Task<List<Diagnosis>?> GetAppointmentDiagnoses(int appointmentId)
+    public async Task<List<AppointmentDiagnoses>?> GetAppointmentDiagnoses(int appointmentId)
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<List<Diagnosis>>($"Appointment/diagnoses/?appointmentId={appointmentId}");
+            var response = await _httpClient.GetFromJsonAsync<List<AppointmentDiagnoses>>($"Appointment/diagnoses/?appointmentId={appointmentId}");
             return response;
         }
         catch (Exception ex)

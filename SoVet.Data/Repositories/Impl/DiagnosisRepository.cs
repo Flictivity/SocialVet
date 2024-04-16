@@ -4,6 +4,7 @@ using SoVet.Data.Mappers;
 using SoVet.Domain.Models;
 using SoVet.Domain.Responses;
 using SoVet.Domain.SqlQueries;
+using Diagnosis = SoVet.Domain.Models.Diagnosis;
 
 namespace SoVet.Data.Repositories.Impl;
 
@@ -18,10 +19,19 @@ public sealed class DiagnosisRepository : IDiagnosisRepository
         _mapper = new DatabaseMapper();
     }
 
-    public async Task<List<Diagnosis>> GetDiagnosesAsync(int appointmentId)
+    public async Task<List<AppointmentDiagnoses>> GetAppointmentDiagnosesAsync(int appointmentId)
     {
         var connection = _context.Database.GetDbConnection();
-        return (await connection.QueryAsync<Diagnosis>(DiagnosisRepositoryQueries.GetDiagnoses, new {appointmentId})).AsList();
+        
+        var result = (await connection.QueryAsync<AppointmentDiagnoses,Diagnosis,AppointmentDiagnoses>(
+            DiagnosisRepositoryQueries.GetDiagnoses, 
+            (appointmentDiagnosis, diagnosis) =>
+            {
+                appointmentDiagnosis.Diagnosis = diagnosis;
+                return appointmentDiagnosis;
+            },new{appointmentId})).AsList();
+
+        return result;
     }
 
     public async Task<BaseResponse> SaveDiagnosisAsync(Diagnosis diagnosis)
@@ -52,5 +62,41 @@ public sealed class DiagnosisRepository : IDiagnosisRepository
         _context.Diagnoses.Remove(diagnosisDb);
         await _context.SaveChangesAsync();
         return new BaseResponse{ IsSuccess = true};
+    }
+
+    public async Task<BaseResponse> DeleteDiagnosisInAppointmentAsync(int appointmentDiagnosisId)
+    {
+        _context.ChangeTracker.Clear();
+        var appointmentDiagnosisDb = _context.AppointmentDiagnoses.FirstOrDefault(x => x.Id == appointmentDiagnosisId);
+        if (appointmentDiagnosisDb is null)
+            return new BaseResponse{ IsSuccess = false, Message = "Диагноз не найден" };
+
+        _context.AppointmentDiagnoses.Remove(appointmentDiagnosisDb);
+        await _context.SaveChangesAsync();
+        return new BaseResponse{ IsSuccess = true};
+    }
+
+    public async Task<BaseResponse> SaveDiagnosisInAppointmentAsync(AppointmentDiagnoses appointmentDiagnosis)
+    {
+        _context.ChangeTracker.Clear();
+        
+        
+        var existDiagnosis = _context.AppointmentDiagnoses.FirstOrDefault(x => x.Id == appointmentDiagnosis.Id);
+        var appointmentDiagnosisDb = _mapper.Map(appointmentDiagnosis);
+        if (existDiagnosis is null)
+        {
+            await _context.AppointmentDiagnoses.AddAsync(appointmentDiagnosisDb);
+        }
+        else
+        {
+            _context.AppointmentDiagnoses.Update(appointmentDiagnosisDb);
+        }
+        await _context.SaveChangesAsync();
+        return new BaseResponse { IsSuccess = true };
+    }
+
+    public async Task<List<Diagnosis>> GetDiagnosesAsync()
+    {
+        return await _context.Diagnoses.Select(x => _mapper.Map(x)).ToListAsync();
     }
 }

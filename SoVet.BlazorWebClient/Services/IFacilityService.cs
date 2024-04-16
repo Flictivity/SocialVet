@@ -8,4 +8,7 @@ public interface IFacilityService
     public Task<BaseResult> SaveFacilityInAppointment(AppointmentFacility appointmentFacility);
     public Task<BaseResult> DeleteFacilityInAppointment(int appointmentFacilityId);
     public Task<List<Facility>?> GetFacilities();
+    public Task<List<FacilityCategory>?> GetFacilityCategories();
+    public Task<BaseResult> UpdateFacility(Facility facility);
+    public Task<BaseResult> UpdateFacilityCategory(FacilityCategory facilityCategory);
 }

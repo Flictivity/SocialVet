@@ -48,6 +48,28 @@ public sealed class FacilityRepository : IFacilityRepository
         return new BaseResponse{ IsSuccess = true};
     }
 
+    public async Task<BaseResponse> UpdateFacility(Facility facility)
+    {
+        var facilityDb = _mapper.Map(facility);
+        _context.Facilities.Update(facilityDb);
+        await _context.SaveChangesAsync();
+        
+        _context.ChangeTracker.Clear();
+
+        return new BaseResponse { IsSuccess = true };
+    }
+
+    public async Task<BaseResponse> UpdateFacilityCategory(FacilityCategory facilityCategory)
+    {
+        var facilityCategoryDb = _mapper.Map(facilityCategory);
+        _context.FacilityCategories.Update(facilityCategoryDb);
+        await _context.SaveChangesAsync();
+        
+        _context.ChangeTracker.Clear();
+
+        return new BaseResponse { IsSuccess = true };
+    }
+
     public async Task<List<AppointmentFacility>> GetFacilitiesInAppointment(int appointmentId)
     {
         var connection = _context.Database.GetDbConnection();
@@ -74,5 +96,11 @@ public sealed class FacilityRepository : IFacilityRepository
             })).AsList();
 
         return result;
+    }
+
+    public Task<List<FacilityCategory>> GetFacilityCategoriesAsync()
+    {
+        return Task.FromResult(_context.FacilityCategories.Where(x => !x.IsDeleted)
+            .Select(x => _mapper.Map(x)).ToList());
     }
 }

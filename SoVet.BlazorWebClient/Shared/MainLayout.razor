@@ -65,6 +65,16 @@
                     <MudNavLink Href="/client-registrations" Icon="@Icons.Material.Filled.ViewTimeline">Мои записи</MudNavLink>
                 </Authorized>
             </AuthorizeView>
+            <AuthorizeView Roles="@Role.Administrator">
+                <Authorized>
+                    <MudNavLink Href="/facility-categories" Icon="@Icons.Material.Filled.Category">Категории услуг</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Administrator">
+                <Authorized>
+                    <MudNavLink Href="/facilities" Icon="@Icons.Material.Filled.MedicalServices">Услуги</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
@@ -75,7 +85,7 @@
 </MudLayout>
 
 @code {
-    bool _drawerOpen = false;
+    bool _drawerOpen;
 
     void DrawerToggle()
     {

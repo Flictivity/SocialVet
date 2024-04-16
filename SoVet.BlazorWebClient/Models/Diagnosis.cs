@@ -1,11 +1,11 @@
-﻿namespace SoVet.BlazorWebClient.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SoVet.BlazorWebClient.Models;
 
 public sealed class Diagnosis
 {
     public int Id { get; set; }
+    [Required(ErrorMessage = "Обязательное поле!")]
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
-    public DateOnly Date { get; set; }
-    public int Result { get; set; }
-    public int AppointmentId { get; set; }
 }

@@ -17,7 +17,14 @@ var connectionString = builder.Configuration.GetConnectionString("ApiConnection"
 if (connectionString is null)
     throw new InvalidOperationException("APIBaseAddress missing from appsettings file.");
 
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+    {
+        config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        config.SnackbarConfiguration.PreventDuplicates = false;
+        config.SnackbarConfiguration.NewestOnTop = false;
+        config.SnackbarConfiguration.ShowCloseIcon = true;
+    }
+);
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -33,7 +40,8 @@ builder.Services.AddScoped<IFacilityService, FacilityService>();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(connectionString) });
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
+    provider.GetRequiredService<CustomAuthenticationStateProvider>());
 builder.Services.AddSingleton<MudLocalizer, RussianMudblazorLocalizer>();
 builder.Services.AddAuthorizationCore();
 

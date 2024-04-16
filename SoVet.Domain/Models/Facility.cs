@@ -5,5 +5,6 @@ public sealed class Facility
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public decimal Cost { get; set; }
+    public bool IsDeleted { get; set; }
     public FacilityCategory? FacilityCategory { get; set; } = null!;
 }

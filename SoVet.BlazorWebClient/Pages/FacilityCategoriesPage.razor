@@ -1,0 +1,81 @@
+﻿@page "/facility-categories"
+
+@attribute [Authorize(Roles = Role.Administrator)]
+@using SoVet.BlazorWebClient.Shared.Windows
+@inject IFacilityService FacilityService;
+@inject IDialogService DialogService;
+@inject ISnackbar Snackbar;
+
+<PageTitle>Категории услуг</PageTitle>
+
+<MudDataGrid @ref="_dataGrid" Striped="true" T="FacilityCategory" Items="_facilityCategories" QuickFilter="QuickFilter" Filterable="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Категории</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+        </MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Наименование"/>
+        <TemplateColumn Filterable="false">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled"
+                               OnClick="@(async() => await OpenEditWindow(context.Item, true))"/>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+<MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenEditWindow(new FacilityCategory(), false))"></MudFab>
+
+@code {
+    private List<FacilityCategory>? _facilityCategories;
+    private MudDataGrid<FacilityCategory> _dataGrid = null!;
+
+    private string _searchString = null!;
+    
+    private Func<FacilityCategory, bool> QuickFilter => x => string.IsNullOrWhiteSpace(_searchString)
+                                                               || x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var facilityCategories = await FacilityService.GetFacilityCategories();
+
+        _facilityCategories = facilityCategories;
+        if (facilityCategories is null)
+        {
+            _facilityCategories = new();
+        }
+    }
+
+    private async Task OpenEditWindow(FacilityCategory? facility, bool isEdit)
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Model", facility },
+            {"IsEdit", isEdit}
+        };
+
+        var dialog = await DialogService.ShowAsync<FacilityCategoryWindow>("Категория услуги", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Snackbar.Add("Успешно", Severity.Success);
+        }
+        
+        var facilityCategories = await FacilityService.GetFacilityCategories();
+
+        _facilityCategories = facilityCategories;
+        if (facilityCategories is null)
+        {
+            _facilityCategories = new();
+        }
+    }
+}
