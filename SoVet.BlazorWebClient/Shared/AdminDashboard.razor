@@ -11,6 +11,7 @@
 @inject IDialogService DialogService;
 @inject NavigationManager NavigationManager;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject IReportService ReportService;
 
 <MudText>
 
@@ -21,7 +22,7 @@
             <MudItem xs="12" md="12" lg="12">
                 <MudCard>
                     <MudCardContent>
-                        <MudText Typo="Typo.h4">120</MudText>
+                        <MudText Typo="Typo.h4">@_appointmentsInMonth</MudText>
                         <MudText Typo="Typo.h6">Приемов в этом месяце</MudText>
                     </MudCardContent>
                 </MudCard>
@@ -39,8 +40,8 @@
                         </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent>
-                        <RadzenChart Style="min-height: 65vh">
-                            <RadzenLineSeries Data="@_facilitiesIncome" CategoryProperty="Category" ValueProperty="Count"
+                        <RadzenChart Style="min-height: 66.5vh">
+                            <RadzenLineSeries Data="@_appointmentsInYear" CategoryProperty="Category" ValueProperty="Count"
                                               Title="@(DateTime.Today.Year.ToString())" LineType="LineType.Solid"> 
                                 <RadzenMarkers MarkerType="MarkerType.Circle"/>
                                 <RadzenSeriesDataLabels Visible="false"/>
@@ -92,64 +93,11 @@
     </MudItem>
 </MudGrid>
 
-
 @code {
     private DateTime? Year { get; set; } = DateTime.Today;
-
-    class DataItem
-    {
-        public string Category { get; set; }
-        public double Count { get; set; }
-    }
-
-    DataItem[] _appointmentsStatusesInfo =
-    {
-        new()
-        {
-            Category = AppointmentStatus.Active.GetDisplayName()!,
-            Count = 4
-        },
-        new()
-        {
-            Category = AppointmentStatus.Finished.GetDisplayName()!,
-            Count = 6
-        },
-        new()
-        {
-            Category = AppointmentStatus.NotVisited.GetDisplayName()!,
-            Count = 2
-        },
-        new()
-        {
-            Category = AppointmentStatus.WaitingStart.GetDisplayName()!,
-            Count = 1
-        }
-    };
-
-    DataItem[] _appointmentsPickInfo =
-    {
-        new()
-        {
-            Category = DateTime.Today.ToString("d"),
-            Count = 2
-        }
-    };
-
-    DataItem[] _facilitiesIncome =
-    {
-        new() { Category = "Янв.", Count = 1 },
-        new() { Category = "Фев.", Count = 2 },
-        new() { Category = "Мар.", Count = 3 },
-        new() { Category = "Апр.", Count = 75 },
-        new() { Category = "Май", Count = 60 },
-        new() { Category = "Июнь", Count = 6 },
-        new() { Category = "Июль", Count = 3 },
-        new() { Category = "Авг.", Count = 50 },
-        new() { Category = "Сен.", Count = 5 },
-        new() { Category = "Окт.", Count = 5 },
-        new() { Category = "Нояб.", Count = 5 },
-        new() { Category = "Дек.", Count = 35 }
-    };
+    private int _appointmentsInMonth = 0;
+    DataItem[]? _appointmentsStatusesInfo;
+    DataItem[]? _appointmentsInYear;
 
     RadzenScheduler<Registration> _scheduler = null!;
     private List<Registration>? _registrations = new();
@@ -167,6 +115,13 @@
             ? await RegistrationService.GetRegistrations(null)
             : await RegistrationService.GetRegistrations(employeeId);
 
+        _appointmentsStatusesInfo = await ReportService.AppointmentsStatusesInfo();
+        // _appointmentsInYear = await ReportService.AppointmentsInYear(Year!.Value.Year);
+        // _appointmentsInMonth = await ReportService.AppointmentsInMonthCount();
+        
+    _appointmentsInYear = Array.Empty<DataItem>();
+    _appointmentsInMonth = 0;
+        
         await base.OnInitializedAsync();
     }
 
