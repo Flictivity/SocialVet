@@ -21,4 +21,22 @@ public sealed class ReportController : AuthorizedControllerBase
         var commandResult = await _sender.Send(command);
         return Ok(commandResult);
     }
+    
+    [HttpGet]
+    [Route("appointments-in-year")]
+    public async Task<IActionResult> AppointmentsInYear([FromQuery] int year)
+    {
+        var command = new GetAppointmentsInYearCommand(year);
+        var commandResult = await _sender.Send(command);
+        return Ok(commandResult);
+    }
+    
+    [HttpGet]
+    [Route("appointments-in-month-count")]
+    public async Task<IActionResult> AppointmentsInMonthCount()
+    {
+        var command = new GetAppointmentsInMonthCountCommand();
+        var commandResult = await _sender.Send(command);
+        return Ok(commandResult);
+    }
 }

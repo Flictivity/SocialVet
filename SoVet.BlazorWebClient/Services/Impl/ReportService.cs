@@ -32,7 +32,7 @@ public sealed class ReportService : IReportService
     {
         try
         {
-            var result = await _httpClient.GetFromJsonAsync<DataItem[]>("Report/appointments-in-year");
+            var result = await _httpClient.GetFromJsonAsync<DataItem[]>($"Report/appointments-in-year?year={year}");
             return result ?? Array.Empty<DataItem>();
         }
         catch (Exception ex)

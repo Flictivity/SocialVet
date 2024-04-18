@@ -13,16 +13,14 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IReportService ReportService;
 
-<MudText>
 
-</MudText>
 <MudGrid Style="min-height: 90vh">
     <MudItem xs="12" lg="8" md="8">
         <MudGrid>
             <MudItem xs="12" md="12" lg="12">
                 <MudCard>
                     <MudCardContent>
-                        <MudText Typo="Typo.h4">@_appointmentsInMonth</MudText>
+                        <MudText Typo="Typo.h4">@_appointmentsInMonthCount</MudText>
                         <MudText Typo="Typo.h6">Приемов в этом месяце</MudText>
                     </MudCardContent>
                 </MudCard>
@@ -36,22 +34,28 @@
                         <CardHeaderActions>
                             <MudDatePicker Variant="Variant.Outlined" Style="width: 200px; height: 50px;" OpenTo="OpenTo.Year"
                                            FixMonth="@DateTime.Today.Month" DisableToolbar="true"
-                                           @bind-Date="Year" FixDay="@DateTime.Today.Day" DateFormat="yyyy"/>
+                                           DateChanged="YearChanged" Date="Year" FixDay="@DateTime.Today.Day" DateFormat="yyyy"/>
                         </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent>
-                        <RadzenChart Style="min-height: 66.5vh">
-                            <RadzenLineSeries Data="@_appointmentsInYear" CategoryProperty="Category" ValueProperty="Count"
-                                              Title="@(DateTime.Today.Year.ToString())" LineType="LineType.Solid"> 
-                                <RadzenMarkers MarkerType="MarkerType.Circle"/>
-                                <RadzenSeriesDataLabels Visible="false"/>
-                                <RadzenLegend Visible="false"/>
-                                <RadzenCategoryAxis/>
-                            </RadzenLineSeries>
-                            <RadzenValueAxis>
-                                <RadzenGridLines Visible="true"/>
-                            </RadzenValueAxis>
-                        </RadzenChart>
+                        @if (_appointmentsInYear is not null && !_appointmentsInYear.Any(x => x.Count > 0))
+                        {
+                            <MudAlert Severity="Severity.Info" Class="mt-3">Приемы отсутсвуют...</MudAlert>
+                        }
+                        else
+                        {
+                            <RadzenChart Style="min-height: 66.5vh">
+                                <RadzenLineSeries Data="@_appointmentsInYear" CategoryProperty="Category" ValueProperty="Count"
+                                                  Title="@(DateTime.Today.Year.ToString())" LineType="LineType.Solid" Smooth="true">
+                                    <RadzenMarkers MarkerType="MarkerType.Circle"/>
+                                    <RadzenSeriesDataLabels Visible="false"/>
+                                    <RadzenLegend Visible="false"/>
+                                </RadzenLineSeries>
+                                <RadzenValueAxis Step="1">
+                                    <RadzenGridLines Visible="true"/>
+                                </RadzenValueAxis>
+                            </RadzenChart>
+                        }
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -61,20 +65,24 @@
                         <MudText Typo="Typo.h6" Class="text-center">Приемы cегодня</MudText>
                     </MudCardHeader>
                     <MudCardContent>
-                        <RadzenChart>
-                            <RadzenChart Style="min-height: 37.7vh">
-                                <RadzenLegend Position="LegendPosition.Bottom"></RadzenLegend>
-                                <RadzenDonutSeries Data="@_appointmentsStatusesInfo" CategoryProperty="Category" ValueProperty="Count" TotalAngle="180" StartAngle="180">
-                                    <TooltipTemplate Context="data">
-                                        @data.Category
-                                        @data.Count
-                                    </TooltipTemplate>
-                                    <ChildContent>
-                                        <RadzenSeriesDataLabels Visible="true"/>
-                                    </ChildContent>
-                                </RadzenDonutSeries>
+                        @if(_appointmentsStatusesInfo is not null  && !_appointmentsStatusesInfo.Any(x => x.Count > 0))
+                        {
+                            <MudAlert Severity="Severity.Info" Class="mt-3">Приемы отсутсвуют...</MudAlert>
+                        }
+                        else
+                        {
+                            <RadzenChart>
+                                <RadzenChart Style="min-height: 37.7vh">
+                                    <RadzenChartTooltipOptions Visible="false"/>
+                                    <RadzenLegend Position="LegendPosition.Bottom"></RadzenLegend>
+                                    <RadzenDonutSeries Data="@_appointmentsStatusesInfo" CategoryProperty="Category" ValueProperty="Count" TotalAngle="180" StartAngle="180">
+                                        <ChildContent>
+                                            <RadzenSeriesDataLabels Visible="true"/>
+                                        </ChildContent>
+                                    </RadzenDonutSeries>
+                                </RadzenChart>
                             </RadzenChart>
-                        </RadzenChart>
+                        }
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -95,7 +103,7 @@
 
 @code {
     private DateTime? Year { get; set; } = DateTime.Today;
-    private int _appointmentsInMonth = 0;
+    private int _appointmentsInMonthCount = 0;
     DataItem[]? _appointmentsStatusesInfo;
     DataItem[]? _appointmentsInYear;
 
@@ -114,13 +122,10 @@
         _registrations = userIdentity.IsInRole(Role.Administrator)
             ? await RegistrationService.GetRegistrations(null)
             : await RegistrationService.GetRegistrations(employeeId);
-
+            
         _appointmentsStatusesInfo = await ReportService.AppointmentsStatusesInfo();
-        // _appointmentsInYear = await ReportService.AppointmentsInYear(Year!.Value.Year);
-        // _appointmentsInMonth = await ReportService.AppointmentsInMonthCount();
-        
-    _appointmentsInYear = Array.Empty<DataItem>();
-    _appointmentsInMonth = 0;
+        _appointmentsInYear = await ReportService.AppointmentsInYear(Year!.Value.Year);
+        _appointmentsInMonthCount = await ReportService.AppointmentsInMonthCount();
         
         await base.OnInitializedAsync();
     }
@@ -146,4 +151,9 @@
         args.Attributes["style"] = "background: #3F51B5";
     }
 
+    private async Task YearChanged(DateTime? value)
+    {
+        Year = value;
+        _appointmentsInYear = await ReportService.AppointmentsInYear(Year!.Value.Year);
+    }
 }
