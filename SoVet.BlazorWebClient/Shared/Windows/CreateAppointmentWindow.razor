@@ -58,8 +58,9 @@
 
     private Task<IEnumerable<Patient>> GetClientPatients(string value)
     {
-        var res = _patients.Where(x => x.Name.Contains(value));
-        return Task.FromResult(res);
+        return Task.FromResult(string.IsNullOrEmpty(value) 
+            ? _patients 
+            : _patients.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     private async Task OpenAppointment()

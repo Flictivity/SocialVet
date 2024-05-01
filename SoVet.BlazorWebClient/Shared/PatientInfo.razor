@@ -126,14 +126,16 @@ else
 
     private Task<IEnumerable<Client>> GetClients(string value)
     {
-        var res = _clients.Where(x => x.Name.Contains(value));
-        return Task.FromResult(res);
+        return Task.FromResult(string.IsNullOrEmpty(value) 
+            ? _clients 
+            : _clients.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     private Task<IEnumerable<AnimalType>> GetAnimalTypes(string value)
     {
-        var res = _animalTypes.Where(x => x.Name.Contains(value));
-        return Task.FromResult(res);
+        return Task.FromResult(string.IsNullOrEmpty(value) 
+            ? _animalTypes 
+            : _animalTypes.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     private async Task Save()
