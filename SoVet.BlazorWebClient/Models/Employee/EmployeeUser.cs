@@ -15,6 +15,7 @@ public sealed class EmployeeUser
     [Required(ErrorMessage = "Роль обязательна!")]
     public string Role { get; set; } = null!;
 
+    [MinLength(5, ErrorMessage = "Минимальная длина пароля 5 символов")]
     public string? Password { get; set; } = null!;
     public string? OldEmail { get; set; } = null!;
 }
