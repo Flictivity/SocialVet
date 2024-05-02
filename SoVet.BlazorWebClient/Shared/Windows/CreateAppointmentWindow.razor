@@ -37,6 +37,7 @@
 </MudDialog>
 
 @code {
+
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = null!;
 
@@ -45,7 +46,7 @@
 
     private Patient? _patient;
     private MudForm _form = null!;
-    private List<Patient> _patients = new ();
+    private List<Patient> _patients = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,30 +54,41 @@
         if (patients is not null)
             _patients = patients;
         
+        var appointment = await AppointmentService.GetAppointmentByRegistration(Model.Id);
+        if (appointment is not null)
+        {
+            _patient = _patients.FirstOrDefault(x => x.Id == appointment.PatientId);
+            if (_patient != null) 
+                NavigationManager.NavigateTo($"/patient/{_patient.Id}/{appointment.Id}");
+            MudDialog.Close();
+            return;
+        }
+
         await base.OnInitializedAsync();
     }
 
     private Task<IEnumerable<Patient>> GetClientPatients(string value)
     {
-        return Task.FromResult(string.IsNullOrEmpty(value) 
-            ? _patients 
+        return Task.FromResult(string.IsNullOrEmpty(value)
+            ? _patients
             : _patients.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     private async Task OpenAppointment()
     {
-        if(_patient is null)
+        if (_patient is null)
             return;
         MudDialog.Close();
+
         var result = await AppointmentService.SaveAppointment(
             new Models.Appointment.Appointment
             {
                 RegistrationId = Model.Id,
                 Purpose = string.Empty,
                 ChangeDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
-                CreationDate =DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
+                CreationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
                 AppointmentStatus = 0,
-                Employee = new Employee { Id = Model.EmployeeId, Name = string.Empty},
+                Employee = new Employee { Id = Model.EmployeeId, Name = string.Empty },
                 PatientId = _patient.Id
             });
 
@@ -87,7 +99,7 @@
         }
         NavigationManager.NavigateTo($"/patient/{_patient.Id}");
     }
-    
+
     private async Task OpenWindow(Patient? patient)
     {
         var options = new DialogOptions
@@ -97,7 +109,7 @@
 
         var parameters = new DialogParameters
         {
-            {"Model", patient},
+            { "Model", patient },
         };
 
         var dialog = await DialogService.ShowAsync<PatientInfo>("Пациент", parameters, options);
@@ -109,4 +121,5 @@
                 _patients = patients;
         }
     }
+
 }

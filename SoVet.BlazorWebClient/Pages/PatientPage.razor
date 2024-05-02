@@ -1,4 +1,4 @@
-﻿@page "/patient/{PatientId:int}"
+﻿@page "/patient/{PatientId:int}/{AppointmentId:int?}"
 @using Appointment = SoVet.BlazorWebClient.Models.Appointment.Appointment
 @using SoVet.BlazorWebClient.Models.Appointment
 
@@ -14,7 +14,7 @@
         <MudTabPanel Text="История приемов" Icon="@Icons.Material.Filled.History" OnClick="@(async () => await ChangeTab(0))">
             @if (_appointment is null)
             {
-                <Appointments AppointmentSelect="x => _appointment = x" Patient="_patient"></Appointments>
+                <Appointments AppointmentSelect="x => _appointment = x" Patient="_patient" AppointmentId="AppointmentId"></Appointments>
             }
             else
             {
@@ -30,6 +30,9 @@
 @code {
     [Parameter]
     public int PatientId { get; set; }
+    
+    [Parameter]
+    public int? AppointmentId { get; set; }
     
     private Patient? _patient;
     
