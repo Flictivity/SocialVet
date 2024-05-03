@@ -54,4 +54,18 @@ public sealed class ReportService : IReportService
             return 0;
         }
     }
+
+    public async Task<List<FacilityReport>> FacilityReport(DateTime start, DateTime end)
+    {
+        try
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<FacilityReport>>($"Report/facility?start={start:yyyy-MM-dd}&end={end:yyyy-MM-dd}");
+            return result ?? new List<FacilityReport>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new List<FacilityReport>();
+        }
+    }
 }

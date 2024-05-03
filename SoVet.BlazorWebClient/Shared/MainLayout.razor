@@ -2,6 +2,7 @@
 
 @inject IAuthenticationService AuthenticationService;
 @inject NavigationManager NavigationManager;
+@inject IJSRuntime IJSR;
 
 <MudThemeProvider Theme="_theme"/>
 <MudDialogProvider/>
@@ -73,6 +74,15 @@
             <AuthorizeView Roles="@Role.Administrator">
                 <Authorized>
                     <MudNavLink Href="/facilities" Icon="@Icons.Material.Filled.MedicalServices">Услуги</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Administrator">
+                <Authorized>
+                    <MudNavGroup Title="Отчеты" Expanded="false" Icon="@Icons.Material.Filled.BarChart">
+                        <MudNavLink Href="/facilities-report" Icon="@Icons.Material.Filled.Circle">Отчет по услугам</MudNavLink>
+                        <MudNavLink Href="/security" Icon="@Icons.Material.Filled.Circle">Отчет по сотрудникам</MudNavLink>
+                        <MudNavLink Href="/security" Icon="@Icons.Material.Filled.Cabin">Отчет по приемам</MudNavLink>
+                    </MudNavGroup>
                 </Authorized>
             </AuthorizeView>
         </MudNavMenu>

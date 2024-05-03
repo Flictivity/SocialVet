@@ -103,4 +103,10 @@ public sealed class FacilityRepository : IFacilityRepository
         return Task.FromResult(_context.FacilityCategories.Where(x => !x.IsDeleted)
             .Select(x => _mapper.Map(x)).ToList());
     }
+
+    public async Task<List<FacilityReport>> GetReport(DateTime start, DateTime end)
+    {
+        var connection = _context.Database.GetDbConnection();
+        return (await connection.QueryAsync<FacilityReport>(FacilityRepositoryQueries.GetReport, new{start,end})).AsList();
+    }
 }

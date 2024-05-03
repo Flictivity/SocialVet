@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Globalization;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SoVet.Domain.Commands.Report;
 
@@ -36,6 +37,26 @@ public sealed class ReportController : AuthorizedControllerBase
     public async Task<IActionResult> AppointmentsInMonthCount()
     {
         var command = new GetAppointmentsInMonthCountCommand();
+        var commandResult = await _sender.Send(command);
+        return Ok(commandResult);
+    }
+    
+    [HttpGet]
+    [Route("facility")]
+    public async Task<IActionResult> Facility([FromQuery] string start, [FromQuery] string end)
+    {
+        if (!DateTime.TryParseExact(start, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None,
+                out var startDate))
+        {
+            return BadRequest();
+        }
+        if (!DateTime.TryParseExact(end, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None,
+                out var endDate))
+        {
+            return BadRequest();
+        }
+
+        var command = new GetFacilityReportCommand(startDate, endDate);
         var commandResult = await _sender.Send(command);
         return Ok(commandResult);
     }
