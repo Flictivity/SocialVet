@@ -1,6 +1,6 @@
 ﻿namespace SoVet.BlazorWebClient.Models;
 
-public class FacilityReport
+public sealed class FacilityReport
 {
     public string FacilityName { get; set; } = null!;
     public string FacilityCategoryName { get; set; } = null!;

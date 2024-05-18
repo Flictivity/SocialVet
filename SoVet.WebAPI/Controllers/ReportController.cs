@@ -60,4 +60,24 @@ public sealed class ReportController : AuthorizedControllerBase
         var commandResult = await _sender.Send(command);
         return Ok(commandResult);
     }
+    
+    [HttpGet]
+    [Route("employee")]
+    public async Task<IActionResult> Employee([FromQuery] string start, [FromQuery] string end)
+    {
+        if (!DateTime.TryParseExact(start, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None,
+                out var startDate))
+        {
+            return BadRequest();
+        }
+        if (!DateTime.TryParseExact(end, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None,
+                out var endDate))
+        {
+            return BadRequest();
+        }
+
+        var command = new GetEmployeeReportCommand(startDate, endDate);
+        var commandResult = await _sender.Send(command);
+        return Ok(commandResult);
+    }
 }
