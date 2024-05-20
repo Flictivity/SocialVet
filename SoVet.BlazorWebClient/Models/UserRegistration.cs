@@ -14,7 +14,7 @@ public class UserRegistration
 
     [Required(ErrorMessage = "Пароль не может быть пустым!")]
     [DataType(DataType.Password, ErrorMessage = "неверный формат пароля")]
-    [Compare(nameof(Password), ErrorMessage = "The passwords do not match.")]
+    [Compare(nameof(Password), ErrorMessage = "Пароли должны быть одинаковыми")]
     public string ConfirmPassword { get; set; } = null!;
     
     [Required(ErrorMessage = "ФИО не может быть пустым")]

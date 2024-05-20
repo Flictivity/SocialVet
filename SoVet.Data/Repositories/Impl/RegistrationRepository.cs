@@ -33,7 +33,8 @@ public sealed class RegistrationRepository : IRegistrationRepository
     {
         registration.StartTime = DateTime.SpecifyKind(registration.StartTime, DateTimeKind.Utc);
         
-        var existRegistration = await _context.Registrations.FirstOrDefaultAsync(x => x.StartTime == registration.StartTime);
+        var existRegistration = await _context.Registrations.FirstOrDefaultAsync(x => x.StartTime == registration.StartTime 
+            && x.ClientId == registration.ClientId);
 
         if (existRegistration is not null)
         {
