@@ -23,5 +23,12 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
+
+
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Shared\PrintPages\BlankLayout.razor" />
+      <_ContentIncludedByDefault Remove="Shared\PrintPages\TablePrintPage.razor" />
+    </ItemGroup>
     
 </Project>

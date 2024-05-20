@@ -59,6 +59,9 @@
 
     [Parameter]
     public Patient Patient { get; set; } = null!;
+    
+    [Parameter]
+    public int? AppointmentId { get; set; }
 
     private AppointmentTable _appointment = new();
 
@@ -70,6 +73,12 @@
     {
         _appointments = await AppointmentService.GetAppointments(Patient.Id);
         _isLoaded = true;
+        if (AppointmentId is not null)
+        {
+            var appointment = _appointments.FirstOrDefault(x => x.Id == AppointmentId);
+            if (appointment != null) 
+                Change(appointment);
+        }
         await base.OnInitializedAsync();
     }
 

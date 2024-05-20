@@ -60,4 +60,13 @@ public class AppointmentController : AuthorizedControllerBase
 
         return Ok(result);
     }
+    
+    [HttpGet("registration")]
+    public async Task<IActionResult> CheckAppointmentExist([FromQuery] int registrationId)
+    {
+        var command = new GetAppointmentByRegistrationCommand(registrationId);
+        var result = await _sender.Send(command);
+
+        return Ok(result);
+    }
 }

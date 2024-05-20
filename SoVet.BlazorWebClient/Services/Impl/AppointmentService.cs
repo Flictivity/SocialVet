@@ -86,4 +86,18 @@ public sealed class AppointmentService : IAppointmentService
             return new BaseResult {IsSuccess = false, Message = ex.Message};
         }
     }
+
+    public async Task<Appointment?> GetAppointmentByRegistration(int registrationId)
+    {
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<Appointment?>($"Appointment/registration/?registrationId={registrationId}");
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
+    }
 }
