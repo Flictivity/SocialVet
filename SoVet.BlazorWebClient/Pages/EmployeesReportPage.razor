@@ -50,15 +50,9 @@
             @if (_diagramItems is not null && _diagramItems.Length > 0)
             {
                 <RadzenChart>
-                    <RadzenColumnSeries Data="@_diagramItems" CategoryProperty="Category" ValueProperty="Count" Title="Услуги">
-                        <TooltipTemplate Context="data">
-                            <div>
-                                <span>@data.Category</span>
-                                <strong>@data.Count</strong>
-                            </div>
-                        </TooltipTemplate>
-                    </RadzenColumnSeries>
-                    <RadzenValueAxis Min="0"/>
+                    <RadzenPieSeries Data="@_diagramItems" Title="Продано услуг" CategoryProperty="Category" ValueProperty="Count">
+                        <RadzenSeriesDataLabels Visible="true"></RadzenSeriesDataLabels>
+                    </RadzenPieSeries>
                 </RadzenChart>
             }
         </MudItem>
