@@ -21,9 +21,14 @@
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
+            <PageTitle>Не найдено</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <div class="d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+                    <div class="text-center">
+                        <img src="/images/logo.png" style="width:50%" alt="Logo"/>
+                    </div>
+                    <MudAlert Class="mt-4" Variant="Variant.Filled" Severity="Severity.Warning">Страница по указанному адресу не найдена...</MudAlert>
+                </div>
             </LayoutView>
         </NotFound>
     </Router>

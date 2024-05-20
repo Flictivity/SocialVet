@@ -12,4 +12,6 @@ public interface IFacilityRepository
     public Task<List<AppointmentFacility>> GetFacilitiesInAppointment(int appointmentId);
     public Task<List<Facility>> GetFacilitiesAsync();
     public Task<List<FacilityCategory>> GetFacilityCategoriesAsync();
+
+    public Task<List<FacilityReport>> GetReport(DateTime start, DateTime end);
 }

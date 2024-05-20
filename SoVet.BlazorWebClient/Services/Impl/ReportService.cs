@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using SoVet.BlazorWebClient.Models;
+using SoVet.BlazorWebClient.Models.Employee;
 
 namespace SoVet.BlazorWebClient.Services.Impl;
 
@@ -52,6 +53,34 @@ public sealed class ReportService : IReportService
         {
             _logger.LogError(ex.Message);
             return 0;
+        }
+    }
+
+    public async Task<List<FacilityReport>> FacilityReport(DateTime start, DateTime end)
+    {
+        try
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<FacilityReport>>($"Report/facility?start={start:yyyy-MM-dd}&end={end:yyyy-MM-dd}");
+            return result ?? new List<FacilityReport>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new List<FacilityReport>();
+        }
+    }
+
+    public async Task<List<EmployeeReport>> EmployeeReport(DateTime start, DateTime end)
+    {
+        try
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<EmployeeReport>>($"Report/employee?start={start:yyyy-MM-dd}&end={end:yyyy-MM-dd}");
+            return result ?? new List<EmployeeReport>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new List<EmployeeReport>();
         }
     }
 }

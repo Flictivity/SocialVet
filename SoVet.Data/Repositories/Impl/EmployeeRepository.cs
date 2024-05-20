@@ -1,6 +1,8 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using SoVet.Data.Mappers;
 using SoVet.Domain.Models;
+using SoVet.Domain.SqlQueries;
 
 namespace SoVet.Data.Repositories.Impl;
 
@@ -60,5 +62,23 @@ public sealed class EmployeeRepository : IEmployeeRepository
         _context.Employees.Update(employeeDb);
         await _context.SaveChangesAsync();
         return _mapper.Map(employeeDb);
+    }
+
+    public async Task<List<EmployeeReport>> GetReport(DateTime start, DateTime end)
+    {
+        var connection = _context.Database.GetDbConnection();
+        var results = await connection.QueryAsync<FacilityReportResult>(EmployeeRepositoryQueries.GetReport, new { start, end });
+
+        var groupedResults = results
+            .GroupBy(r => new { r.EmployeeName, r.FacilitiesSell, r.FacilitiesSellSum })
+            .Select(g => new EmployeeReport
+            {
+                EmployeeName = g.Key.EmployeeName,
+                FacilitiesSell = g.Key.FacilitiesSell,
+                FacilitiesSellSum = g.Key.FacilitiesSellSum,
+                Facilities = g.Select(f => new DataItem { Category = f.FacilityName, Count = f.FacilityCount }).ToList()
+            }).ToList();
+
+        return groupedResults;
     }
 }
