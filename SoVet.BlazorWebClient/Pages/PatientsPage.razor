@@ -9,7 +9,14 @@
 
 <PageTitle>Пациенты</PageTitle>
 
-<MudDataGrid @ref="_dataGrid" Striped="true" T="Patient" ServerData="GetServerData">
+<MudDataGrid @ref="_dataGrid" Striped="true" T="Patient" ServerData="GetServerData" QuickFilter="QuickFilter">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Пациенты</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+        </MudTextField>
+    </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="Кличка"/>
         <PropertyColumn Property="x => x.BirthDate" Title="Дата рождения"/>
@@ -24,6 +31,9 @@
             </TemplateColumn>
         }
     </Columns>
+    <PagerContent>
+        <MudDataGridPager Class="hidden" T="Patient" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+    </PagerContent>
 </MudDataGrid>
 
 <MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenWindow( null))"></MudFab>
@@ -31,6 +41,13 @@
 @code {
     MudDataGrid<Patient> _dataGrid = null!;
     private bool _isClient;
+    private string? _searchString;
+    
+    private Func<Patient, bool> QuickFilter => x => string.IsNullOrWhiteSpace(_searchString)
+                                                             || x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                                                             || x.Client.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                                                             || x.AnimalType.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+
 
     private async Task<GridData<Patient>> GetServerData(GridState<Patient> state)
     {

@@ -59,6 +59,11 @@
 
     private async Task Save()
     {
+        if (_model.StartTime > _model.EndTime)
+        {
+            Snackbar.Add("Время начала работы не может быть позже времения окончания",Severity.Error);
+            return;
+        }
         var result = await ClinicService.UpdateClinicAsync(_model);
         if (!result.IsSuccess)
         {

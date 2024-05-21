@@ -11,7 +11,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudNumericField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Cost)" T="decimal"
-                                     @bind-Value="Model.Cost" Label="Стоимость" FullWidth="true"/>
+                                     @bind-Value="Model.Cost" Label="Стоимость" FullWidth="true" Min="0"/>
                 </MudItem>
                 <MudItem xs="12">
                     <MudAutocomplete Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.FacilityCategory)" T="FacilityCategory"

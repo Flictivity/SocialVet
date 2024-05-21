@@ -111,7 +111,7 @@
                         <Columns>
                             <PropertyColumn Property="x => x.Diagnosis.Name" Title="Наименование"/>
                             <PropertyColumn Property="x => x.EditDate" Title="Дата изменения"/>
-                            <TemplateColumn Title="Результат" Filterable="true">
+                            <TemplateColumn Title="Результат">
                                 <CellTemplate>
                                     @if (context.Item.Result > -1)
                                     {

@@ -9,14 +9,21 @@
 
 <PageTitle>Сотрудники</PageTitle>
 
-<MudDataGrid @ref="_dataGrid" Striped="true" T="EmployeeUser" ServerData="GetServerData">
+<MudDataGrid @ref="_dataGrid" Striped="true" T="EmployeeUser" ServerData="GetServerData" QuickFilter="QuickFilter">
+    <ToolBarContent>
+            <MudText Typo="Typo.h6">Сотрудники</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+            </MudTextField>
+        </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="ФИО"/>
         <PropertyColumn Property="x => x.Email" Title="Email адрес"/>
         <PropertyColumn Property="x => x.Role" Title="Роль"/>
         <TemplateColumn>
-            <CellTemplate>  
-                <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled" 
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled"
                                OnClick="@(async () => await OpenCreateWindow(context.Item, context.Item.Email))"/>
             </CellTemplate>
         </TemplateColumn>
@@ -27,7 +34,14 @@
 
 @code {
     MudDataGrid<EmployeeUser> _dataGrid = null!;
-
+    
+    private string? _searchString;
+    
+    private Func<EmployeeUser, bool> QuickFilter => x => string.IsNullOrWhiteSpace(_searchString)
+                                                    || x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                                                    || x.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                                                    || x.Role.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+    
     private async Task OpenCreateWindow(EmployeeUser employeeUser, string? email)
     {
         var options = new DialogOptions

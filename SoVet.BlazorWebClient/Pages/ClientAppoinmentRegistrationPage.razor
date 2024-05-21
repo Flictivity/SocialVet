@@ -38,7 +38,7 @@
             </MudSelect>
         }
 
-        <MudDatePicker Class="mt-5" MinDate="DateTime.Today" DateChanged="DateChanged"
+        <MudDatePicker Class="mt-5" MinDate="DateTime.Today" DateChanged="DateChanged" IsDateDisabledFunc="@((DateTime dt)=>!((int)dt.DayOfWeek > 0 && (int)dt.DayOfWeek < 6))"
                        Variant="Variant.Outlined" Label="Дата посещения" PickerVariant="PickerVariant.Dialog"/>
         @if (_availableTimes is null)
         {
