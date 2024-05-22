@@ -25,6 +25,9 @@
             </CellTemplate>
         </TemplateColumn>
     </Columns>
+    <PagerContent>
+            <MudDataGridPager Class="hidden" T="Facility" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+        </PagerContent>
 </MudDataGrid>
 <MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenEditWindow(new Facility(), false))"></MudFab>
 

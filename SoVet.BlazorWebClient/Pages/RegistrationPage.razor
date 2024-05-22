@@ -50,7 +50,7 @@
 @code {
     private readonly UserRegistration _model = new();
     private bool IsFromFilled => string.IsNullOrWhiteSpace(_model.Email) || string.IsNullOrWhiteSpace(_model.Password)
-        || string.IsNullOrWhiteSpace(_model.Name);
+        || string.IsNullOrWhiteSpace(_model.Name) || _model.Password != _model.ConfirmPassword;
     
     private bool _isShowPassword;
     private InputType _passwordInput = InputType.Password;
