@@ -9,6 +9,7 @@ public sealed class UserLogin
     public string Email { get; set; } = null!;
     
     [Required(ErrorMessage = "Пароль не может быть пустым!")]
-    [DataType(DataType.Password, ErrorMessage = "неверный формат пароля")]
+    [DataType(DataType.Password, ErrorMessage = "Неверный формат пароля")]
+    [MinLength(5,ErrorMessage = "Минимальная длина пароля 5 символов")]
     public string Password { get; set; } = null!;
 }

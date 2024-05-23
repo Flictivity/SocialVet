@@ -23,6 +23,7 @@ services:
 
   api:
     container_name: api
+    image: flictivity/social_vet_backend:latest
     restart: on-failure
     build:
       context: .
@@ -40,6 +41,7 @@ services:
     
   app:
     container_name: app
+    image: flictivity/social_vet_frontend:latest
     build:
       context: .
       dockerfile: SoVet.BlazorWebClient/Dockerfile

@@ -12,7 +12,6 @@
 
 <AuthorizeView Roles="@Role.Client">
     <MudForm @ref="_form" @bind-IsValid="_isValid" Model="_model">
-        <MudStack Row="true" Class="d-flex align-items-center">
             @if (!string.IsNullOrWhiteSpace(_model.Name))
             {
                 <MudAvatar Class="d-flex align-center" Style="height:200px;width:200px; font-size: 2rem;" Color="Color.Primary" Variant="Variant.Filled">@_model.Name[0]</MudAvatar>
@@ -21,23 +20,24 @@
                 <MudItem xs="12">
                     <MudTextField Required="true" RequiredError="Обязательное поле" Variant="Variant.Outlined" Immediate For="@(() => _model.Name)" T="string" @bind-Value="_model.Name" Label="ФИО" FullWidth="true"/>
                 </MudItem>
-                <MudItem xs="12">
-                    <MudTextField Required="true" RequiredError="Обязательное поле" Variant="Variant.Outlined" InputType="InputType.Email" T="string"
-                                  @bind-Value="_model.Email" Immediate For="@(() => _model.Email)" FullWidth="true" Label="Email"/>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" T="string"
-                                  @bind-Value="_model.Address" Immediate For="@(() => _model.Address)" FullWidth="true" Label="Адрес"/>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="_password" Immediate For="@(() => _model.Password)"
-                                  InputType="InputType.Password" FullWidth="true" Label="Новый пароль"/>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudButton OnClick="@(async () => await Save())" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Сохранить</MudButton>
-                </MudItem>
+                <MudGrid xs="12">
+                    <MudItem xs="12" sm="12" xl="12">
+                        <MudTextField Required="true" RequiredError="Обязательное поле" Variant="Variant.Outlined" InputType="InputType.Email" T="string"
+                                      @bind-Value="_model.Email" Immediate For="@(() => _model.Email)" FullWidth="true" Label="Email"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" xl="12">
+                        <MudTextField Variant="Variant.Outlined" T="string"
+                                      @bind-Value="_model.Address" Immediate For="@(() => _model.Address)" FullWidth="true" Label="Адрес"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" xl="12">
+                        <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="_password" Immediate For="@(() => _model.Password)"
+                                      InputType="InputType.Password" FullWidth="true" Label="Новый пароль"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" xl="12">
+                        <MudButton OnClick="@(async () => await Save())" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Сохранить</MudButton>
+                    </MudItem>
+                </MudGrid>
             </MudGrid>
-        </MudStack>
     </MudForm>
 </AuthorizeView>
 
@@ -72,6 +72,11 @@
 
     private async Task Save()
     {
+        if (_password?.Length < 5)
+        {
+            Snackbar.Add("Минимальная длина пароля 5 символов", Severity.Error);
+            return;
+        }
         BaseResult? result;
         var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
         if (user.IsInRole(Role.Client))
@@ -80,6 +85,7 @@
         }
         else
         {
+            _modelEmployee.Password = _password;
             result = await EmployeeService.UpdateEmployee(_modelEmployee, OldEmail);
         }
         
