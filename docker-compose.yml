@@ -12,7 +12,6 @@ services:
       POSTGRES_DB: $POSTGRES_DATABASE_NAME
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      TZ: Europe/Moscow
     volumes:
       - ~/volumes/postgres:/var/lib/postgresql/data
       - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
@@ -36,7 +35,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: $ASPNETCORE_ENVIRONMENT
       ASPNETCORE_URLS: http://+:5000;
-      TZ: Europe/Moscow
     stdin_open: true
     tty: true
     
@@ -51,7 +49,5 @@ services:
     ports:
       - "${APP_HTTP_PORT}:80"
       - "${APP_HTTPS_PORT}:443"
-    environment:
-      TZ: Europe/Moscow
     stdin_open: true
     tty: true

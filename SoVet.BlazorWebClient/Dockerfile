@@ -13,5 +13,5 @@ RUN dotnet publish "SoVet.BlazorWebClient.csproj" -c Release -o /app/publish /p:
 FROM nginx:alpine as final
 WORKDIR /usr/share/nginx/html
 COPY --from=publish /app/publish/wwwroot .
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY SoVet.BlazorWebClient/nginx.conf /etc/nginx/nginx.conf
 CMD ["nginx", "-g", "daemon off;"]

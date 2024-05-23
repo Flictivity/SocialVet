@@ -2,6 +2,7 @@
 
 @using SoVet.BlazorWebClient.Shared.Windows
 @using SoVet.BlazorWebClient.Models.Employee
+@using SoVet.BlazorWebClient.Results
 @inject IClientService ClientService;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IEmployeeService EmployeeService;
@@ -71,17 +72,31 @@
 
     private async Task Save()
     {
-        var result = await ClientService.UpdateClient(_model, OldEmail, _password);
+        BaseResult? result;
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if (user.IsInRole(Role.Client))
+        {
+            result = await ClientService.UpdateClient(_model, OldEmail, _password);
+        }
+        else
+        {
+            result = await EmployeeService.UpdateEmployee(_modelEmployee, OldEmail);
+        }
+        
         if (!result!.IsSuccess)
         {
             Snackbar.Add(result.Message, Severity.Error);
             return;
         }
         Snackbar.Add("Успешно", Severity.Success);
-        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+
         if (user.IsInRole(Role.Client))
         {
             _model = await ClientService.GetClient(OldEmail) ?? new Client();
+        }
+        else
+        {
+            _modelEmployee = await EmployeeService.GetEmployee(OldEmail) ?? new EmployeeUser();
         }
     }
 }
