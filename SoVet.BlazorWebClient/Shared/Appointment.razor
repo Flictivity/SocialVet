@@ -304,6 +304,8 @@
             Snackbar.Add("Успешно!", Severity.Success);
             _appointmentDiagnosis = new AppointmentDiagnoses();
             _appointmentDiagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
+            _diagnoses = (await DiagnosisService.GetDiagnoses() ?? new List<Diagnosis>())
+                .Where(x => _appointmentDiagnoses.FirstOrDefault(z => z.Diagnosis!.Id == x.Id) is null).ToList();
             return;
         }
         Snackbar.Add(result.Message, Severity.Error);
@@ -319,6 +321,8 @@
             Snackbar.Add("Успешно!", Severity.Success);
             _appointmentDiagnosis = new AppointmentDiagnoses();
             _appointmentDiagnoses = await AppointmentService.GetAppointmentDiagnoses(_model.Id) ?? new List<AppointmentDiagnoses>();
+            _diagnoses = (await DiagnosisService.GetDiagnoses() ?? new List<Diagnosis>())
+                .Where(x => _appointmentDiagnoses.FirstOrDefault(z => z.Diagnosis!.Id == x.Id) is null).ToList();
             return;
         }
         Snackbar.Add(result.Message, Severity.Error);

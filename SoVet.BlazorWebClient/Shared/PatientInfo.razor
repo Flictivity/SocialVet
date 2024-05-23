@@ -19,16 +19,16 @@
                                       T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudDatePicker Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
+                        <MudDatePicker Required="true" Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
                                                                Editable="true" @bind-Date="_birthDate" Placeholder="Дата рождения" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
+                        <MudAutocomplete Required="true" T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
                                          ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
                         </MudAutocomplete>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudAutocomplete T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
+                        <MudAutocomplete Required="true" T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
                                          ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
                         </MudAutocomplete>
                     </MudItem>
@@ -40,7 +40,7 @@
             </MudForm>
         </MudCardContent>
         <MudCardActions>
-            <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
+            <MudButton Disabled="@(!_isValid)" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
         </MudCardActions>
     </MudCard>
 }
@@ -55,16 +55,16 @@ else
                                       T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudDatePicker Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
+                        <MudDatePicker Required="true" Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
                                        Editable="true" @bind-Date="_birthDate" Placeholder="Дата рождения" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudAutocomplete T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
+                        <MudAutocomplete Required="true" T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
                                          ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
                         </MudAutocomplete>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudAutocomplete T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
+                        <MudAutocomplete Required="true" T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
                                          ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
                         </MudAutocomplete>
                     </MudItem>
@@ -76,7 +76,7 @@ else
             </MudForm>
         </DialogContent>
         <DialogActions>
-            <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
+            <MudButton Disabled="@(!_isValid)" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
         </DialogActions>
     </MudDialog>
 }
@@ -115,13 +115,22 @@ else
         {
             _clients = clients;
         }
-
+        
         var types = await AnimalTypeService.GetAnimalTypes();
         if (types is not null)
         {
             _animalTypes = types;
         }
         await base.OnInitializedAsync();
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (_isEdit)
+        {
+            await _form.Validate();
+        }
     }
 
     private Task<IEnumerable<Client>> GetClients(string value)
