@@ -1,0 +1,93 @@
+﻿@page "/register"
+@using Microsoft.AspNetCore.Components
+
+@inject IAuthenticationService AuthenticationService;
+@inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager;
+
+<MudForm @ref="@_form" @onsubmit="@(async () => await Register())">
+    <MudContainer Class="d-flex align-center justify-center mud-width-full" style="height:80vh;">
+        <MudGrid>
+            <MudItem xs="12" sm="12" lg="12">
+                <MudCard>
+                    <MudCardHeader>
+                        <h2>Регистрация</h2>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTextField Label="ФИО" Class="mt-3" Variant="Variant.Outlined" Required="true"
+                                      @bind-Value="_model.Name" InputType="InputType.Text" Immediate For="@(() => _model.Name)"/>
+                        <MudTextField Label="Почта" Class="mt-3" Variant="Variant.Outlined" Required="true"
+                                      @bind-Value="_model.Email" InputType="InputType.Email" Immediate For="@(() => _model.Email)"/>
+
+                        <MudTextField Label="Пароль" Class="mt-3" Required="true"
+                                      @bind-Value="_model.Password" Immediate For="@(() => _model.Password)"
+                                      InputType="_passwordInput"
+                                      Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon"
+                                      Variant="Variant.Outlined"
+                                      OnAdornmentClick="ShowPasswordClick" AdornmentAriaLabel="Показать пароль"/>
+                        <MudTextField Label="Повтор пароля" Class="mt-3" Required="true"
+                                      @bind-Value="_model.ConfirmPassword" Immediate For="@(() => _model.ConfirmPassword)"
+                                      InputType="_passwordInput" Variant="Variant.Outlined"/>
+                        <MudTextField Label="Адрес" Class="mt-3" Variant="Variant.Outlined" Required="false"
+                                      @bind-Value="_model.Address" InputType="InputType.Text" Immediate For="@(() => _model.Address)"/>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Disabled="@(IsFromFilled)" ButtonType="ButtonType.Submit"
+                                   Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="ma-2">
+                            Зарегистрироваться
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+                <MudLink Href="/login" Underline="Underline.Always"
+                         Style="text-align: center; display: block; margin: 0 auto;" Class="mt-3">
+                    Уже есть аккаунт?
+                </MudLink>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</MudForm>
+
+@code {
+    private readonly UserRegistration _model = new();
+    private bool IsFromFilled => string.IsNullOrWhiteSpace(_model.Email) || string.IsNullOrWhiteSpace(_model.Password)
+        || string.IsNullOrWhiteSpace(_model.Name) || _model.Password != _model.ConfirmPassword;
+    
+    private bool _isShowPassword;
+    private InputType _passwordInput = InputType.Password;
+    private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private MudForm _form = null!;
+    
+    private void ShowPasswordClick()
+    {
+        @if (_isShowPassword)
+        {
+            _isShowPassword = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
+        }
+        else
+        {
+            _isShowPassword = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
+
+    private async Task Register()
+    {
+        var res = await AuthenticationService.Register(_model);
+
+        if (!res.IsSuccess)
+        {
+            Snackbar.Add(res.Message, Severity.Error);
+            return;
+        }
+
+        NavigationManager.NavigateTo("/login");
+    }
+}
+
+@code {
+    
+}

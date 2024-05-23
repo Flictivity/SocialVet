@@ -1,0 +1,172 @@
+﻿@using SoVet.BlazorWebClient.Results
+@inject IClientService ClientService;
+@inject IAnimalTypeService AnimalTypeService;
+@inject IPatientService PatientService;
+@inject ISnackbar Snackbar;
+
+@if (Model is null)
+{
+    return;
+}
+@if (MudDialog is null)
+{
+    <MudCard>
+        <MudCardContent>
+            <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)"
+                                      T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudDatePicker Required="true" Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
+                                                               Editable="true" @bind-Date="_birthDate" Placeholder="Дата рождения" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete Required="true" T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete Required="true" T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField Required="false" Placeholder="Особые примечания" Variant="Variant.Outlined" Immediate For="@(() => Model.Comment)"
+                                      T="string" @bind-Value="Model.Comment" Label="Комментарий" FullWidth="true" Lines="3"/>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Disabled="@(!_isValid)" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
+        </MudCardActions>
+    </MudCard>
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudTextField Required="true" Variant="Variant.Outlined" Immediate For="@(() => Model.Name)"
+                                      T="string" @bind-Value="Model.Name" Label="Кличка" FullWidth="true"/>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudDatePicker Required="true" Label="Дата рождения" Variant="Variant.Outlined" MaxDate="DateTime.Today"
+                                       Editable="true" @bind-Date="_birthDate" Placeholder="Дата рождения" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete Required="true" T="AnimalType" Label="Вид животного" Variant="Variant.Outlined" @bind-Value="Model.AnimalType" SearchFunc="@(GetAnimalTypes)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAutocomplete Required="true" T="Client" Label="Владелец" Variant="Variant.Outlined" @bind-Value="Model.Client" SearchFunc="@(GetClients)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name}")">
+                        </MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField Required="false" Placeholder="Особые примечания" Variant="Variant.Outlined" Immediate For="@(() => Model.Comment)"
+                                      T="string" @bind-Value="Model.Comment" Label="Комментарий" FullWidth="true" Lines="3"/>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Disabled="@(!_isValid)" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await Save())">Сохранить</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+
+    [Parameter]
+    public Patient? Model { get; set; }
+
+    private DateTime? _birthDate;
+
+    [CascadingParameter]
+    public MudDialogInstance? MudDialog { get; set; }
+
+    private MudForm _form = null!;
+    private bool _isValid;
+    private List<AnimalType> _animalTypes = new();
+    private List<Client> _clients = new();
+    private bool _isEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Model is null)
+        {
+            Model = new Patient();
+            _birthDate = DateTime.Today;
+        }
+        else
+        {
+            _isEdit = true;
+            _birthDate = Model.BirthDate.ToDateTime(TimeOnly.MinValue);
+        }
+
+        var clients = await ClientService.GetClients();
+        if (clients is not null)
+        {
+            _clients = clients;
+        }
+        
+        var types = await AnimalTypeService.GetAnimalTypes();
+        if (types is not null)
+        {
+            _animalTypes = types;
+        }
+        await base.OnInitializedAsync();
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (_isEdit)
+        {
+            await _form.Validate();
+        }
+    }
+
+    private Task<IEnumerable<Client>> GetClients(string value)
+    {
+        return Task.FromResult(string.IsNullOrEmpty(value) 
+            ? _clients 
+            : _clients.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
+    private Task<IEnumerable<AnimalType>> GetAnimalTypes(string value)
+    {
+        return Task.FromResult(string.IsNullOrEmpty(value) 
+            ? _animalTypes 
+            : _animalTypes.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
+    private async Task Save()
+    {
+        Model!.BirthDate = DateOnly.FromDateTime(_birthDate!.Value);
+        BaseResult result;
+        if (_isEdit)
+        {
+            result = await PatientService.UpdatePatient(Model!);
+        }
+        else
+        {
+            result = await PatientService.CreatePatient(Model!);
+        }
+
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add("Произошла ошибка при сохранении", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно!", Severity.Success);
+        MudDialog?.Close(DialogResult.Ok(true));
+    }
+
+}

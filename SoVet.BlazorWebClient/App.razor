@@ -1,12 +1,35 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <div id="app" class="d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+                        <div class="text-center">
+                            <img src="/images/logo.png" style="width:50%" alt="Logo"/>
+                        </div>
+                        <text>Авторизация...</text>
+                    </div>
+                </Authorizing>
+                <NotAuthorized>
+                    <div class="d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+                        <div class="text-center">
+                            <img src="/images/logo.png" style="width:50%" alt="Logo"/>
+                        </div>
+                        <MudAlert Class="mt-4" Variant="Variant.Filled" Severity="Severity.Warning">Страница по указанному адресу не найдена...</MudAlert>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <PageTitle>Не найдено</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <div class="d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+                    <div class="text-center">
+                        <img src="/images/logo.png" style="width:50%" alt="Logo"/>
+                    </div>
+                    <MudAlert Class="mt-4" Variant="Variant.Filled" Severity="Severity.Warning">Страница по указанному адресу не найдена...</MudAlert>
+                </div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

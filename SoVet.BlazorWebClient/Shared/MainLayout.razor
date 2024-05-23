@@ -1,17 +1,129 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
+@inject IAuthenticationService AuthenticationService;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime IJSR;
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+<MudThemeProvider Theme="_theme"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
 
-        <article class="content px-4">
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        <MudLink Href="/">
+            <MudImage Src="/images/logo2.png" Width="70" Height="55"/>
+        </MudLink>
+        <MudSpacer/>
+        <AuthorizeView>
+            <Authorized>
+                <MudStack Row="true" Class="d-flex align-center">
+                    <MudLink Style="color:#ffffff;" Href="@($"/profile/{context.User.Identity?.Name}")">
+                        <MudText Style="color:#ffffff;">@context.User.Identity?.Name</MudText>
+                    </MudLink>
+                    <MudTooltip Text="Выход">
+                        <MudIconButton Color="Color.Secondary" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Logout" OnClick="@(async () => await LogOut())"/>
+                    </MudTooltip>
+                </MudStack>
+            </Authorized>
+            <NotAuthorized>
+                <MudTooltip Text="Войти">
+                    <MudIconButton Color="Color.Secondary" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Login" Href="/login">Войти</MudIconButton>
+                </MudTooltip>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <MudNavMenu Color="Color.Secondary">
+            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>
+            <AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")">
+                <Authorized>
+                    <MudNavLink Href="/appointment-registrations" Icon="@Icons.Material.Filled.Schedule">Записи</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@($"{Role.Administrator}")">
+                <Authorized>
+                    <MudNavLink Href="/clinic" Icon="@Icons.Material.Filled.AccountBalance">Информация об организации</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@($"{Role.Administrator}")">
+                <Authorized>
+                    <MudNavLink Href="/employees" Icon="@Icons.Material.Filled.PeopleAlt">Сотрудники</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@($"{Role.Administrator}, {Role.Veterinarian}")">
+                <Authorized>
+                    <MudNavLink Href="/patients" Icon="@Icons.Custom.Brands.Linux">Пациенты</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Client">
+                <Authorized>
+                    <MudNavLink Href="/registrate-to-appointment" Icon="@Icons.Material.Filled.PlaylistAdd">Записаться</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Client">
+                <Authorized>
+                    <MudNavLink Href="/client-registrations" Icon="@Icons.Material.Filled.ViewTimeline">Мои записи</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Administrator">
+                <Authorized>
+                    <MudNavLink Href="/facility-categories" Icon="@Icons.Material.Filled.Category">Категории услуг</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Administrator">
+                <Authorized>
+                    <MudNavLink Href="/facilities" Icon="@Icons.Material.Filled.MedicalServices">Услуги</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="@Role.Administrator">
+                <Authorized>
+                    <MudNavGroup Title="Отчеты" Expanded="false" Icon="@Icons.Material.Filled.BarChart">
+                        <MudNavLink Href="/facilities-report" Icon="@Icons.Material.Filled.Circle">Отчет по услугам</MudNavLink>
+                        <MudNavLink Href="/employees-report" Icon="@Icons.Material.Filled.Circle">Отчет по ветеринарам</MudNavLink>
+                    </MudNavGroup>
+                </Authorized>
+            </AuthorizeView>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-3">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    
+    private readonly MudTheme _theme = new()
+    {
+        Palette = new PaletteLight
+        {
+            Primary ="#3F51B5",
+            Secondary = "#4CAF50",
+            AppbarBackground = "#303F9F",
+            AppbarText = "#FFFFFF",
+            TableHover = "#C7E8CA",
+            TextPrimary = "#212121",
+            TextSecondary = "#757575",
+            PrimaryDarken = "#303F9F",
+            PrimaryLighten = "#C5CAE9",
+            Divider = "#BDBDBD"
+        }
+    };
+
+    private async Task LogOut()
+    {
+        var result = await AuthenticationService.LogOut();
+        if (result.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

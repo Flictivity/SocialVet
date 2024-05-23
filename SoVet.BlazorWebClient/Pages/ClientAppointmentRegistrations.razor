@@ -1,0 +1,144 @@
+﻿@page "/client-registrations"
+@attribute [Authorize(Roles = Role.Client)]
+@inject IRegistrationService RegistrationService;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject ISnackbar Snackbar;
+@inject IDialogService DialogService;
+
+<MudExpansionPanels>
+    <MudExpansionPanel Text="Прошедшие">
+        <MudGrid>
+            @foreach (var registration in _oldRegistrations)
+            {
+                <MudItem xs="12" sm="12" md="6" lg="6">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderAvatar>
+                                <MudAvatar Color="Color.Secondary">@(registration.EmployeeName?[0])</MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Ветеринар: </MudText>
+                                <MudText Typo="Typo.body2">@registration.EmployeeName</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="12" sm="12" md="12" lg="6">
+                                    <MudContainer>
+                                        <MudText Typo="Typo.h6">@(registration.StartTime.Date.ToString("d"))</MudText>
+                                    </MudContainer>
+                                </MudItem>
+                                <MudItem xs="12" sm="12" md="12" lg="6">
+                                    <MudContainer>
+                                        <MudText Typo="Typo.h6">@(registration.StartTime.TimeOfDay)</MudText>
+                                    </MudContainer>
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudTooltip Text="Отменить запись нельзя т.к. время записи уже прошло">
+                                <MudButton Variant="Variant.Filled" Color="Color.Default"
+                                           Disabled="true">
+                                    Отменить запись
+                                </MudButton>
+                            </MudTooltip>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Предстоящие">
+        <MudGrid>
+            @foreach (var registration in _registrations)
+            {
+                <MudItem xs="12" sm="12" md="6" lg="6">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderAvatar>
+                                <MudAvatar Color="Color.Secondary">@(registration.EmployeeName?[0])</MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Ветеринар: </MudText>
+                                <MudText Typo="Typo.body2">@registration.EmployeeName</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="12" sm="12" md="12" lg="6">
+                                    <MudContainer>
+                                        <MudText Typo="Typo.h6">@(registration.StartTime.Date.ToString("d"))</MudText>
+                                    </MudContainer>
+                                </MudItem>
+                                <MudItem xs="12" sm="12" md="12" lg="6">
+                                    <MudContainer>
+                                        <MudText Typo="Typo.h6">@(registration.StartTime.TimeOfDay)</MudText>
+                                    </MudContainer>
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudTooltip Text="@(registration.AppointmentChangeDate != DateTime.MinValue ? 
+                                                  "Отменить запись нельзя из-за наличия существующих приемов" : "")">
+                                <MudButton Variant="Variant.Filled" Color="Color.Default"
+                                           OnClick="@(async () => await DeleteRegistration(registration.Id))"
+                                           Disabled="@(registration.AppointmentChangeDate != DateTime.MinValue)">
+                                    Отменить запись
+                                </MudButton>
+                            </MudTooltip>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    private List<Registration> _registrations = new();
+    private List<Registration> _oldRegistrations = new();
+    private string? _appointmentSearchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRegistrations();
+    }
+
+    private async Task LoadRegistrations()
+    {
+        int? clientId = null;
+        var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if (userIdentity.IsInRole(Role.Client))
+        {
+            clientId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.ClientId).Value);
+        }
+
+        var registrations = await RegistrationService.GetRegistrations(null, clientId);
+        if (registrations is not null)
+        {
+            _registrations = registrations.Where(x => x.StartTime > DateTime.Now).ToList();
+            _oldRegistrations = registrations.Where(x => x.StartTime < DateTime.Now).ToList();
+        }
+    }
+
+    private async Task DeleteRegistration(int registrationId)
+    {
+        var dialogResult = await DialogService.ShowMessageBox("Сообщение",
+            "Вы действительно хотите отменить запись?","Отменить","Отмена");
+
+        if (dialogResult == null)
+        {
+            return;
+        }
+        
+        var deleteRegistrationResult = await RegistrationService.DeleteRegistration(registrationId);
+
+        if (!deleteRegistrationResult.IsSuccess)
+        {
+            Snackbar.Add(deleteRegistrationResult.Message, Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно!", Severity.Success);
+        await LoadRegistrations();
+    }
+}

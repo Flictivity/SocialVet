@@ -1,9 +1,16 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 
+@attribute [Authorize(Roles = "Клиент")]
 <PageTitle>Weather forecast</PageTitle>
 
-<h1>Weather forecast</h1>
+<AuthorizeView Roles="Клиент">
+    <h1>Weather forecast2</h1>
+</AuthorizeView>
+
+<AuthorizeView Roles="Администратор">
+    <h1>Weather forecast</h1>
+</AuthorizeView>
 
 <p>This component demonstrates fetching data from the server.</p>
 
@@ -43,7 +50,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
     }
 
     public class WeatherForecast

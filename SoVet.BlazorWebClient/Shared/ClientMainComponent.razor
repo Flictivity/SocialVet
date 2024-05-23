@@ -1,0 +1,31 @@
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject NavigationManager NavigationManager;
+
+<div style="margin: -16px; padding:-16px">
+    <div style="min-width: 100%; min-height: 100%; z-index: -1; position: fixed; display: block; top: 0; left: 0; margin: 0; padding: 0; filter: brightness(40%); background-image: url('images/main.png'); background-size: cover"></div>
+    <div style="margin: 0 0 0 0; padding-left:10px; position: absolute; top: 52%;-ms-transform: translateY(-52%); transform: translateY(-52%);">
+        <h1 style="font-family: 'Montserrat SemiBold'; font-size:6vw; color: white">
+            Ветеринарная клиника
+        </h1>
+        <p style="font-family: 'Montserrat SemiBold'; font-size: 4vw; color: white">
+            Широкий спектр ветеринарных услуг от лучших врачей
+        </p>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="pa-3" OnClick="@(async () => await GoToRegistrationPage())">Записаться</MudButton>
+    </div>
+</div>
+
+@code {
+    private async Task GoToRegistrationPage()
+    {
+        var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
+        if (userIdentity is {IsAuthenticated: true })
+        {
+            NavigationManager.NavigateTo("/registrate-to-appointment");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/register");
+        }
+    }
+
+}

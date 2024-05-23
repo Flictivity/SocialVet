@@ -1,0 +1,85 @@
+﻿@page "/facilities"
+@using SoVet.BlazorWebClient.Shared.Windows
+@attribute [Authorize(Roles = Role.Administrator)]
+@inject IFacilityService FacilityService;
+@inject ISnackbar Snackbar;
+@inject IDialogService DialogService;
+
+<PageTitle>Услуги</PageTitle>
+<MudDataGrid @ref="_dataGrid" Striped="true" T="Facility" Items="_facilities" QuickFilter="QuickFilter">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Услуги</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+        </MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Наименование"/>
+        <PropertyColumn Property="x => x.Cost" Title="Стоимость"/>
+        <PropertyColumn Property="x => x.FacilityCategory.Name" Title="Категория"></PropertyColumn>
+        <TemplateColumn Filterable="false">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled"
+                               OnClick="@(async () => await OpenEditWindow(context.Item, true))"/>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+            <MudDataGridPager Class="hidden" T="Facility" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+        </PagerContent>
+</MudDataGrid>
+<MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenEditWindow(new Facility(), false))"></MudFab>
+
+@code {
+    private List<Facility>? _facilities;
+    private MudDataGrid<Facility> _dataGrid = null!;
+
+    private string _searchString = null!;
+
+    private Func<Facility, bool> QuickFilter => x => string.IsNullOrWhiteSpace(_searchString)
+                                                     || x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                                                     || x.FacilityCategory.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var facilities = await FacilityService.GetFacilities();
+
+        _facilities = facilities;
+        if (facilities is null)
+        {
+            _facilities = new();
+        }
+    }
+
+    private async Task OpenEditWindow(Facility? facility, bool isEdit)
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Model", facility },
+            { "IsEdit", isEdit }
+        };
+
+        var dialog = await DialogService.ShowAsync<FacilityWindow>("Услуга", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Snackbar.Add("Успешно", Severity.Success);
+        }
+        var facilities = await FacilityService.GetFacilities();
+
+        _facilities = facilities;
+        if (facilities is null)
+        {
+            _facilities = new();
+        }
+    }
+
+}

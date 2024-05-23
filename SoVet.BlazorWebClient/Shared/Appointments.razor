@@ -1,0 +1,89 @@
+﻿@using SoVet.BlazorWebClient.Models.Appointment
+@using SoVet.BlazorWebClient.Extensions
+@inject IAppointmentService AppointmentService;
+@if (!_isLoaded)
+{
+    <MudProgressLinear/>
+    return;
+}
+<div class="ma-5">
+    <MudGrid Class="mb-3" Spacing="2">
+        <MudItem xs="12">
+            <MudStack Row Class="d-flex align-center">
+                <MudText Typo="Typo.h4" Color="Color.Primary" Style="font-weight: bold; line-height: 1">@Patient.Name</MudText>
+                <MudText Typo="Typo.h6" Color="Color.Secondary" Style="font-weight: bold; line-height: 1">@Patient.AnimalType.Name</MudText>
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12">
+            <MudStack Row>
+                <MudText Typo="Typo.h6" Color="Color.Secondary" Style="font-weight: bolder">Дата рождения:</MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Style="font-weight: bold">@Patient.BirthDate</MudText>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+    
+    @* Таблица с приемами *@
+    @if (_appointments is not null && _appointments.Count == 0)
+    {
+         <MudAlert Icon="@Icons.Material.Filled.FilterNone" Severity="Severity.Info" Class="mt-3">Приемы не найдены...</MudAlert>
+    }
+    else
+    {
+        <MudDataGrid @ref="_dataGrid" Striped="true" T="AppointmentTable" Items="_appointments">
+            <Columns>
+                <PropertyColumn Property="x => x.CreationDate" Title="Дата"/>
+                <PropertyColumn Property="x => x.VeterinarianName" Title="Ветеринар"/>
+                <TemplateColumn Title="Статус">
+                    <CellTemplate>
+                        @if (context.Item.Status > -1)
+                        {
+                            var status = (AppointmentStatus)context.Item.Status;
+                            <MudChip Style="@($"color:#FFFFFF; background:{StatusColors.StatusColor[status]};")">@status.GetDisplayName()</MudChip>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled"
+                                       OnClick="@(() => Change(context.Item))"/>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<AppointmentTable> AppointmentSelect { get; set; }
+
+    [Parameter]
+    public Patient Patient { get; set; } = null!;
+    
+    [Parameter]
+    public int? AppointmentId { get; set; }
+
+    private AppointmentTable _appointment = new();
+
+    private List<AppointmentTable>? _appointments = null!;
+    private MudDataGrid<AppointmentTable> _dataGrid = null!;
+    private bool _isLoaded;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _appointments = await AppointmentService.GetAppointments(Patient.Id);
+        _isLoaded = true;
+        if (AppointmentId is not null)
+        {
+            var appointment = _appointments.FirstOrDefault(x => x.Id == AppointmentId);
+            if (appointment != null) 
+                Change(appointment);
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private void Change(AppointmentTable appointment)
+    {
+        AppointmentSelect.InvokeAsync(appointment);
+    }
+}

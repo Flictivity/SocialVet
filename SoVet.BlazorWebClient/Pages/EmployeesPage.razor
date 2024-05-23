@@ -1,0 +1,80 @@
+﻿@page "/employees"
+@using SoVet.BlazorWebClient.Shared.Windows
+@using SoVet.BlazorWebClient.Models.Employee
+
+@inject IDialogService DialogService;
+@inject IEmployeeService EmployeeService;
+
+@attribute [Authorize(Roles = Role.Administrator)]
+
+<PageTitle>Сотрудники</PageTitle>
+
+<MudDataGrid @ref="_dataGrid" Striped="true" T="EmployeeUser" ServerData="GetServerData" QuickFilter="QuickFilter">
+    <ToolBarContent>
+            <MudText Typo="Typo.h6">Сотрудники</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="_searchString" Placeholder="Поиск" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+            </MudTextField>
+        </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="ФИО"/>
+        <PropertyColumn Property="x => x.Email" Title="Email адрес"/>
+        <PropertyColumn Property="x => x.Role" Title="Роль"/>
+        <TemplateColumn>
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Secondary" Variant="Variant.Filled"
+                               OnClick="@(async () => await OpenCreateWindow(context.Item, context.Item.Email))"/>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+            <MudDataGridPager Class="hidden" T="EmployeeUser" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+    </PagerContent>
+</MudDataGrid>
+
+<MudFab Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenCreateWindow(new EmployeeUser(), null))"></MudFab>
+
+@code {
+    MudDataGrid<EmployeeUser> _dataGrid = null!;
+    
+    private string? _searchString;
+    
+    private Func<EmployeeUser, bool> QuickFilter => x => string.IsNullOrWhiteSpace(_searchString)
+                                                    || x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                                                    || x.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                                                    || x.Role.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+    
+    private async Task OpenCreateWindow(EmployeeUser employeeUser, string? email)
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            {"Model", employeeUser},
+            {"OldEmail", email}
+        };
+
+        var dialog = await DialogService.ShowAsync<EmployeeInfo>("Сотрудник", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await _dataGrid.ReloadServerData();
+        }
+    }
+
+    private async Task<GridData<EmployeeUser>> GetServerData(GridState<EmployeeUser> state)
+    {
+        var employees = new List<EmployeeUser>();
+        var res = await EmployeeService.GetEmployees();
+        if (res is not null)
+        {
+            employees = res;
+        }
+        return new GridData<EmployeeUser> {Items = employees, TotalItems = employees.Count};
+    }
+
+}

@@ -1,0 +1,125 @@
+﻿@using SoVet.BlazorWebClient.Models.Employee
+@inject IPatientService PatientService;
+@inject NavigationManager NavigationManager;
+@inject IAppointmentService AppointmentService;
+@inject IDialogService DialogService;
+@inject ISnackbar Snackbar;
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="Model">
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="true" Variant="Variant.Outlined" T="string"
+                                  Value="Model.EmployeeName" FullWidth="true" Label="Ветеринар"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="true" Variant="Variant.Outlined" T="string"
+                                  Value="Model.ClientName" FullWidth="true" Label="Клиент"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudStack Row>
+                        <MudAutocomplete T="Patient" Label="Пациент" Variant="Variant.Outlined" @bind-Value="_patient" SearchFunc="@(GetClientPatients)"
+                                         ToStringFunc="@(e => e is null ? null : $"{e.Name} Дата рождения: {e.BirthDate}")">
+                        </MudAutocomplete>
+                        <MudFab Color="Color.Secondary" Icon="@Icons.Material.Filled.Add" OnClick="@(async () => await OpenWindow(null))"></MudFab>
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="true" Variant="Variant.Outlined" T="string" Lines="4" Value="Model.Comment" Label="Комментарий" FullWidth="true"/>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit" OnClick="@(async () => await OpenAppointment())">Перейти к приему</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public Registration Model { get; set; } = new();
+
+    private Patient? _patient;
+    private MudForm _form = null!;
+    private List<Patient> _patients = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var patients = await PatientService.GetPatients(Model.ClientId);
+        if (patients is not null)
+            _patients = patients;
+        
+        var appointment = await AppointmentService.GetAppointmentByRegistration(Model.Id);
+        if (appointment is not null)
+        {
+            _patient = _patients.FirstOrDefault(x => x.Id == appointment.PatientId);
+            if (_patient != null) 
+                NavigationManager.NavigateTo($"/patient/{_patient.Id}/{appointment.Id}");
+            MudDialog.Close();
+            return;
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private Task<IEnumerable<Patient>> GetClientPatients(string value)
+    {
+        return Task.FromResult(string.IsNullOrEmpty(value)
+            ? _patients
+            : _patients.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
+    private async Task OpenAppointment()
+    {
+        if (_patient is null)
+            return;
+        MudDialog.Close();
+
+        var result = await AppointmentService.SaveAppointment(
+            new Models.Appointment.Appointment
+            {
+                RegistrationId = Model.Id,
+                Purpose = string.Empty,
+                ChangeDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
+                CreationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
+                AppointmentStatus = 0,
+                Employee = new Employee { Id = Model.EmployeeId, Name = string.Empty },
+                PatientId = _patient.Id
+            });
+
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+        NavigationManager.NavigateTo($"/patient/{_patient.Id}");
+    }
+
+    private async Task OpenWindow(Patient? patient)
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Model", patient },
+        };
+
+        var dialog = await DialogService.ShowAsync<PatientInfo>("Пациент", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var patients = await PatientService.GetPatients(Model.ClientId);
+            if (patients is not null)
+                _patients = patients;
+        }
+    }
+
+}

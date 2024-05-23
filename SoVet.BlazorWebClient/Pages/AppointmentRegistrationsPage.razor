@@ -1,0 +1,79 @@
+﻿@page "/appointment-registrations"
+@using Radzen.Blazor
+@using SoVet.BlazorWebClient.Shared.Windows
+@using DialogOptions = MudBlazor.DialogOptions
+@using DialogPosition = MudBlazor.DialogPosition
+@using Radzen
+@using Variant = MudBlazor.Variant
+
+@inject IRegistrationService RegistrationService;
+@inject IDialogService DialogService;
+@inject NavigationManager NavigationManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+
+<PageTitle>Записи</PageTitle>
+@attribute [Authorize(Roles=$"{Role.Administrator}, {Role.Veterinarian}")]
+
+
+@if (_registrations?.Count != 0)
+{
+    <RadzenScheduler @ref=@_scheduler TItem="Registration" Data=@_registrations StartProperty="StartTime" EndProperty="StartTime"
+                     TextProperty="ScheduleText" SelectedIndex="1" TodayText="Сегодня" AppointmentSelect="RegistrationSelect" Style="height: 90vh"
+                     AppointmentRender="@OnAppointmentRender">
+        <RadzenDayView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="День"/>
+        <RadzenWeekView StartTime="@StartTime" EndTime="@EndTime" TimeFormat="H:mm" Text="Неделя"/>
+    </RadzenScheduler>
+    
+    <MudButton Style="position: fixed; bottom: 0; right: 0; margin: 35px 25px;" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@OpenCreatePage">Новая запись</MudButton>
+}
+else
+{
+    <MudAlert Severity="Severity.Info" Class="mt-3">Записи отсутствуют...</MudAlert>
+}
+
+@code {
+    RadzenScheduler<Registration> _scheduler = null!;
+    private List<Registration>? _registrations = new();
+
+    public static TimeSpan StartTime = new(8, 0, 0);
+    public static TimeSpan EndTime = new(23, 0, 0);
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var employeeId = int.Parse(userIdentity.Claims.First(x => x.Type == UserClaims.EmployeeId).Value);
+
+        _registrations = userIdentity.IsInRole(Role.Administrator) 
+            ? await RegistrationService.GetRegistrations(null) 
+            : await RegistrationService.GetRegistrations(employeeId);
+        
+        await base.OnInitializedAsync();
+    }
+
+    private void OpenCreatePage()
+    {
+        NavigationManager.NavigateTo("/registrate-to-appointment");
+    }
+    
+    private async Task RegistrationSelect(SchedulerAppointmentSelectEventArgs<Registration> args)
+    {
+        var options = new DialogOptions
+        {
+            Position = DialogPosition.Center, CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Model", args.Data }
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateAppointmentWindow>("Прием", parameters, options);
+        var result = await dialog.Result;
+    }
+
+    private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Registration> args)
+    {
+        args.Attributes["style"] = "background: #3F51B5";
+    }
+}

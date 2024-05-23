@@ -1,0 +1,75 @@
+﻿@page "/clinic"
+
+@inject IClinicService ClinicService;
+@inject ISnackbar Snackbar;
+
+@attribute [Authorize(Roles = Role.Administrator)]
+<PageTitle>Информация о клинике</PageTitle>
+
+@if (!_isLoaded)
+{
+    <MudProgressLinear Color="Color.Primary"  Indeterminate="true" />
+    return;
+}
+<MudStack>
+    <MudStack Row="true" Class="d-flex align-center">
+        <MudText Typo="Typo.h6">Информация о клинике</MudText>
+        <MudTooltip Text="Сохранить">
+            <MudIconButton Disabled="@(_model.ClinicName == "")" Color="Color.Secondary" Icon="@Icons.Material.Filled.Save" OnClick="@(async () => await Save())"/>
+        </MudTooltip>
+    </MudStack>
+    <MudTextField Required="true" RequiredError="Обязательное поле" Variant="Variant.Outlined" T="string" Label="Наименование клиники" @bind-Value="_model.ClinicName"></MudTextField>
+    <MudText Typo="Typo.h6">Рабочее время</MudText>
+    <MudGrid Spacing="2" Justify="Justify.SpaceBetween">
+        <MudItem xs=12 sm=6>
+            <MudTimePicker @bind-Time="_model.StartTime" Variant="Variant.Outlined" Label="Время открытия" Editable="true"></MudTimePicker>
+        </MudItem>
+        <MudItem xs=12 sm=6>
+            <MudTimePicker @bind-Time="_model.EndTime" Variant="Variant.Outlined" Label="Время закрытия" Editable="true"></MudTimePicker>
+        </MudItem>
+    </MudGrid>
+    <MudGrid Spacing="2" Justify="Justify.SpaceBetween">
+        <MudItem xs=12 sm=6>
+            <MudSlider @bind-Value="_model.AppointmentDuration" Min="0.5" Max="3" Step="0.5" Color="Color.Primary">Время приема (ч.): @_model.AppointmentDuration</MudSlider>
+        </MudItem>
+        <MudItem xs=12 sm=6>
+            <MudSlider @bind-Value="_model.PauseDuration" Min="15" Max="60" Step="5" Color="Color.Primary">Время перерыва между приемами (мин.): @_model.PauseDuration</MudSlider>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+
+
+@code {
+    private Clinic _model = new();
+    private bool _isLoaded;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ClinicService.GetClinicInfoAsync();
+
+        if (result is null)
+        {
+            return;
+        }
+        
+        _model = result;
+        _isLoaded = true;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Save()
+    {
+        if (_model.StartTime > _model.EndTime)
+        {
+            Snackbar.Add("Время начала работы не может быть позже времения окончания",Severity.Error);
+            return;
+        }
+        var result = await ClinicService.UpdateClinicAsync(_model);
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(result.Message,Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно",Severity.Success);
+    }
+}

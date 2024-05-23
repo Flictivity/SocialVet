@@ -1,0 +1,103 @@
+﻿@using Radzen.Blazor
+@page "/facilities-report"
+@inject IReportService ReportService;
+
+<PageTitle>Отчет по услугам</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" lg="12" sm="12" xl="12" xxl="12">
+        <MudDataGrid @ref="_dataGrid" T="FacilityReport" ServerData="LoadServerData" Height="30vh">
+            <ToolBarContent>
+                <MudDateRangePicker Class="hidden" Variant="Variant.Outlined" DateRangeChanged="DateRangeChanged" Editable="false" Clearable="true"
+                                    PlaceholderStart="Начало периода" PlaceholderEnd="Конец периода">
+                    Период
+                </MudDateRangePicker>
+                <MudSpacer/>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.FacilityName" Title="Наименование">
+                    <FooterTemplate>
+                        <MudText>
+                            <b>Итого</b>
+                        </MudText>
+                    </FooterTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.FacilityCategoryName" Title="Категория"></PropertyColumn>
+                <PropertyColumn Property="x => x.UseCount" Title="Количество использований" AggregateDefinition="_sumAggregator"></PropertyColumn>
+                <PropertyColumn Property="x => x.Sum" Title="Общая сумма" AggregateDefinition="_sumAggregator"></PropertyColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager Class="hidden" T="FacilityReport" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+            </PagerContent>
+        </MudDataGrid>
+    </MudItem>
+
+    @if (_isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true"/>
+    }
+    else
+    {
+        <MudItem xs="12" lg="12" sm="12" xl="12" xxl="12">
+            @if (_diagramItems is not null && _diagramItems.Length > 0)
+            {
+                <RadzenChart>
+                    <RadzenColumnSeries Data="@_diagramItems" CategoryProperty="Category" ValueProperty="Count" Title="Услуги">
+                        <TooltipTemplate Context="data">
+                            <div>
+                                <span>@data.Category</span>
+                                <strong>@data.Count</strong>
+                            </div>
+                        </TooltipTemplate>
+                    </RadzenColumnSeries>
+                    <RadzenValueAxis Min="0"/>
+                </RadzenChart>
+            }
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private DataItem[]? _diagramItems;
+    private DateRange? _dateRange = new() { Start = DateTime.MinValue, End = DateTime.MaxValue };
+    private MudDataGrid<FacilityReport> _dataGrid = null!;
+    private List<FacilityReport> _reportItems = new();
+    private bool _isLoading = true;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private async Task<GridData<FacilityReport>> LoadServerData(GridState<FacilityReport> state)
+    {
+        _isLoading = true;
+        var items = await ReportService.FacilityReport(_dateRange!.Start!.Value, _dateRange!.End!.Value);
+        _reportItems = items;
+        GenerateDiagram();
+        _isLoading = false;
+        StateHasChanged();
+        return new GridData<FacilityReport> { Items = items, TotalItems = items.Count };
+    }
+
+    private void GenerateDiagram()
+    {
+        _diagramItems = _reportItems.Select(x => new DataItem { Category = x.FacilityName, Count = x.UseCount }).ToArray();
+    }
+
+    readonly AggregateDefinition<FacilityReport> _sumAggregator = new()
+    {
+        Type = AggregateType.Sum,
+        DisplayFormat = "{value}"
+    };
+
+    private async Task DateRangeChanged(DateRange? value)
+    {
+        _dateRange = value;
+        if (_dateRange is not null && (_dateRange.Start is null || _dateRange.End is null))
+        {
+            _dateRange = new DateRange { Start = DateTime.MinValue, End = DateTime.MaxValue };
+        }
+        await _dataGrid.ReloadServerData();
+    }
+}

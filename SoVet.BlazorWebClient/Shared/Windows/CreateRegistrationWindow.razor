@@ -1,0 +1,46 @@
+﻿@using SoVet.BlazorWebClient.Models.RegistrationModels
+
+@inject IRegistrationService RegistrationService;
+@inject ISnackbar Snackbar;
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid" Model="Model">
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" Immediate For="@(() => Model.Comment)" T="string" 
+                                  @bind-Value="Model.Comment" Label="Комментарий" FullWidth="true"/>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Disabled="!_isValid" Class="ma-3" Color="Color.Primary" FullWidth="true" Variant="Variant.Filled"
+                   ButtonType="ButtonType.Submit" OnClick="@(async () => await Create())">Создать</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public RegistrationCreateRequest Model { get; set; } = null!;
+
+    private MudForm _form = null!;
+    private bool _isValid;
+
+    private async Task Create()
+    {
+        var result = await RegistrationService.CreateRegistration(Model);
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+}

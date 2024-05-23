@@ -1,0 +1,100 @@
+﻿@using Radzen.Blazor
+@using SoVet.BlazorWebClient.Models.Employee
+@page "/employees-report"
+
+@inject IReportService ReportService;
+<PageTitle>Отчет по ветеринарам</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" lg="12" sm="12" xl="12" xxl="12">
+        <MudDataGrid @ref="_dataGrid" T="EmployeeReport" Height="30vh" ServerData="LoadServerData">
+            <ToolBarContent>
+                <MudDateRangePicker Class="hidden" Variant="Variant.Outlined" DateRangeChanged="DateRangeChanged" Editable="false" Clearable="true"
+                                    PlaceholderStart="Начало периода" PlaceholderEnd="Конец периода">
+                    Период
+                </MudDateRangePicker>
+                <MudSpacer/>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.EmployeeName" Title="Ветеринар">
+                    <FooterTemplate>
+                        <MudText>
+                            <b>Итого</b>
+                        </MudText>
+                    </FooterTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.FacilitiesSell" AggregateDefinition="_sumAggregator" Title="Продано услуг (кол-во)"/>
+                <PropertyColumn Property="x => x.FacilitiesSellSum" AggregateDefinition="_sumAggregator" Title="Сумма проданных услуг"/>
+                <TemplateColumn Title="Проданные услуги">
+                    <CellTemplate>
+                        @foreach (DataItem facility in context.Item.Facilities)
+                        {
+                            <MudBadge Content="@($"x{(int)facility.Count}")" Overlap="true" Color="Color.Primary"><MudChip>@facility.Category</MudChip></MudBadge>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager Class="hidden" T="EmployeeReport" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+            </PagerContent>
+        </MudDataGrid>
+    </MudItem>
+
+    @if (_isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true"/>
+    }
+    else
+    {
+        <MudItem xs="12" lg="12" sm="12" xl="12" xxl="12">
+            @if (_diagramItems is not null && _diagramItems.Length > 0)
+            {
+                <RadzenChart>
+                    <RadzenPieSeries Data="@_diagramItems" Title="Продано услуг" CategoryProperty="Category" ValueProperty="Count">
+                        <RadzenSeriesDataLabels Visible="true"></RadzenSeriesDataLabels>
+                    </RadzenPieSeries>
+                </RadzenChart>
+            }
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private DataItem[]? _diagramItems;
+    private DateRange? _dateRange = new() { Start = DateTime.MinValue, End = DateTime.MaxValue };
+    private MudDataGrid<EmployeeReport> _dataGrid = null!;
+    private List<EmployeeReport> _reportItems = new();
+    private bool _isLoading = true;
+    
+    private readonly AggregateDefinition<EmployeeReport> _sumAggregator = new()
+    {
+        Type = AggregateType.Sum,
+        DisplayFormat = "{value}"
+    };
+    
+    private async Task<GridData<EmployeeReport>> LoadServerData(GridState<EmployeeReport> state)
+    {
+        _isLoading = true;
+        var items = await ReportService.EmployeeReport(_dateRange!.Start!.Value, _dateRange!.End!.Value);
+        _reportItems = items;
+        GenerateDiagram();
+        _isLoading = false;
+        StateHasChanged();
+        return new GridData<EmployeeReport> { Items = items, TotalItems = items.Count };
+    }
+    
+    private void GenerateDiagram()
+    {
+        _diagramItems = _reportItems.Select(x => new DataItem { Category = x.EmployeeName, Count = x.FacilitiesSell }).ToArray();
+    }
+    
+    private async Task DateRangeChanged(DateRange? value)
+    {
+        _dateRange = value;
+        if (_dateRange is not null && (_dateRange.Start is null || _dateRange.End is null))
+        {
+            _dateRange = new DateRange { Start = DateTime.MinValue, End = DateTime.MaxValue };
+        }
+        await _dataGrid.ReloadServerData();
+    }
+}
