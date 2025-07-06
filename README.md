@@ -42,7 +42,10 @@
 - 🎨 **MudBlazor**, **RadzenBlazor** (UI-компоненты)
 - 📱 **Адаптивная верстка** для мобильных устройств
 
-##💬 Связаться
+---
+
+## 💬 Связаться
+
 Telegram: @Bulat_S1
 
 GitHub: github.com/Flictivity
